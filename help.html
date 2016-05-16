@@ -1,0 +1,61 @@
+<html>
+
+<head>
+    <script src="config.js"></script>
+    <script src="./resources/functions.js"></script>
+
+    <link rel="stylesheet" href="./resources/bootstrap/css/bootstrap.min.css">
+    <script src="./resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="./resources/material-design/material.min.css">
+    <script src="./resources/material-design/material.min.js"></script>
+
+    <link rel="stylesheet" href="./resources/custom.css">
+</head>
+
+<body>
+
+    <dialog id="dialog_notf" class="mdl-dialog">
+        <h4 class="mdl-dialog__title">Wichtige Meldung!</h4>
+        <div class="mdl-dialog__content">
+            <p>
+                <label id="lbl_notf"></label>
+            </p>
+        </div>
+        <div class="mdl-dialog__actions">
+            <button id="btn_dialog_notf_close" type="button" class="mdl-button close">OK</button>
+        </div>
+    </dialog>
+
+
+    <script>
+
+        getLauncherNotification(showNotf);
+
+
+        function showNotf(jsonData,success){
+            if(success){
+                document.getElementById('lbl_notf').innerHTML = jsonData.Notification;
+
+                var dialog = document.getElementById('dialog_notf');
+                if (!dialog.showModal) {
+                    dialogPolyfill.registerDialog(dialog);
+                }
+
+                document.getElementById('btn_dialog_notf_close').addEventListener('click', function() {
+                    dialog.close();
+                });
+
+                if(jsonData.UseNotification){
+                    dialog.showModal();
+                }
+            }else{
+                console.log('Error requesting Notification: ' + jsonData);
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
