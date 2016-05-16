@@ -10,8 +10,5 @@
   "license": "ISC",
   "devDependencies": {
     "electron-prebuilt": "^1.1.0"
-  },
-  "dependencies": {
-    "material-design-lite": "^1.1.3"
   }
 }
