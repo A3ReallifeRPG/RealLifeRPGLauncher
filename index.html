@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <title>RealLifeRPG Launcher v3</title>
 
-    <script src="./resources/jquery/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript">
+        window.$ = window.jQuery = require(__dirname+'/resources/jquery/jquery-1.12.3.min.js');
+    </script>
 
     <link rel="stylesheet" href="./resources/bootstrap/css/bootstrap.min.css">
     <script src="./resources/bootstrap/js/bootstrap.min.js"></script>
@@ -14,45 +16,45 @@
     <script src="./resources/material-design/material.min.js"></script>
 
     <link rel="stylesheet" href="./resources/custom.css">
+
+    <link href="./resources/winjs/css/ui-light.css" rel="stylesheet" />
+    <script src="./resources/winjs/js/base.js"></script>
+    <script src="./resources/winjs/js/ui.js"></script>
+
 </head>
 
-<body>
-    <div>
-        <div class="row">
-            <div class="col-md-1 text-center" style="background-color: #721000;height: 600px;text-align: center;">
-
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" style="position: absolute;bottom:40px;left:20px;">
-                    <img src="./icon/ic_help_outline_white_48px.svg" height="32px" width="32px">
-                </button>
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" style="position: absolute;bottom:4px;left:20px;">
-                    <img src="./icon/ic_settings_white_48px.svg" height="32px" width="32px">
-                </button>
-
-            </div>
-            <div class="col-md-3" style="background-color: #2f2f2f;height: 600px;">
-                tadaaaa
-            </div>
-            <div class="col-md-8" style="background-color: #ff0000;height: 600px;">
-                <div class="row" style="background-color: #d45a02;height: 200px">
-                    <div class="col-md-12">
-                        <img src="./img/header.jpg" height="200" width="100%">
-                    </div>
-
-                </div>
-                <div class="row" style="background-color:#474747;height: 400px">
-                    <div class="col-md-12">
-                        <h3>Und hier der Content</h3>
-                        <span>UNd gaaaaanz viel Contents</span>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
-    </div>
-
-</body>
 <script>
+WinJS.UI.processAll().done(function () {
+    var splitView = document.querySelector(".splitView").winControl;
+    new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+});
 </script>
+
+<body>
+  <div id="app">
+    <div class="splitView" data-win-control="WinJS.UI.SplitView">
+        <!-- Pane area -->
+        <div>
+            <div class="header">
+                <button
+                    class="win-splitviewpanetoggle"
+                    data-win-control="WinJS.UI.SplitViewPaneToggle"
+                    data-win-options="{ splitView: select('.splitView') }"
+                ></button>
+                <div class="title">SplitView Pane area</div>
+            </div>
+
+            <div class="nav-commands">
+                <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Favorite', icon: 'favorite'}"></div>
+                <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Settings', icon: 'settings'}"></div>
+            </div>
+        </div>
+
+        <!-- Content area -->
+        <div class="contenttext"><h2 class="win-h2">SplitView Content area</h2> </div>
+    </div>
+</div>
+</body>
 
 </html>
