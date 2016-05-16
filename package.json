@@ -1,0 +1,17 @@
+{
+  "name": "realliferpg",
+  "version": "1.0.0",
+  "description": "Test Application developed in Electron",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "RealLifeRPG",
+  "license": "ISC",
+  "devDependencies": {
+    "electron-prebuilt": "^1.1.0"
+  },
+  "dependencies": {
+    "material-design-lite": "^1.1.3"
+  }
+}
