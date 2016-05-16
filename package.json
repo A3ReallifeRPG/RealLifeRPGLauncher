@@ -2,7 +2,7 @@
   "name": "realliferpg",
   "version": "1.0.0",
   "description": "Test Application developed in Electron",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
