@@ -34,18 +34,17 @@
               </div>
 
               <div class="nav-commands">
-                  <div class="nav-element" data-navigate = "Test1" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
-                  <div class="nav-element" data-navigate = "Test2" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Server', icon: 'world'}"></div>
-                  <div class="nav-element" data-navigate = "Test3" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Changelog', icon: 'previewlink'}"></div>
-                  <div class="nav-element" data-navigate = "Test4" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Info', icon: 'contact'}"></div>
-
-                  <div class="nav-element" data-navigate = "Test5" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Hilfe', icon: 'help'}"></div>
-                  <div class="nav-element" data-navigate = "Test6" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Einstellungen', icon: 'settings'}"></div>
+                  <div class="nav-element" data-navigate = "home" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                  <div class="nav-element" data-navigate = "server" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Server', icon: 'world'}"></div>
+                  <div class="nav-element" data-navigate = "changelog" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Changelog', icon: 'previewlink'}"></div>
+                  <div class="nav-element" data-navigate = "info" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Info', icon: 'contact'}"></div>
+                  <div class="nav-element" data-navigate = "help" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Hilfe', icon: 'help'}"></div>
+                  <div class="nav-element" data-navigate = "settings" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Einstellungen', icon: 'settings'}"></div>
               </div>
           </div>
 
           <!-- Content area -->
-            <div class="contenttext"><h2 class="win-h2">SplitView Content area</h2>TESTASETASDWADASD </div>
+            <div class="contenttext" id="content"></div>
       </div>
   </div>
 
@@ -54,10 +53,10 @@
 <script>
 WinJS.UI.processAll().done(function () {
     var splitView = document.querySelector(".splitView").winControl;
-    var splitViewCommand = document.querySelector(".test").winControl;
     new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
     $( ".nav-element" ).click(function(){
-        console.log($(this).attr("data-navigate") )
+        $( "#content" ).load($(this).attr("data-navigate")+".html");
+
     })
 });
 
