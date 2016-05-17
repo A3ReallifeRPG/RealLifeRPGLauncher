@@ -20,38 +20,40 @@
 </head>
 
 <body>
-  <div id="app">
-      <div class="splitView" data-win-control="WinJS.UI.SplitView">
-          <!-- Pane area -->
-          <div>
-              <div class="header">
-                  <button
-                      class="win-splitviewpanetoggle"
-                      data-win-control="WinJS.UI.SplitViewPaneToggle"
-                      data-win-options="{ splitView: select('.splitView') }"
-                  ></button>
-                  <div class="title">SplitView Pane area</div>
-              </div>
+    <div id="app">
+        <div class="splitView" data-win-control="WinJS.UI.SplitView">
+            <!-- Pane area -->
+            <div>
+                <div class="header">
+                    <button class="win-splitviewpanetoggle" data-win-control="WinJS.UI.SplitViewPaneToggle" data-win-options="{ splitView: select('.splitView') }"></button>
+                    <div class="title">RealLifeRPG</div>
+                </div>
 
-              <div class="nav-commands">
-                  <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
-                  <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Favorite', icon: 'favorite'}"></div>
-                  <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Settings', icon: 'settings'}"></div>
-              </div>
-          </div>
+                <div class="nav-commands">
+                    <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                    <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Server', icon: 'world'}"></div>
+                    <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Changelog', icon: 'previewlink'}"></div>
+                    <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Info', icon: 'contact'}"></div>
 
-          <!-- Content area -->
-          <div class="contenttext"><h2 class="win-h2">SplitView Content area</h2> </div>
-      </div>
-  </div>
+                    <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Hilfe', icon: 'help'}"></div>
+                    <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Einstellungen', icon: 'settings'}"></div>
+                </div>
+            </div>
+
+            <!-- Content area -->
+            <div id="main_content" class="contenttext">
+                <h2 class="win-h2">SplitView Content area</h2>
+            </div>
+        </div>
+    </div>
 
 </body>
 
 <script>
-WinJS.UI.processAll().done(function () {
-    var splitView = document.querySelector(".splitView").winControl;
-    new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
-});
+    WinJS.UI.processAll().done(function() {
+        var splitView = document.querySelector(".splitView").winControl;
+        new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+    });
 </script>
 
 </html>
