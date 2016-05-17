@@ -1,1 +1,60 @@
 <h2 class="win-h2">Server</h2>
+
+
+<div id="sample">
+    <!-- Simple template for the ListView instantiation  -->
+    <div class="smallListIconTextTemplate" data-win-control="WinJS.Binding.Template" style="display: none">
+        <div class="smallListIconTextItem">
+            <img src="#" class="smallListIconTextItem-Image" data-win-bind="src: picture" />
+            <div class="smallListIconTextItem-Detail">
+                <h4 class="win-h4" data-win-bind="textContent: title"></h4>
+                <h6 class="win-h6" data-win-bind="textContent: text"></h6>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- The declarative markup necesary for ListView instantiation -->
+    <!-- Call WinJS.UI.processAll() in your initialization code -->
+    <div class="listView win-selectionstylefilled"
+         data-win-control="WinJS.UI.ListView"
+         data-win-options="{
+                    itemDataSource: Sample.ListView.data.dataSource,
+                    itemTemplate: select('.smallListIconTextTemplate'),
+                    footer: select('.footer'),
+                    selectionMode: 'none',
+                    tapBehavior: 'none',
+                    layout: { type: WinJS.UI.ListLayout }
+            }">
+    </div>
+</div>
+
+<script>
+var itemArray = [
+        { title: "Marvelous Mint", text: "Gelato", picture: "/images/fruits/60Mint.png" },
+        { title: "Succulent Strawberry", text: "Sorbet", picture: "/images/fruits/60Strawberry.png" },
+        { title: "Banana Blast", text: "Low-fat frozen yogurt", picture: "/images/fruits/60Banana.png" },
+        { title: "Lavish Lemon Ice", text: "Sorbet", picture: "/images/fruits/60Lemon.png" },
+        { title: "Creamy Orange", text: "Sorbet", picture: "/images/fruits/60Orange.png" },
+        { title: "Very Vanilla", text: "Ice Cream", picture: "/images/fruits/60Vanilla.png" },
+        { title: "Banana Blast", text: "Low-fat frozen yogurt", picture: "/images/fruits/60Banana.png" },
+        { title: "Lavish Lemon Ice", text: "Sorbet", picture: "/images/fruits/60Lemon.png" }
+];
+
+var items = [];
+
+// Generate 160 items
+for (var i = 0; i < 20; i++) {
+    itemArray.forEach(function (item) {
+        items.push(item);
+    });
+}
+
+
+WinJS.Namespace.define("Sample.ListView", {
+    data: new WinJS.Binding.List(items)
+});
+WinJS.UI.processAll();
+
+
+</script>

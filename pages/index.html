@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <title>RealLifeRPG Launcher v3</title>
 
+    <script src="../config.js"></script>
+    <script src="../resources/functions.js"></script>
+
     <script type="text/javascript">
         window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
     </script>
@@ -20,48 +23,67 @@
 </head>
 
 <body>
-  <div id="app">
-      <div class="splitView" data-win-control="WinJS.UI.SplitView">
-          <!-- Pane area -->
-          <div>
-              <div class="header">
-                  <button
-                      class="win-splitviewpanetoggle"
-                      data-win-control="WinJS.UI.SplitViewPaneToggle"
-                      data-win-options="{ splitView: select('.splitView') }"
-                  ></button>
-                  <div class="title">Project Husky</div>
-              </div>
+    <div id="app">
+        <div class="splitView" data-win-control="WinJS.UI.SplitView">
+            <!-- Pane area -->
+            <div>
+                <div class="header">
+                    <button class="win-splitviewpanetoggle" data-win-control="WinJS.UI.SplitViewPaneToggle" data-win-options="{ splitView: select('.splitView') }"></button>
+                    <div class="title">SplitView Pane area</div>
+                </div>
 
-              <div class="nav-commands">
-                  <div class="nav-element" data-navigate = "home" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
-                  <div class="nav-element" data-navigate = "server" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Server', icon: 'world'}"></div>
-                  <div class="nav-element" data-navigate = "changelog" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Changelog', icon: 'previewlink'}"></div>
-                  <div class="nav-element" data-navigate = "info" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Info', icon: 'contact'}"></div>
-                  <div class="nav-element" data-navigate = "help" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Hilfe', icon: 'help'}"></div>
-                  <div class="nav-element" data-navigate = "settings" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Einstellungen', icon: 'settings'}"></div>
-              </div>
-          </div>
+                <div class="nav-commands">
+                    <div class="nav-element" data-navigate="home" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                    <div class="nav-element" data-navigate="server" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Server', icon: 'world'}"></div>
+                    <div class="nav-element" data-navigate="changelog" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Changelog', icon: 'previewlink'}"></div>
+                    <div class="nav-element" data-navigate="info" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Info', icon: 'contact'}"></div>
+                    <div class="nav-element" data-navigate="help" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Hilfe', icon: 'help'}"></div>
+                    <div class="nav-element" data-navigate="settings" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Einstellungen', icon: 'settings'}"></div>
+                </div>
+            </div>
 
-          <!-- Content area -->
+            <!-- Content area -->
             <div class="contenttext" id="content"></div>
-      </div>
-  </div>
+        </div>
+    </div>
 
+    <!-- Notification Dialog -->
+    <div class="box">
+
+        <div id="dialog_notf" data-win-control="WinJS.UI.ContentDialog" data-win-options="{
+             title: 'Wichtige Meldung',
+             primaryCommandText: 'OK'
+        }">
+
+        </div>
+    </div>
 </body>
 
 <script>
-WinJS.UI.processAll().done(function () {
-    var splitView = document.querySelector(".splitView").winControl;
-    new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
-});
+    WinJS.UI.processAll().done(function() {
+        var splitView = document.querySelector(".splitView").winControl;
+        new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+        $(".nav-element").click(function() {
+            $("#content").load($(this).attr("data-navigate") + ".html");
 
-var anim = document.getElementById("content");
-$( ".nav-element" ).click(function(){
-    $( "#content" ).load($(this).attr("data-navigate")+".html");
-    enterPage = WinJS.UI.Animation.enterPage(anim, null);
-})
+        })
+    });
 
+    getLauncherNotification(showNotf);
+
+
+    function showNotf(jsonData, success) {
+        if (success) {
+            document.getElementById('dialog_notf').innerHTML = jsonData.Notification;
+
+            if (jsonData.UseNotification) {
+                var contentDialog = document.querySelector(".win-contentdialog").winControl;
+                contentDialog.show();
+            }
+        } else {
+            console.log('Error requesting Notification: ' + jsonData);
+        }
+    }
 </script>
 
 </html>
