@@ -41,7 +41,7 @@
 
 /*SplitView content style*/
 #app .win-splitview-content {
-    background-color: rgb(112,112,112);
+    background-color: rgb(54,53,51);
 }
 
 #app .contenttext {
@@ -87,4 +87,27 @@
 
 .listView .win-container.win-container-even {
     background-color: #444;
+}
+
+.help-button {
+    background-color: #777;
+    border: none;
+    color: white;
+    width:100px;
+    height: 100px;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.2s;
+    cursor: pointer;
+    border-radius: 100%;
+    text-align: center;
+}
+
+.help-button:hover {
+    background-color: #ED8E0E; 
+    color: white;
 }
