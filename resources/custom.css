@@ -102,12 +102,11 @@
     font-size: 16px;
     margin: 4px 2px;
     transition-duration: 0.2s;
-    cursor: pointer;
+    cursor: default;
     border-radius: 100%;
-    text-align: center;
 }
 
 .help-button:hover {
-    background-color: #ED8E0E; 
+    background-color: #ED8E0E;
     color: white;
 }

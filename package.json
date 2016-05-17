@@ -9,6 +9,7 @@
   "author": "RealLifeRPG",
   "license": "ISC",
   "devDependencies": {
+    "devtron": "^1.1.1",
     "electron-prebuilt": "^1.1.0"
   }
 }
