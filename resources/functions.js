@@ -33,8 +33,36 @@ function getServerInfo() {
 
             for (var i = 0; i < jsObj.length; i++) {
                 document.write(jsObj[i].Id + ' - ' + jsObj[i].Servername + ' - ' + jsObj[i].IpAddress + '<br/>')
+
+
             };
 
+        }
+        if (this.readyState == 4 && this.status == 404) {
+            document.write('Error 404');
+        }
+    }
+    xhr.send();
+}
+
+/*
+    Query Panel for Connnected Clients
+*/
+function getServerClients(serverid) {
+    var searchUrl = infoServerURL + server_PlayerListPath + serverid;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", searchUrl, true);
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var jsObj = JSON.parse(this.responseText);
+
+            var arr = [];
+
+            for(var x in jsObj){
+              arr.push("title: " + jsObj[x]);
+            };
+            return arr;
         }
         if (this.readyState == 4 && this.status == 404) {
             document.write('Error 404');

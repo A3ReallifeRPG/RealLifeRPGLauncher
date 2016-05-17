@@ -1,1 +1,10 @@
-<h2 class="win-h2">Home</h2>
+<h2 class="win-h2">Changelog</h2>
+<br>
+<div class="listview-outlook" id="changelog" data-role="listview" style="width:98%">
+</div>
+
+<script>
+$( document ).ready(function() {
+$( "#changelog" ).load( "https://service.realliferpg.de/include/changelog?gameid=1" );
+});
+</script>
