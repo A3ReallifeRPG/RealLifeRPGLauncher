@@ -17,34 +17,37 @@
 
     <link rel="stylesheet" href="../resources/custom.css">
 
-    <link href="../resources/winjs/css/ui-light.css" rel="stylesheet" />
+    <link href="../resources/winjs/css/ui-dark.css" rel="stylesheet" />
     <script src="../resources/winjs/js/base.js"></script>
     <script src="../resources/winjs/js/ui.js"></script>
-
 </head>
 
 <body>
+  <div id="app">
+      <div class="splitView" data-win-control="WinJS.UI.SplitView">
+          <!-- Pane area -->
+          <div>
+              <div class="header">
+                  <button
+                      class="win-splitviewpanetoggle"
+                      data-win-control="WinJS.UI.SplitViewPaneToggle"
+                      data-win-options="{ splitView: select('.splitView') }"
+                  ></button>
+                  <div class="title">SplitView Pane area</div>
+              </div>
 
-    <div class="splitView" data-win-control="WinJS.UI.SplitView">
-        <!-- Pane area -->
-        <div>
-            <div class="header">
-                <!--this is a button that allows you to "toggle" the menu in and out of view -->
-                <button class="win-splitviewpanetoggle" data-win-control="WinJS.UI.SplitViewPaneToggle"
-                        data-win-options="{ splitView: select('.splitView') }"></button>
-            </div>
-            <!--this is where the navigation icons go -->
-            <div class="nav-commands">
-                <div data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{
-                  label:'Server',
-                  icon:'server',
-                    }"></div>
-            </div>
-        </div>
-        <!-- Content area -->
-        <div class="contenttext"><h2 class="win-h2">SplitView Content area</h2> </div>
-    </div>
-adwfwafda
+              <div class="nav-commands">
+                  <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                  <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Favorite', icon: 'favorite'}"></div>
+                  <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Settings', icon: 'settings'}"></div>
+              </div>
+          </div>
+
+          <!-- Content area -->
+          <div class="contenttext"><h2 class="win-h2">SplitView Content area</h2> </div>
+      </div>
+  </div>
+
 </body>
 
 <script>

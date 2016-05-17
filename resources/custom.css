@@ -1,0 +1,50 @@
+.content,
+#app {
+    height: 100%;
+}
+
+    #app .win-splitviewpanetoggle {
+        float: left;
+    }
+
+    /* SplitView pane content style*/
+    #app .header {
+        white-space: nowrap;
+    }
+
+    #app .title {
+        font-size: 25px;
+        left: 50px;
+        margin-top: 6px;
+        vertical-align: middle;
+        display: inline-block;
+    }
+
+    #app .nav-commands {
+        margin-top: 20px;
+    }
+
+.win-navbarcommand-button {
+    background-color: transparent;
+}
+
+#app .win-splitview-pane-hidden .win-navbarcommand-button {
+    width: 46px;
+}
+
+#app .win-splitview-pane-hidden .win-navbarcommand-label {
+    /* Workaround: Make sure pane doesn't scroll if ContentDialog restores focus to
+       NavBarCommand's label
+    */
+    visibility: hidden;
+}
+
+/*SplitView content style*/
+#app .win-splitview-content {
+    background-color: rgb(112,112,112);
+}
+
+#app .contenttext {
+    margin-left: 20px;
+    margin-top: 6px;
+}
