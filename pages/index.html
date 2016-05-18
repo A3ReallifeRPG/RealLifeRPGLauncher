@@ -46,24 +46,23 @@
 
             <!-- Content area -->
             <div class="contenttext" id="content"></div>
-            </div>
-
         </div>
+
+    </div>
     </div>
 
     <!-- Notification Dialog -->
-    <div class="box">
+    <div data-role="dialog" id="dialog_notf" class="padding20 dialog success" data-close-button="true" data-type="success" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
+            <h1>Wichtige Information</h1>
+            <p id="dialog_notf_text">
 
-        <div id="dialog_notf" data-win-control="WinJS.UI.ContentDialog" data-win-options="{
-             title: 'Wichtige Meldung',
-             primaryCommandText: 'OK'
-        }">
-
-        </div>
+            </p>
+        <span class="dialog-close-button"></span>
     </div>
 </body>
 
 <script>
+
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
         new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
@@ -77,15 +76,13 @@
 
 
     getLauncherNotification(showNotf);
-
-
     function showNotf(jsonData, success) {
         if (success) {
-            document.getElementById('dialog_notf').innerHTML = jsonData.Notification;
+            document.getElementById('dialog_notf_text').innerHTML = jsonData.Notification;
 
             if (jsonData.UseNotification) {
-                var contentDialog = document.querySelector(".win-contentdialog").winControl;
-                contentDialog.show();
+                var dialog = $('#dialog_notf').data('dialog');
+                dialog.open();
             }
         } else {
             console.log('Error requesting Notification: ' + jsonData);
