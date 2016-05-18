@@ -1,1 +1,117 @@
 <h2 class="win-h2">Settings</h2>
+<br/>
+<br/>
+<div class="container">
+    <div class="row">
+        <h3 class="win-h3">Arma Pfad</h3>
+        <br/>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="C:\Program Files (x86)\Steam\SteamApps\common\Arma 3" aria-describedby="basic-addon2" disabled="true">
+            <span class="input-group-btn">
+                <button class="btn btn-secondary" type="button">...</button>
+              </span>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <h3 class="win-h3">Arma Startparameter</h3>
+        <div class="col-md-6">
+
+
+            <table>
+                <tr>
+                    <td>
+                        <br/>
+                        <br/>
+                        <h5 class="win-h5">Kein Splashscreen:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <div id="wifiToggle" data-win-control="WinJS.UI.ToggleSwitch" data-win-options="{checked: true, onchange: toggleWifi, labelOn: 'An', labelOff: 'Aus'}">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br/>
+                        <br/>
+                        <h5 class="win-h5">Intro Überspringen:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <div id="wifiToggle" data-win-control="WinJS.UI.ToggleSwitch" data-win-options="{checked: true, onchange: toggleWifi, labelOn: 'An', labelOff: 'Aus'}">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br/>
+                        <br/>
+                        <h5 class="win-h5">Nutze Hyper-threading:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <div id="wifiToggle" data-win-control="WinJS.UI.ToggleSwitch" data-win-options="{checked: true, onchange: toggleWifi, labelOn: 'An', labelOff: 'Aus'}">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br/>
+                        <br/>
+                        <h5 class="win-h5">Fenstermodus:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <div id="wifiToggle" data-win-control="WinJS.UI.ToggleSwitch" data-win-options="{checked: true, onchange: toggleWifi, labelOn: 'An', labelOff: 'Aus'}">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table >
+                <tr>
+                    <td>
+                        <h5 class="win-h5">Max. Mem:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <input type="number" class='input-control text' width="10px">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h5 class="win-h5">Max. vRAM:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <input type="number" class='input-control text' width="10px">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h5 class="win-h5">CPU Count:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <input type="number" class='input-control text' width="10px">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h5 class="win-h5">Ex. Threads:&nbsp;&nbsp;</h5>
+                    </td>
+                    <td class="verticalstacking">
+                        <input type="number" class='input-control text' width="10px">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var toggleWifi = function() {
+        var obj = document.getElementById("wifiToggle").winControl;
+        console.log("Wifi toggled. Current status: " + (obj.checked ? "on" : "off"));
+    }
+
+    // To protect against untrusted code execution, all functions are required to be marked as supported for processing before they can be used inside a data-win-options attribute in HTML markup.
+    WinJS.Utilities.markSupportedForProcessing(toggleWifi);
+
+    WinJS.UI.processAll();
+</script>
