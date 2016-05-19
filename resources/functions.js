@@ -93,3 +93,23 @@ function getModInfo() {
     }
     xhr.send();
 }
+
+/*
+    Query Panel for Mod Information
+*/
+function getModHashList(modId,callBackFnc) {
+    var searchUrl = infoServerURL + mod_FileList + modId;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", searchUrl, true);
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var jsObj = JSON.parse(this.responseText);
+            callBackFnc(jsObj);
+        }
+        if (this.readyState == 4 && this.status == 404) {
+            document.write('Error 404 in function: getModHashList');
+        }
+    }
+    xhr.send();
+}
