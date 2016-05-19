@@ -18,9 +18,11 @@ function getHashListCallback(jsObj) {
 
 function download(fileObj) {
 
+
     if(!(quickCheck(fileObj))){
         downloadNext();
     }
+    
 
     var dest = armaPath + fileObj.RelativPath;
     curFileObj = fileObj;
@@ -73,18 +75,18 @@ function downloadNext() {
 
 function quickCheck(fileObj){
     try{
-        var error = false;
         var stats = fs.lstatSync(armaPath + fileObj.RelativPath);
 
         if(stats['size'] != fileObj.Size){
+            console.log(fileObj.FileName);
+            return true;
+        }
+        /*
+        if(stats['ctime'].getTime() != fileObj.ModifiedAt){
             error = true;
             debugger;
-        }
-        if(stats['mtime'] != fileObj.ModifiedAt){
-            error = true;
-            debugger;
-        }
-        return error;
+        }*/
+        return false;
     }catch(e){
         return true;
     }
