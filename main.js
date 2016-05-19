@@ -1,14 +1,9 @@
 const electron = require('electron');
 // Module to control application life.
-const {
-    app
-} = electron;
-// Module to create native browser window.
-const {
-    BrowserWindow
-} = electron;
 
-const {shell} = electron;
+const app = require('electron').app
+// Module to create native browser window.
+const BrowserWindow = require('electron').BrowserWindow
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -27,7 +22,9 @@ function createWindow() {
     win.loadURL(`file://${__dirname}/pages/index.html`);
 
     // Open the DevTools.
-    win.webContents.openDevTools({detach:true});
+    win.webContents.openDevTools({
+        detach: true
+    });
 
     // Emitted when the window is closed.
     win.on('closed', () => {

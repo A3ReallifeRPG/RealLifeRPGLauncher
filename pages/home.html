@@ -1,6 +1,25 @@
 <h2 class="win-h2">Home</h2>
 <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
 <script>
-document.getElementById("downloadtfar").addEventListener("click", function(){
-});
+    const electron = require('electron');
+
+    const {
+        app
+    } = electron;
+    // Module to create native browser window.
+    const {
+        BrowserWindow
+    } = electron;
+
+    document.getElementById("downloadtfar").addEventListener("click", function() {
+        win = new BrowserWindow({
+            width: 1000,
+            height: 550,
+            minWidth: 1000,
+            minHeight: 550
+        });
+
+        win.loadURL('http://213.202.212.13/download/%40RealLifeRPG5.0/addons/CUP_Weapons_Bizon.pbo');
+    });
+
 </script>
