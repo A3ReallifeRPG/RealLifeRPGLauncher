@@ -1,85 +1,61 @@
-<h2 class="win-h2">Home</h2>
-<button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
-<label id="lbl_downInfo"> TEST</label>
+<script src="home.js"></script>
+<div>
+    <div id="div_header">
+        <h2 class="win-h2">RealLifeRPG Mods</h2>
+    </div>
+    <div id="div_content" style="background-color:#444444;">
+        <table>
+            <tr>
+                <td>
+                    <div class="panel success">
+                        <div class="heading">
+                            <span class="title">RealLifeRPG 5.0</span>
+                        </div>
+                        <div class="content padding10">
+                            <p>
+                                RealLifeRPG 5.0 Mod Download
+                            </p>
+                            <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="panel success">
+                        <div class="heading">
+                            <span class="title">RealLifeRPG 5.0</span>
+                        </div>
+                        <div class="content padding10">
+                            <p>
+                                RealLifeRPG 5.0 Mod Download
+                            </p>
+                            <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="panel success">
+                        <div class="heading">
+                            <span class="title">RealLifeRPG 5.0</span>
+                        </div>
+                        <div class="content padding10">
+                            <p>
+                                RealLifeRPG 5.0 Mod Download
+                            </p>
+                            <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="div_download" class="row" style="background-color:#333333;padding-top:3px;padding-bottom:3px;padding-right:3px;padding-left:3px">
+
+        <label id="lbl_downInfo">TEST</label>
+    </div>
+</div>
+
 <script>
-    var armaPath = "D:/SteamLibrary/SteamApps/common/Arma 3/";
-    var downloadList = [];
-    var curFileName = "";
-
-    document.getElementById("downloadtfar").addEventListener("click", function() {
-        getModHashList(18, getHashListCallback);
-    });
-
-    function getHashListCallback(jsObj) {
-        downloadList = jsObj;
-        download(downloadList[0]);
-    }
-
-    function download(fileObj) {
-        var dwn = require('dwn');
-        var progress = require('progress-stream');
-        var fs = require('fs');
-        var mkpath = require('mkpath');
-
-        var dest = armaPath + fileObj.RelativPath;
-        curFileName = fileObj.FileName;
-
-        try {
-            stats = fs.lstatSync(dest.replace(fileObj.FileName, ''));
-            if (stats.isDirectory()) {}
-
-        } catch (e) {
-            mkpath(dest.replace(fileObj.FileName, ''), function(err) {
-                //if (err) throw err;
-                console.log('Directory created');
-                download(downloadList[0]);
-                return;
-            });
-        }
-
-        var stream = dwn._download('http://213.202.212.13/download/' + fileObj.RelativPath);
-
-        var str = progress({
-            length: fileObj.Size,
-            time: 100
-        });
-
-        str.on('progress', function(progress) {
-            //console.log(progress);
-            document.getElementById("lbl_downInfo").innerHTML = (progress.percentage).toFixed(2) + "% - " + ((progress.speed)/1000000).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileName;
-
-
-            /*
-            	{
-            		percentage: 9.05,
-            		transferred: 949624,
-            		length: 10485760,
-            		remaining: 9536136,
-            		eta: 42,
-            		runtime: 3,
-            		delta: 295396,
-            		speed: 949624
-            	}
-           */
-        });
-
-        stream.on('end', function() {
-            downloadNext();
-        });
-
-        stream.pipe(str).pipe(fs.createWriteStream(dest));
-    }
-
-    function downloadNext() {
-        downloadList.shift();
-
-        if (downloadList.length > 0) {
-            download(downloadList[0]);
-        } else {
-
-        }
-    }
-
-    // http://213.202.212.13/download/%40RealLifeRPG5.0/addons/CUP_Weapons_Bizon.pbo
-    // size 3910264
+    $('#div_header').height($(this).height() * 0.15);
+    $('#div_content').height($(this).height() * 0.75);
+    $('#div_download').height($(this).height() * 0.10);
 </script>
