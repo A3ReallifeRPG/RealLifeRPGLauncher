@@ -62,6 +62,12 @@
 </body>
 
 <script>
+    const electron = require('electron');
+
+    //const app = require('electron').app
+    const BrowserWindow = require('electron').BrowserWindow
+    const shell = require('electron').shell;
+
 
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
