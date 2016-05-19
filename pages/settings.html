@@ -6,9 +6,9 @@
         <h3 class="win-h3">Arma Pfad</h3>
         <br/>
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="C:\Program Files (x86)\Steam\SteamApps\common\Arma 3" aria-describedby="basic-addon2" disabled="true">
+            <input type="text" id = "armapath" class="form-control" placeholder="C:\Program Files (x86)\Steam\SteamApps\common\Arma 3" aria-describedby="basic-addon2" disabled="true">
             <span class="input-group-btn">
-                <button class="btn btn-secondary" type="button">...</button>
+                <button class="btn btn-secondary" id="armapathbtn" type="button">...</button>
               </span>
         </div>
     </div>
@@ -96,10 +96,51 @@
 </div>
 
 <script>
+
+    $( document ).ready(function() {
+      path = "";
+        storage.get('settings', function(error, data) {
+            path = data.armapath;
+        });
+        if(path == null) {
+          debugger;
+          var Registry = require('winreg')
+          , regKey = new Registry({                                       // new operator is optional
+            hive: Winreg.HKLM,                                          // HKEY_LOCAL_MACHINE
+            key:  '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
+          })
+
+          // list autostart programs
+          regKey.values(function (err, items /* array of RegistryItem */) {
+            if(items[3].value != null) {
+              path = items[3].value;
+            };
+          });
+        } else {
+
+          $('#armapath').val(path);
+        };
+    });
+
     var toggleWifi = function() {
         var obj = document.getElementById("wifiToggle").winControl;
         console.log("Wifi toggled. Current status: " + (obj.checked ? "on" : "off"));
     }
+
+    document.getElementById("armapathbtn").addEventListener("click", function() {
+      var options = {
+      filters: [
+            {name: 'Arma3.exe', extensions: ['exe']},
+          ],
+      title: "Bitte wähle deine Arma3.exe aus",
+      properties: ['openFile'],
+      defaultPath: "C:\\Program Files (x86)\\Steam\\SteamApps\\common\\Arma 3\\Arma3.exe"
+    };
+        var path = dialog.showOpenDialog(options);
+        $('#armapath').val(path);
+        storage.set('settings', { armapath: path}, function(error) {
+        });
+    });
 
     // To protect against untrusted code execution, all functions are required to be marked as supported for processing before they can be used inside a data-win-options attribute in HTML markup.
     WinJS.Utilities.markSupportedForProcessing(toggleWifi);
