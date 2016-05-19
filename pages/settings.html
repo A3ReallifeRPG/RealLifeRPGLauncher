@@ -98,28 +98,10 @@
 <script>
 
     $( document ).ready(function() {
-      path = "";
         storage.get('settings', function(error, data) {
-            path = data.armapath;
+            var path = data.armapath;
+            $('#armapath').val(path);
         });
-        if(path == null) {
-          debugger;
-          var Registry = require('winreg')
-          , regKey = new Registry({                                       // new operator is optional
-            hive: Winreg.HKLM,                                          // HKEY_LOCAL_MACHINE
-            key:  '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
-          })
-
-          // list autostart programs
-          regKey.values(function (err, items /* array of RegistryItem */) {
-            if(items[3].value != null) {
-              path = items[3].value;
-            };
-          });
-        } else {
-
-          $('#armapath').val(path);
-        };
     });
 
     var toggleWifi = function() {

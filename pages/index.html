@@ -22,6 +22,7 @@
     <script src="../resources/winjs/js/ui.js"></script>
     <link href="../resources/metroui/css/metro.css" rel="stylesheet">
     <script src="../resources/metroui/js/metro.js"></script>
+    <script src="index.js"></script>
 </head>
 
 <body>
@@ -59,43 +60,52 @@
             </p>
         <span class="dialog-close-button"></span>
     </div>
+    <div data-role="dialog" id="dialog_defaultpath" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
+    <h1>Arma Pfad gefunden</h1>
+    <p id="armapathtext">
+    </p>
+    <button class="button success" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('home.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:left">Richtig</button>
+    <button class="button danger" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('settings.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:right">Falsch</button>
+</div>
 </body>
-
 <script>
-    const electron = require('electron');
-    //const app = require('electron').app
-    const BrowserWindow = require('electron').BrowserWindow
-    const shell = require('electron').shell;
-    const {dialog} = require('electron').remote;
-    const storage = require('electron-json-storage');
+
+WinJS.UI.processAll().done(function() {
+    var splitView = document.querySelector(".splitView").winControl;
+    new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+});
+
+var anim = document.getElementById("content");
+$(".nav-element").click(function() {
+    $("#content").load($(this).attr("data-navigate") + ".html");
+    enterPage = WinJS.UI.Animation.enterPage(anim, null);
+});
+
+$(document).ready(function() {
+    storage.get('settings', function(error, data) {
+            if (jQuery.isEmptyObject(data)) {
+                 regKey = new Winreg({ // new operator is optional
+                        hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
+                        key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
+                    })
+
+                // list autostart programs
+                regKey.values(function(err, items /* array of RegistryItem */ ) {
+                    if (items[3].value != null) {
+                        path = items[3].value + "\\arma3.exe";
+                        var pathdialog = $('#dialog_defaultpath').data('dialog');
+                        $('#armapathtext').html(path);
+                        pathdialog.open();
+                        storage.set('settings', {
+                            armapath: path
+                        }, function(error) {});
+                    };
+                });
 
 
-
-    WinJS.UI.processAll().done(function() {
-        var splitView = document.querySelector(".splitView").winControl;
-        new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+            };
+        });
     });
-
-    var anim = document.getElementById("content");
-    $(".nav-element").click(function() {
-        $("#content").load($(this).attr("data-navigate") + ".html");
-        enterPage = WinJS.UI.Animation.enterPage(anim, null);
-    });
-
-
-    getLauncherNotification(showNotf);
-    function showNotf(jsonData, success) {
-        if (success) {
-            document.getElementById('dialog_notf_text').innerHTML = jsonData.Notification;
-
-            if (jsonData.UseNotification) {
-                var dialog = $('#dialog_notf').data('dialog');
-                dialog.open();
-            }
-        } else {
-            console.log('Error requesting Notification: ' + jsonData);
-        }
-    }
 </script>
 
 </html>
