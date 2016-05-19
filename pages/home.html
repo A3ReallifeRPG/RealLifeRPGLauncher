@@ -2,18 +2,15 @@
 <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
 <script>
     document.getElementById("downloadtfar").addEventListener("click", function() {
-        var http = require('http');
+        var dwn = require('dwn');
         var fs = require('fs');
-        var app = require('electron').remote;
+        var dest = 'D:/test.pbo'
 
-        var file = fs.createWriteStream("D:/test.pbo");
-        var request = http.get("http://213.202.212.13/download/%40RealLifeRPG5.0/addons/CUP_Weapons_Bizon.pbo", function(response) {
-            response.pipe(file);
-
-            file.on('finish', function() {
-                console.log('TEST' + file.size);
-            });
-        });
+        var stream = dwn._download('http://213.202.212.13/download/%40RealLifeRPG5.0/addons/CUP_Weapons_Bizon.pbo')
+        stream.on('progress', function(v){ console.log('progress:', v) });
+        //stream.on('end', done);
+        //stream.on('error', done);
+        stream.pipe(fs.createWriteStream(dest));
     });
 
     // http://213.202.212.13/download/%40RealLifeRPG5.0/addons/CUP_Weapons_Bizon.pbo
