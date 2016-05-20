@@ -28,7 +28,7 @@
                             <p>
                                 RealLifeRPG 5.0 Mod Download
                             </p>
-                            <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
+                            <button class="button loading-pulse lighten primary">Download NOW</button>
                         </div>
                     </div>
                 </td>
@@ -41,7 +41,7 @@
                             <p>
                                 RealLifeRPG 5.0 Mod Download
                             </p>
-                            <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
+                            <button class="button loading-pulse lighten primary">Download NOW</button>
                         </div>
                     </div>
                 </td>
@@ -49,12 +49,20 @@
         </table>
     </div>
     <div id="div_download" class="row" style="background-color:#333333;padding-top:3px;padding-bottom:3px;padding-right:3px;padding-left:3px">
-
         <label id="lbl_downInfo">TEST</label>
     </div>
 </div>
 
 <script>
+    $('#downloadtfar').on('click', function() {
+        
+        ipcRenderer.send('download-mod');
+    });
+
+    ipcRenderer.on('download-mod-update', (event, arg) => {
+        console.log(arg);
+    });
+
     $('#div_header').height($(this).height() * 0.15);
     $('#div_content').height($(this).height() * 0.75);
     $('#div_download').height($(this).height() * 0.10);

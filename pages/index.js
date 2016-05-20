@@ -1,10 +1,11 @@
 const electron = require('electron');
-//const app = require('electron').app
-const BrowserWindow = require('electron').BrowserWindow
+const BrowserWindow = require('electron').remote
+const app = require('electron').remote
 const shell = require('electron').shell;
-const storage = require('electron-json-storage');
+const storage = require('electron-json-storage')
 const Winreg = require('winreg')
-const {dialog} = require('electron').remote;
+const dialog = require('electron').remote
+const {ipcRenderer} = require('electron');
 
 getLauncherNotification(showNotf);
 
