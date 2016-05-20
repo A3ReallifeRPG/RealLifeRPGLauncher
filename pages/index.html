@@ -93,7 +93,7 @@
                 regKey.keyExists(function(err, exists /* array of RegistryItem */ ) {
                     if (exists) {
                         regKey.values(function(err, items /* array of RegistryItem */ ) {
-                            path = items[3].value + "\\arma3.exe";
+                            path = items[3].value;
                             try {
                                 filepath = fs.lstatSync(path);
                                 if (filepath.isFile()) {
@@ -119,13 +119,13 @@
     function checkregkey2() {
         regKey2 = new Winreg({ // new operator is optional
             hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
-            key: 'SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
+            key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
         })
 
         regKey2.keyExists(function(err, exists /* array of RegistryItem */ ) {
             if (exists) {
                 regKey2.values(function(err, items /* array of RegistryItem */ ) {
-                    path = items[0].value + "\\arma3.exe";
+                    path = items[0].value;
                     try {
                         filepath = fs.lstatSync(path);
                         if (filepath.isFile()) {
@@ -155,7 +155,7 @@
         regKey3.keyExists(function(err, exists /* array of RegistryItem */ ) {
             if (exists) {
                 regKey3.values(function(err, items /* array of RegistryItem */ ) {
-                    path = items[0].value + "\\arma3.exe";
+                    path = items[0].value;
                     try {
                         filepath = fs.lstatSync(path);
                         if (filepath.isFile()) {
@@ -167,11 +167,20 @@
                             }, function(error) {});
                         };
                     } catch (e) {
-                        console.log("Fuck")
+
+                        storage.set('settings', {
+                            armapath: ''
+                        }, function(error) {});
+                        $('#content').load('settings.html');
+                        enterPage = WinJS.UI.Animation.enterPage(anim, null);
                     }
                 });
             } else {
-                console.log("Fuck")
+                storage.set('settings', {
+                    armapath: ''
+                }, function(error) {});
+                $('#content').load('settings.html');
+                enterPage = WinJS.UI.Animation.enterPage(anim, null);
             }
         });
     };

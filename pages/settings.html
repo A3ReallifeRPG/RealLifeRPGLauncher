@@ -112,8 +112,7 @@
                 extensions: ['exe']
             }, ],
             title: "Bitte wähle deine Arma3.exe aus",
-            properties: ['openFile'],
-            defaultPath: "C:\\Program Files (x86)\\Steam\\SteamApps\\common\\Arma 3\\Arma3.exe"
+            properties: ['openFile']
         };
         path = dialog.showOpenDialog(options);
         $('#armapath').val(path);
