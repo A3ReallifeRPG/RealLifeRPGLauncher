@@ -4,14 +4,19 @@ var fs = require('fs');
 var mkpath = require('mkpath');
 window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
 
-const {ipcRenderer} = require('electron');
+const {
+    ipcRenderer
+} = require('electron');
 
 
 var armaPath = "D:/SteamLibrary/SteamApps/common/Arma 3/";
 var downloadList = [];
 var curFileObj = null;
+var curHashObj = null;
+var totalFileSize = 0;
+var currentDownloadSize = 0;
 
-ipcRenderer.on('download-receiver',(event, arg) => {
+ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
         case 'start-download':
             console.log('download start');
@@ -25,12 +30,19 @@ ipcRenderer.on('download-receiver',(event, arg) => {
 
 function getHashListCallback(jsObj) {
     downloadList = jsObj;
+    calcDownloadStats();
     download(downloadList[0]);
+}
+
+function calcDownloadStats() {
+    for (i = 0; i < downloadList.length; i++) {
+        totalFileSize = totalFileSize + downloadList[i].Size;
+    }
 }
 
 function download(fileObj) {
 
-    if(quickCheck(fileObj)){
+    if (quickCheck(fileObj)) {
         downloadNext();
         return;
     }
@@ -59,13 +71,21 @@ function download(fileObj) {
     });
 
     str.on('progress', function(progress) {
-        //console.log(progress);
-        document.getElementById('lbl_downInfo').innerHTML = (progress.percentage).toFixed(2) + "% - " + ((progress.speed)/1000000).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName;
-        var args = { type:1,message:"update-progress",obj:((progress.percentage).toFixed(2) + "% - " + ((progress.speed)/1000000).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName)};
-        ipcRenderer.send('message-to-render',args);
+        document.getElementById('lbl_downInfo').innerHTML = (progress.percentage).toFixed(2) + "% - " + ((progress.speed) / 1048576).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName;
+        var args = {
+            type: 1,
+            message: "update-progress",
+            obj: {
+                fileObj: curFileObj,
+                progressObj: progress
+            }
+        };
+        ipcRenderer.send('message-to-render', args);
     });
 
     stream.on('end', function() {
+        currentDownloadSize = currentDownloadSize + curFileObj.Size;
+        //fullCheck(curFileObj);
         downloadNext();
     });
 
@@ -86,24 +106,34 @@ function downloadNext() {
 
 }
 
-function quickCheck(fileObj){
-    try{
+function quickCheck(fileObj) {
+    try {
         var stats = fs.lstatSync(armaPath + fileObj.RelativPath);
 
-        if(stats['size'] != fileObj.Size){
-            console.log(fileObj.FileName);
+        if (stats['size'] != fileObj.Size) {
             return false;
         }
-        /*
-        if(stats['ctime'].getTime() != fileObj.ModifiedAt){
-            error = true;
-            debugger;
-        }*/
         return true;
-    }catch(e){
+    } catch (e) {
         return false;
     }
 }
 
-// http://213.202.212.13/download/%40RealLifeRPG5.0/addons/CUP_Weapons_Bizon.pbo
-// size 3910264
+function fullCheck(fObj) {
+    var fs = require('fs');
+    var crypto = require('crypto');
+    // the file you want to get the hash
+    var file = fs.createReadStream(armaPath + fObj.RelativPath);
+    var hash = crypto.createHash('md5');
+    hash.setEncoding('hex');
+
+    debugger;
+
+    file.on('end', (fObj) => {
+        hash.end();
+        debugger;
+        console.log(hash.read() + ' - original: ' + fObj.Hash); // the desired sha1sum
+    });
+
+    file.pipe(hash);
+}
