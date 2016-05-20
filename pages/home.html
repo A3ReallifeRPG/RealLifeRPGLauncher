@@ -49,18 +49,14 @@
         </table>
     </div>
     <div id="div_download" class="row" style="background-color:#333333;padding-top:3px;padding-bottom:3px;padding-right:3px;padding-left:3px">
-        <label id="lbl_downInfo">TEST</label>
+        <label id="lbl_downInfo">KEINE INFO</label>
     </div>
 </div>
 
 <script>
     $('#downloadtfar').on('click', function() {
-        
-        ipcRenderer.send('download-mod');
-    });
-
-    ipcRenderer.on('download-mod-update', (event, arg) => {
-        console.log(arg);
+        var args = { type:1,message:"start-download"}
+        ipcRenderer.send('message-to-download',args);
     });
 
     $('#div_header').height($(this).height() * 0.15);

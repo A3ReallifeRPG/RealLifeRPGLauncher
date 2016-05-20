@@ -2,6 +2,7 @@ var dwn = require('dwn');
 var progress = require('progress-stream');
 var fs = require('fs');
 var mkpath = require('mkpath');
+window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
 
 const {ipcRenderer} = require('electron');
 
@@ -10,10 +11,18 @@ var armaPath = "D:/SteamLibrary/SteamApps/common/Arma 3/";
 var downloadList = [];
 var curFileObj = null;
 
-ipcRenderer.on('download-mod',function(){
-    console.log('lol');
-    getModHashList(18, getHashListCallback);
+ipcRenderer.on('download-receiver',(event, arg) => {
+    switch (arg.message) {
+        case 'start-download':
+            console.log('download start');
+            getModHashList(18, getHashListCallback);
+            break;
+        default:
+            console.log('Packet dropped');
+            break;
+    }
 })
+
 function getHashListCallback(jsObj) {
     downloadList = jsObj;
     download(downloadList[0]);
@@ -21,11 +30,10 @@ function getHashListCallback(jsObj) {
 
 function download(fileObj) {
 
-
     if(quickCheck(fileObj)){
         downloadNext();
+        return;
     }
-    debugger;
 
     var dest = armaPath + fileObj.RelativPath;
     curFileObj = fileObj;
@@ -52,8 +60,9 @@ function download(fileObj) {
 
     str.on('progress', function(progress) {
         //console.log(progress);
-        document.getElementById("lbl_downInfo").innerHTML = (progress.percentage).toFixed(2) + "% - " + ((progress.speed)/1000000).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName;
-        ipcRenderer.send('download-mod-update',curFileObj);
+        document.getElementById('lbl_downInfo').innerHTML = (progress.percentage).toFixed(2) + "% - " + ((progress.speed)/1000000).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName;
+        var args = { type:1,message:"update-progress",obj:((progress.percentage).toFixed(2) + "% - " + ((progress.speed)/1000000).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName)};
+        ipcRenderer.send('message-to-render',args);
     });
 
     stream.on('end', function() {
@@ -83,7 +92,6 @@ function quickCheck(fileObj){
 
         if(stats['size'] != fileObj.Size){
             console.log(fileObj.FileName);
-            debugger;
             return false;
         }
         /*

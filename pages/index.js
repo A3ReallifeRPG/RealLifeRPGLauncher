@@ -21,3 +21,22 @@ function showNotf(jsonData, success) {
         console.log('Error requesting Notification: ' + jsonData);
     }
 }
+
+
+ipcRenderer.on('render-receiver',(event, arg) => {
+    switch (arg.message) {
+        case 'update-progress':
+            updateDwnProgress(arg);
+            break;
+        default:
+            console.log('Packet dropped');
+            break;
+    }
+})
+
+
+function updateDwnProgress(arg){
+    if(curentPage == "home"){
+        $('#lbl_downInfo').html(arg.obj);
+    }
+}

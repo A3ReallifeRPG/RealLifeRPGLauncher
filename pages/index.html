@@ -70,16 +70,19 @@
 </body>
 <script>
     var fs = require('fs');
+    var curentPage = "home";
 
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
-        new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+        new WinJS.UI._WinKeyboard(splitView.paneElement);
     });
 
+    $("#content").load('home.html')
     var anim = document.getElementById("content");
     $(".nav-element").click(function() {
         $("#content").load($(this).attr("data-navigate") + ".html");
         enterPage = WinJS.UI.Animation.enterPage(anim, null);
+        currentPage = $(this).attr("data-navigate");
     });
 
     $(document).ready(function() {

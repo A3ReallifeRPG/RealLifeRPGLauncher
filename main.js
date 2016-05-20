@@ -1,12 +1,12 @@
 const electron = require('electron');
-// Module to control application life.
 
 const app = require('electron').app
-    // Module to create native browser window.
-const BrowserWindow = require('electron').BrowserWindow
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+const BrowserWindow = require('electron').BrowserWindow
+const {
+    ipcMain
+} = require('electron');
+
 let win;
 let downWin;
 
@@ -33,10 +33,21 @@ function createWindow() {
         detach: false
     });
 
-
     win.on('closed', () => {
         downWin = null;
         win = null;
+    });
+
+    setUpIpcHandlers();
+}
+
+function setUpIpcHandlers() {
+    ipcMain.on('message-to-download', (event, arg) => {
+        downWin.webContents.send('download-receiver',arg);
+    });
+
+    ipcMain.on('message-to-render', (event, arg) => {
+        win.webContents.send('render-receiver',arg);
     });
 }
 
