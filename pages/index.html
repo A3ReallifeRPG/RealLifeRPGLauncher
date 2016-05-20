@@ -54,58 +54,127 @@
 
     <!-- Notification Dialog -->
     <div data-role="dialog" id="dialog_notf" class="padding20 dialog success" data-close-button="true" data-type="success" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
-            <h1>Wichtige Information</h1>
-            <p id="dialog_notf_text">
+        <h1>Wichtige Information</h1>
+        <p id="dialog_notf_text">
 
-            </p>
+        </p>
         <span class="dialog-close-button"></span>
     </div>
     <div data-role="dialog" id="dialog_defaultpath" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
-    <h1>Arma Pfad gefunden</h1>
-    <p id="armapathtext">
-    </p>
-    <button class="button success" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('home.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:left">Richtig</button>
-    <button class="button danger" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('settings.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:right">Falsch</button>
-</div>
+        <h1>Arma Pfad gefunden</h1>
+        <p id="armapathtext">
+        </p>
+        <button class="button success" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('home.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:left">Richtig</button>
+        <button class="button danger" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('settings.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:right">Falsch</button>
+    </div>
 </body>
 <script>
+    var fs = require('fs');
 
-WinJS.UI.processAll().done(function() {
-    var splitView = document.querySelector(".splitView").winControl;
-    new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
-});
+    WinJS.UI.processAll().done(function() {
+        var splitView = document.querySelector(".splitView").winControl;
+        new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+    });
 
-var anim = document.getElementById("content");
-$(".nav-element").click(function() {
-    $("#content").load($(this).attr("data-navigate") + ".html");
-    enterPage = WinJS.UI.Animation.enterPage(anim, null);
-});
+    var anim = document.getElementById("content");
+    $(".nav-element").click(function() {
+        $("#content").load($(this).attr("data-navigate") + ".html");
+        enterPage = WinJS.UI.Animation.enterPage(anim, null);
+    });
 
-$(document).ready(function() {
-    storage.get('settings', function(error, data) {
+    $(document).ready(function() {
+        storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
-                 regKey = new Winreg({ // new operator is optional
-                        hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
-                        key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
-                    })
+                regKey = new Winreg({ // new operator is optional
+                    hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
+                    key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
+                })
 
-                // list autostart programs
-                regKey.values(function(err, items /* array of RegistryItem */ ) {
-                    if (items[3].value != null) {
-                        path = items[3].value + "\\arma3.exe";
-                        var pathdialog = $('#dialog_defaultpath').data('dialog');
-                        $('#armapathtext').html(path);
-                        pathdialog.open();
-                        storage.set('settings', {
-                            armapath: path
-                        }, function(error) {});
-                    };
+                regKey.keyExists(function(err, exists /* array of RegistryItem */ ) {
+                    if (exists) {
+                        regKey.values(function(err, items /* array of RegistryItem */ ) {
+                            path = items[3].value + "\\arma3.exe";
+                            try {
+                                filepath = fs.lstatSync(path);
+                                if (filepath.isFile()) {
+                                    var pathdialog = $('#dialog_defaultpath').data('dialog');
+                                    $('#armapathtext').html(path);
+                                    pathdialog.open();
+                                    storage.set('settings', {
+                                        armapath: path
+                                    }, function(error) {});
+                                };
+                            } catch (e) {
+                                checkregkey3();
+                            }
+                        });
+                    } else {
+                        checkregkey3();
+                    }
                 });
-
-
             };
         });
     });
+
+    function checkregkey2() {
+        regKey2 = new Winreg({ // new operator is optional
+            hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
+            key: 'SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
+        })
+
+        regKey2.keyExists(function(err, exists /* array of RegistryItem */ ) {
+            if (exists) {
+                regKey2.values(function(err, items /* array of RegistryItem */ ) {
+                    path = items[0].value + "\\arma3.exe";
+                    try {
+                        filepath = fs.lstatSync(path);
+                        if (filepath.isFile()) {
+                            var pathdialog = $('#dialog_defaultpath').data('dialog');
+                            $('#armapathtext').html(path);
+                            pathdialog.open();
+                            storage.set('settings', {
+                                armapath: path
+                            }, function(error) {});
+                        };
+                    } catch (e) {
+                        checkregkey3();
+                    }
+                });
+            } else {
+                checkregkey3();
+            }
+        });
+    };
+
+    function checkregkey3() {
+        regKey3 = new Winreg({ // new operator is optional
+            hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
+            key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3' // Arma 3 Key
+        })
+
+        regKey3.keyExists(function(err, exists /* array of RegistryItem */ ) {
+            if (exists) {
+                regKey3.values(function(err, items /* array of RegistryItem */ ) {
+                    path = items[0].value + "\\arma3.exe";
+                    try {
+                        filepath = fs.lstatSync(path);
+                        if (filepath.isFile()) {
+                            var pathdialog = $('#dialog_defaultpath').data('dialog');
+                            $('#armapathtext').html(path);
+                            pathdialog.open();
+                            storage.set('settings', {
+                                armapath: path
+                            }, function(error) {});
+                        };
+                    } catch (e) {
+                        console.log("Fuck")
+                    }
+                });
+            } else {
+                console.log("Fuck")
+            }
+        });
+    };
 </script>
 
 </html>

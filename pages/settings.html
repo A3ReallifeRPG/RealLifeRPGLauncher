@@ -6,7 +6,7 @@
         <h3 class="win-h3">Arma Pfad</h3>
         <br/>
         <div class="input-group">
-            <input type="text" id = "armapath" class="form-control" placeholder="C:\Program Files (x86)\Steam\SteamApps\common\Arma 3" aria-describedby="basic-addon2" disabled="true">
+            <input type="text" id="armapath" class="form-control" placeholder="C:\Program Files (x86)\Steam\SteamApps\common\Arma 3" aria-describedby="basic-addon2" disabled="true">
             <span class="input-group-btn">
                 <button class="btn btn-secondary" id="armapathbtn" type="button">...</button>
               </span>
@@ -23,7 +23,7 @@
                     </td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" id="splashswitch">
                             <span class="check"></span>
                         </label>
                     </td>
@@ -42,7 +42,7 @@
                     </td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" id="introswitch">
                             <span class="check"></span>
                         </label>
                     </td>
@@ -60,7 +60,7 @@
                     </td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" id="htswitch">
                             <span class="check"></span>
                         </label>
                     </td>
@@ -78,7 +78,7 @@
                     </td>
                     <td>
                         <label class="switch">
-                            <input type="checkbox">
+                            <input type="checkbox" id="windowedswitch">
                             <span class="check"></span>
                         </label>
                     </td>
@@ -96,12 +96,8 @@
 </div>
 
 <script>
-
-    $( document ).ready(function() {
-        storage.get('settings', function(error, data) {
-            var path = data.armapath;
-            $('#armapath').val(path);
-        });
+    $(document).ready(function() {
+        loadallsettings();
     });
 
     var toggleWifi = function() {
@@ -110,19 +106,69 @@
     }
 
     document.getElementById("armapathbtn").addEventListener("click", function() {
-      var options = {
-      filters: [
-            {name: 'Arma3.exe', extensions: ['exe']},
-          ],
-      title: "Bitte wähle deine Arma3.exe aus",
-      properties: ['openFile'],
-      defaultPath: "C:\\Program Files (x86)\\Steam\\SteamApps\\common\\Arma 3\\Arma3.exe"
-    };
-        var path = dialog.showOpenDialog(options);
+        var options = {
+            filters: [{
+                name: 'Arma3.exe',
+                extensions: ['exe']
+            }, ],
+            title: "Bitte wähle deine Arma3.exe aus",
+            properties: ['openFile'],
+            defaultPath: "C:\\Program Files (x86)\\Steam\\SteamApps\\common\\Arma 3\\Arma3.exe"
+        };
+        path = dialog.showOpenDialog(options);
         $('#armapath').val(path);
-        storage.set('settings', { armapath: path}, function(error) {
-        });
+        saveallsettings();
     });
+
+    document.getElementById("splashswitch").addEventListener("click", function() {
+        splash = $("#splashswitch").is(':checked');
+        saveallsettings();
+    });
+
+    document.getElementById("introswitch").addEventListener("click", function() {
+        intro = $("#introswitch").is(':checked');
+        saveallsettings();
+    });
+
+    document.getElementById("htswitch").addEventListener("click", function() {
+        ht = $("#htswitch").is(':checked');
+        saveallsettings();
+    });
+
+    document.getElementById("windowedswitch").addEventListener("click", function() {
+        windowed = $("#windowedswitch").is(':checked');
+        saveallsettings();
+    });
+
+    function saveallsettings() {
+        storage.set('settings', {
+            armapath: path,
+            splash: splash,
+            intro: intro,
+            ht: ht,
+            windowed: windowed
+        }, function(error) {});
+    }
+
+    function loadallsettings() {
+        storage.get('settings', function(error, data) {
+            path = data.armapath;
+            splash = data.splash;
+            intro = data.intro;
+            ht = data.ht;
+            windowed = data.windowed;
+            loadsettingstoui();
+        });
+
+    }
+
+    function loadsettingstoui() {
+      $('#armapath').val(path);
+      $('#splashswitch').prop('checked', splash);
+      $('#introswitch').prop('checked', intro);
+      $('#htswitch').prop('checked', ht);
+      $('#windowedswitch').prop('checked', windowed);
+    }
 
     // To protect against untrusted code execution, all functions are required to be marked as supported for processing before they can be used inside a data-win-options attribute in HTML markup.
     WinJS.Utilities.markSupportedForProcessing(toggleWifi);
