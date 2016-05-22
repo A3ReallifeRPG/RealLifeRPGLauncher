@@ -6,9 +6,9 @@
         <h3 class="win-h3">Arma Pfad</h3>
         <br/>
         <div class="input-group">
-            <input type="text" id="armapath" class="form-control" placeholder="C:\Program Files (x86)\Steam\SteamApps\common\Arma 3" aria-describedby="basic-addon2" disabled="true">
+            <input type="text" id="armapath" class="form-control" placeholder="Kein Arma Pfad gefunden" aria-describedby="basic-addon2" readonly>
             <span class="input-group-btn">
-                <button class="btn btn-secondary" id="armapathbtn" type="button">...</button>
+                <button class="btn btn-secondary" id="armapathbtn" type="button" data-role="popover" data-popover-shadow="true" data-popover-position="top" data-popover-text="Wähle deine arma3.exe aus!" data-popover-background="bg-red" data-popover-color="fg-white">...</button>
               </span>
         </div>
     </div>
@@ -27,12 +27,16 @@
                             <span class="check"></span>
                         </label>
                     </td>
-
+                    <td style="width:10%">
+                    </td>
                     <td>
                         <h5 class="win-h5">Max. Mem:&nbsp;&nbsp;</h5>
                     </td>
                     <td>
-                        <input type="number" id="meminput" class="input-control number" style="color:#444444">
+                      <div class="input-control text" data-role="input">
+                        <input type="number" id="meminput" style="color:#444444">
+                        <button class="button" id="membutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Die Maximale Menge Arbeitsspeicher die Arma verwenden darf" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                      </div>
                     </td>
 
                 </tr>
@@ -46,12 +50,16 @@
                             <span class="check"></span>
                         </label>
                     </td>
-
+                    <td style="width:10%">
+                    </td>
                     <td>
                         <h5 class="win-h5">CPU Count:&nbsp;&nbsp;</h5>
                     </td>
                     <td>
-                        <input type="number" id="cpuinput" class="input-control number" style="color:#444444">
+                      <div class="input-control text" data-role="input">
+                        <input type="number" id="cpuinput" style="color:#444444">
+                        <button class="button" id="cpubutton" data-role="popover" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Gleich oder weniger als deine nativen CPU Kerne" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                      </div>
                     </td>
                 </tr>
                 <tr>
@@ -64,12 +72,16 @@
                             <span class="check"></span>
                         </label>
                     </td>
-
+                    <td style="width:10%">
+                    </td>
                     <td>
                         <h5 class="win-h5">Max. vRAM:&nbsp;&nbsp;</h5>
                     </td>
                     <td>
-                        <input type="number" id="vraminput" class="input-control number" style="color:#444444">
+                      <div class="input-control text" data-role="input">
+                      <input type="number" id="vraminput" style="color:#444444">
+                      <button class="button" id="vrambutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Die Maximale Menge Grafikspeicher die Arma verwenden darf" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                    </div>
                     </td>
                 </tr>
                 <tr>
@@ -82,12 +94,16 @@
                             <span class="check"></span>
                         </label>
                     </td>
-
+                    <td style="width:10%">
+                    </td>
                     <td>
                         <h5 class="win-h5">Ex. Threads:&nbsp;&nbsp;</h5>
                     </td>
                     <td>
-                        <input type="number" id="threadinput" class="input-control number" style="color:#444444">
+                        <div class="input-control text" data-role="input">
+                          <input type="number" id="threadinput" style="color:#444444">
+                          <button class="button" id="threadbutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="3 für Dualcore <br> 7 für Quadcore" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                        </div>
                     </td>
                 </tr>
             </table>
@@ -97,6 +113,7 @@
 
 <script>
     $(document).ready(function() {
+        timert = true;
         loadallsettings();
     });
 
@@ -114,9 +131,18 @@
             title: "Bitte wähle deine Arma3.exe aus",
             properties: ['openFile']
         };
-        path = dialog.showOpenDialog(options);
-        $('#armapath').val(path);
-        saveallsettings();
+        path = String(dialog.showOpenDialog(options));
+        if (path !== "undefined" && path.indexOf('\\arma3.exe') > -1) {
+          path = path.replace('\\arma3.exe','');
+          $('#armapath').val(path);
+          saveallsettings();
+        } else {
+          $.Notify({
+              caption: 'Bitte wähle deine Arma3.exe aus',
+              content: ' ',
+              type: 'alert'
+          });
+        }
     });
 
     document.getElementById("splashswitch").addEventListener("click", function() {
@@ -171,11 +197,15 @@
             vram: vram,
             thread: thread
         }, function(error) {});
-        $.Notify({
-            caption: 'Änderungen gespeichert',
-            content: 'Notify content',
-            type: 'success'
-        });
+        if(timert) {
+          $.Notify({
+              caption: 'Änderungen gespeichert',
+              content: ' ',
+              type: 'success'
+          });
+          timert = false;
+          setTimeout(function() { timert = true; }, 2000);
+        };
     }
 
     function loadallsettings() {

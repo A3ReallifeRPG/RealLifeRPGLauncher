@@ -21,6 +21,7 @@
     <script src="../resources/winjs/js/base.js"></script>
     <script src="../resources/winjs/js/ui.js"></script>
     <link href="../resources/metroui/css/metro.css" rel="stylesheet">
+    <link href="../resources/metroui/css/metro-icons.css" rel="stylesheet">
     <script src="../resources/metroui/js/metro.js"></script>
     <script src="index.js"></script>
 </head>
@@ -85,7 +86,7 @@
     $(document).ready(function() {
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
-                regKey = new Winreg({ // new operator is optional
+                regKey = new Winreg({
                     hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
                     key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
                 })
@@ -94,8 +95,9 @@
                     if (exists) {
                         regKey.values(function(err, items /* array of RegistryItem */ ) {
                             path = items[3].value;
+                            console.log(path);
                             try {
-                                filepath = fs.lstatSync(path);
+                                filepath = fs.lstatSync(path + "\\arma3.exe");
                                 if (filepath.isFile()) {
                                     var pathdialog = $('#dialog_defaultpath').data('dialog');
                                     $('#armapathtext').html(path);
@@ -117,7 +119,7 @@
     });
 
     function checkregkey2() {
-        regKey2 = new Winreg({ // new operator is optional
+        regKey2 = new Winreg({
             hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
             key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
         })
@@ -125,9 +127,9 @@
         regKey2.keyExists(function(err, exists /* array of RegistryItem */ ) {
             if (exists) {
                 regKey2.values(function(err, items /* array of RegistryItem */ ) {
-                    path = items[0].value;
+                    path = items[3].value;
                     try {
-                        filepath = fs.lstatSync(path);
+                        filepath = fs.lstatSync(path + "\\arma3.exe");
                         if (filepath.isFile()) {
                             var pathdialog = $('#dialog_defaultpath').data('dialog');
                             $('#armapathtext').html(path);
@@ -147,7 +149,7 @@
     };
 
     function checkregkey3() {
-        regKey3 = new Winreg({ // new operator is optional
+        regKey3 = new Winreg({
             hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
             key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3' // Arma 3 Key
         })
@@ -157,7 +159,7 @@
                 regKey3.values(function(err, items /* array of RegistryItem */ ) {
                     path = items[0].value;
                     try {
-                        filepath = fs.lstatSync(path);
+                        filepath = fs.lstatSync(path + "\\arma3.exe");
                         if (filepath.isFile()) {
                             var pathdialog = $('#dialog_defaultpath').data('dialog');
                             $('#armapathtext').html(path);
@@ -165,9 +167,14 @@
                             storage.set('settings', {
                                 armapath: path
                             }, function(error) {});
-                        };
+                        } else {
+                            storage.set('settings', {
+                                armapath: ''
+                            }, function(error) {});
+                            $('#content').load('settings.html');
+                            enterPage = WinJS.UI.Animation.enterPage(anim, null);
+                        }
                     } catch (e) {
-
                         storage.set('settings', {
                             armapath: ''
                         }, function(error) {});
