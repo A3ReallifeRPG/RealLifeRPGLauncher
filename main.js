@@ -3,12 +3,9 @@ const electron = require('electron');
 const app = require('electron').app
 
 const BrowserWindow = require('electron').BrowserWindow
-
 const {
     ipcMain
 } = require('electron');
-
-const {ipcRenderer} = require('electron');
 
 let win;
 let downWin;
