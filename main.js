@@ -3,9 +3,12 @@ const electron = require('electron');
 const app = require('electron').app
 
 const BrowserWindow = require('electron').BrowserWindow
+
 const {
     ipcMain
 } = require('electron');
+
+const {ipcRenderer} = require('electron');
 
 let win;
 let downWin;
@@ -63,4 +66,8 @@ app.on('activate', () => {
     if (win === null) {
         createWindow();
     }
+});
+
+ipcMain.on('winprogress-change',(event, arg) => {
+    win.setProgressBar(arg.progress);
 });

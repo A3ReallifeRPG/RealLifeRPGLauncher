@@ -86,7 +86,8 @@
   color: #ffffff;
 }
 .app-bar.darcula {
-  background-color: #3c3f41;
+  height: 48px;
+  background-color: #171717;
 }
 .app-bar.darcula .app-bar-element:hover,
 .app-bar.darcula .app-bar-menu > li:hover,

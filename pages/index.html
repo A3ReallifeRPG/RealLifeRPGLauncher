@@ -20,20 +20,31 @@
     <link href="../resources/winjs/css/ui-dark.css" rel="stylesheet" />
     <script src="../resources/winjs/js/base.js"></script>
     <script src="../resources/winjs/js/ui.js"></script>
-    <link href="../resources/metroui/css/metro.css" rel="stylesheet">
-    <link href="../resources/metroui/css/metro-icons.css" rel="stylesheet">
+    <link href="../resources/metroui/css/metro.min.css" rel="stylesheet">
+    <link href="../resources/metroui/css/metro-icons.min.css" rel="stylesheet">
+    <link href="../resources/metroui/css/metro-schemes.css" rel="stylesheet">
     <script src="../resources/metroui/js/metro.js"></script>
     <script src="index.js"></script>
 </head>
 
 <body>
+  <script type="text/javascript">
+        $(window).load(function() { // makes sure the whole site is loaded
+            $('#status').fadeOut(); // will first fade out the loading animation
+            $('#preloader').delay(350).fadeOut('slow'); // will fade out the white DIV that covers the website.
+            $('body').delay(350).css({'overflow':'visible'});
+        })
+</script>
+  <div id="preloader">
+    <div id="status"><div data-role="preloader" data-type="cycle" data-style="color"></div></div>
+  </div>
     <div id="app">
         <div class="splitView" data-win-control="WinJS.UI.SplitView">
             <!-- Pane area -->
             <div>
                 <div class="header">
                     <button class="win-splitviewpanetoggle" data-win-control="WinJS.UI.SplitViewPaneToggle" data-win-options="{ splitView: select('.splitView') }"></button>
-                    <div class="title">Project Husky!</div>
+                    <div class="title">&nbsp;</div>
                 </div>
 
                 <div class="nav-commands">
@@ -45,6 +56,23 @@
                     <div class="nav-element" data-navigate="settings" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Einstellungen', icon: 'settings'}"></div>
                 </div>
             </div>
+            <div class="app-bar darcula" data-role="appbar">
+              <div class="row" style="margin-top:0px">
+                <div class="col-md-7" style="margin-top:0px">
+              <div class="progress" id="pb1" data-value="85" data-color="bg-green" data-role="progress" style="margin-left:2%"></div>
+              </div>
+              <div class="col-md-5" id="pb1text" style="margin-top:5px">
+                </div>
+                  </div>
+                  <div class="row" style="margin-top:0px">
+                    <div class="col-md-7" style="margin-top:0px">
+                  <div class="progress" id="pb2" data-value="85" data-color="bg-blue" data-role="progress" style="margin-left:2%;margin-top:0px"></div>
+                </div>
+                <div class="col-md-5" id="pb2text" style="margin-bottom:5px">
+                  Testtext
+                  </div>
+                      </div>
+                        <div class="app-bar-pullbutton automatic" style="display: none;height:48px;"></div><div class="clearfix" style="width: 0;"></div><nav class="app-bar-pullmenu hidden flexstyle-app-bar-menu" style="display: none;"><ul class="app-bar-pullmenubar hidden app-bar-menu"></ul></nav></div>
 
             <!-- Content area -->
             <div class="contenttext" id="content"></div>
@@ -70,23 +98,40 @@
     </div>
 </body>
 <script>
+
+    var interval1;
+    function runPB1(){
+        clearInterval(interval1);
+        var pb = $("#pb1").data('progress');
+        var val = 0;
+
+        interval1 = setInterval(function(){
+            val += 0.1;
+            pb.set(val);
+            if (val >= 100) {
+                val = 0;
+                clearInterval(interval1);
+                runPB1()
+            }
+        }, 10);
+    }
+
     var fs = require('fs');
-    var curentPage = "home";
 
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
-        new WinJS.UI._WinKeyboard(splitView.paneElement);
+        new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
     });
 
-    $("#content").load('home.html')
     var anim = document.getElementById("content");
     $(".nav-element").click(function() {
         $("#content").load($(this).attr("data-navigate") + ".html");
         enterPage = WinJS.UI.Animation.enterPage(anim, null);
-        currentPage = $(this).attr("data-navigate");
+        curentPage = $(this).attr("data-navigate");
     });
 
     $(document).ready(function() {
+      curentPage = '';
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
                 regKey = new Winreg({
