@@ -1,11 +1,8 @@
 <h2 class="win-h2">Changelog</h2>
 <br>
-<div  class="win-scrollview" style="overflow-y:scroll;position: relative;display: inline-block;">
-<div class="listview-outlook" id="changelog" data-role="listview" style="width:98%">
-</div>
-
+  	<div class="accordion" id="changelog" style="width:98%" data-role="accordion" data-close-any="true"></div>
 <script>
-$( document ).ready(function() {
-$( "#changelog" ).load( "https://service.realliferpg.de/include/changelog?gameid=1" );
+$(document).ready(function() {
+$("#changelog").load("https://service.realliferpg.de/include/changelog?gameid=1");
 });
 </script>
