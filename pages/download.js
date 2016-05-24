@@ -11,10 +11,15 @@ const {
 
 var armaPath = "D:/SteamLibrary/SteamApps/common/Arma 3/";
 var downloadList = [];
+var checkList = [];
+var errorList = [];
+
 var curFileObj = null;
 var curHashObj = null;
 var totalFileSize = 0;
 var currentDownloadSize = 0;
+
+var isDownloading = false;
 
 ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
@@ -31,7 +36,8 @@ ipcRenderer.on('download-receiver', (event, arg) => {
 function getHashListCallback(jsObj) {
     downloadList = jsObj;
     calcDownloadStats();
-    download(downloadList[0]);
+    //download(downloadList[0]);
+    fullCheck();
 }
 
 function calcDownloadStats() {
@@ -41,7 +47,7 @@ function calcDownloadStats() {
 }
 
 function download(fileObj) {
-
+    isDownloading = true;
     if (quickCheck(fileObj)) {
         downloadNext();
         return;
@@ -85,7 +91,6 @@ function download(fileObj) {
 
     stream.on('end', function() {
         currentDownloadSize = currentDownloadSize + curFileObj.Size;
-        //fullCheck(curFileObj);
         downloadNext();
     });
 
@@ -94,14 +99,17 @@ function download(fileObj) {
 
 function downloadNext() {
 
-    //quickCheck(curFileObj)
+    if(!(quickCheck(curFileObj))){
+        errorList.push(curFileObj);
+    }
 
+    checkList.push(curFileObj);
     downloadList.shift();
 
     if (downloadList.length > 0) {
         download(downloadList[0]);
     } else {
-
+        isDownloading = false;
     }
 
 }
@@ -119,21 +127,40 @@ function quickCheck(fileObj) {
     }
 }
 
-function fullCheck(fObj) {
-    var fs = require('fs');
-    var crypto = require('crypto');
-    // the file you want to get the hash
-    var file = fs.createReadStream(armaPath + fObj.RelativPath);
-    var hash = crypto.createHash('md5');
-    hash.setEncoding('hex');
+function fullCheck() {
 
-    debugger;
+    if (downloadList.length > 0) {
+        try{
+            var fs = require('fs');
+            var crypto = require('crypto');
 
-    file.on('end', (fObj) => {
-        hash.end();
-        debugger;
-        console.log(hash.read() + ' - original: ' + fObj.Hash); // the desired sha1sum
-    });
+            curHashObj = downloadList[0];
 
-    file.pipe(hash);
+            var file = fs.createReadStream(armaPath + curHashObj.RelativPath);
+
+            var hash = crypto.createHash('md5');
+            hash.setEncoding('hex');
+
+            file.on('end', function () {
+                hash.end();
+                var fileHash = hash.read().toUpperCase();
+                console.log('download: ' + fileHash + ' - original: ' + curHashObj.Hash + ' for file ' + curHashObj.FileName);
+                if(!(fileHash === curHashObj.Hash)){
+                    errorList.push(curHashObj);
+                    console.log('invalid checksum for: ' + curHashObj.FileName);
+                }
+                downloadList.shift();
+                debugger;
+                fullCheck();
+            });
+
+            file.pipe(hash);
+        }catch(e){
+            errorList.push(curHashObj);
+            console.log('invalid checksum for: ' + curHashObj.FileName + 'ERROR: ' + e);
+        }
+    } else {
+
+    }
+
 }
