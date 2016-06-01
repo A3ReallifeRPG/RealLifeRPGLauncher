@@ -59,9 +59,9 @@ function updateDwnProgress(arg) {
     pb2.set(arg.obj.progressObj.percentage);
     var winprogress = arg.obj.progressObj.percentage / 100;
     var args = {
-        progress: winprogress
+        progress: totalProgress
     };
-    ipcRenderer.send('winprogress-change', args);
+    ipcRenderer.send('winprogress-change', args); //WHAT TODO @Greeny war ich das ?
     curDownSize = (arg.obj.currentDownloadSize/1073741824).toFixed(3);
     maxDownSize = (arg.obj.totalFileSize/1073741824).toFixed(3);
     if(curDownSize > maxDownSize){

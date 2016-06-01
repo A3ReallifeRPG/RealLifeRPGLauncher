@@ -27,6 +27,11 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             if(debug_mode >= 2){console.log('download start');};
             getModHashList(18, getHashListCallback);
             break;
+        case 'start-fullcheck':
+            if(debug_mode >= 2){console.log('fullCheck start');};
+            //TODO implement
+            debugger;
+            break;
         default:
             if(debug_mode >= 2){console.log('Packet dropped');};
             break;
