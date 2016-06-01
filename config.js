@@ -12,4 +12,7 @@ var mod_ModList = "/ArmaMod/GetMods";
 var mod_FileList = "VersionUpdate/CurrentFileList/"; // url/<mod id>
 var mod_Changelog = "/News/GetNews/"; // url/<mod id>
 
-var launcher_Notification = "/LauncherSettings/GetSettings"
+var launcher_Notification = "/LauncherSettings/GetSettings";
+
+
+var debug_mode = true;

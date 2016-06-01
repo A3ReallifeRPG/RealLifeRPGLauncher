@@ -24,11 +24,11 @@ var isDownloading = false;
 ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
         case 'start-download':
-            console.log('download start');
+            if(debug_mode >= 2){console.log('download start');};
             getModHashList(18, getHashListCallback);
             break;
         default:
-            console.log('Packet dropped');
+            if(debug_mode >= 2){console.log('Packet dropped');};
             break;
     }
 })
@@ -36,8 +36,8 @@ ipcRenderer.on('download-receiver', (event, arg) => {
 function getHashListCallback(jsObj) {
     downloadList = jsObj;
     calcDownloadStats();
-    //download(downloadList[0]);
-    fullCheck();
+    download(downloadList[0]);
+    //fullCheck();
 }
 
 function calcDownloadStats() {
@@ -58,16 +58,14 @@ function download(fileObj) {
 
     try {
         stats = fs.lstatSync(dest.replace(fileObj.FileName, ''));
-        if (stats.isDirectory()) {}
-
+        if (stats.isDirectory()) {};
     } catch (e) {
-        mkpath(dest.replace(fileObj.FileName, ''), function(err) {
-            if (err) throw err;
-            console.log('Directory created');
+        mkpath(dest.replace(fileObj.FileName, ''), function() {
+            if(debug_mode >= 2){console.log('Directory created');};
             download(downloadList[0]);
             return;
         });
-    }
+    };
 
     var stream = dwn._download('http://213.202.212.13/download/' + fileObj.RelativPath);
 
@@ -83,7 +81,9 @@ function download(fileObj) {
             message: "update-progress",
             obj: {
                 fileObj: curFileObj,
-                progressObj: progress
+                progressObj: progress,
+                totalFileSize : totalFileSize,
+                currentDownloadSize : currentDownloadSize
             }
         };
         ipcRenderer.send('message-to-render', args);
@@ -121,46 +121,51 @@ function quickCheck(fileObj) {
         if (stats['size'] != fileObj.Size) {
             return false;
         }
+
+        currentDownloadSize = currentDownloadSize + fileObj.Size;
         return true;
     } catch (e) {
         return false;
     }
+
 }
 
 function fullCheck() {
 
     if (downloadList.length > 0) {
-        try{
-            var fs = require('fs');
-            var crypto = require('crypto');
+        var fs = require('fs');
+        var crypto = require('crypto');
 
-            curHashObj = downloadList[0];
+        curHashObj = downloadList[0];
 
-            var file = fs.createReadStream(armaPath + curHashObj.RelativPath);
+        var file = fs.createReadStream(armaPath + curHashObj.RelativPath);
 
-            var hash = crypto.createHash('md5');
-            hash.setEncoding('hex');
+        var hash = crypto.createHash('md5');
+        hash.setEncoding('hex');
 
-            file.on('end', function () {
-                hash.end();
-                var fileHash = hash.read().toUpperCase();
-                console.log('download: ' + fileHash + ' - original: ' + curHashObj.Hash + ' for file ' + curHashObj.FileName);
-                if(!(fileHash === curHashObj.Hash)){
-                    errorList.push(curHashObj);
-                    console.log('invalid checksum for: ' + curHashObj.FileName);
-                }
-                downloadList.shift();
-                debugger;
-                fullCheck();
-            });
+        file.on('end', function () {
+            hash.end();
+            var fileHash = hash.read().toUpperCase();
+            if(debug_mode >= 2){console.log('download: ' + fileHash + ' - original: ' + curHashObj.Hash + ' for file ' + curHashObj.FileName);};
 
-            file.pipe(hash);
-        }catch(e){
+            if(!(fileHash === curHashObj.Hash)){
+                errorList.push(curHashObj);
+                if(debug_mode >= 2){console.log('invalid checksum for: ' + curHashObj.FileName);};
+            }
+            downloadList.shift();
+            fullCheck();
+        });
+
+        file.on('error',function(){
+            //console.log('invalid checksum for: ' + curHashObj.FileName);
             errorList.push(curHashObj);
-            console.log('invalid checksum for: ' + curHashObj.FileName + 'ERROR: ' + e);
-        }
-    } else {
+            downloadList.shift();
+            fullCheck();
+        });
 
+        file.pipe(hash);
+    } else {
+        console.log('Error List length: ' + errorList.length);
     }
 
 }
