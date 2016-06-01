@@ -9,7 +9,7 @@ const {
 } = require('electron');
 
 
-var armaPath = "D:/SteamLibrary/SteamApps/common/Arma 3/";
+var armaPath = "D:/SteamLibrary/SteamApps/common/Arma 3/"; //TODO use settings path
 var downloadList = [];
 var checkList = [];
 var errorList = [];
@@ -36,22 +36,34 @@ ipcRenderer.on('download-receiver', (event, arg) => {
 function getHashListCallback(jsObj) {
     downloadList = jsObj;
     calcDownloadStats();
+    preDownloadCheck();
     download(downloadList[0]);
     //fullCheck();
 }
 
 function calcDownloadStats() {
+    totalFileSize = 0;
     for (i = 0; i < downloadList.length; i++) {
         totalFileSize = totalFileSize + downloadList[i].Size;
     }
 }
 
+function preDownloadCheck(){
+    currentDownloadSize = 0;
+    checkList = [];
+
+    for(i = 0; i < downloadList.length; i++){
+        fileObj = downloadList[i];
+        if (!quickCheck(fileObj)) {
+            checkList.push(fileObj);
+        };
+    }
+    downloadList = checkList;
+    checkList = []; //free potantially large amount of memory
+}
+
 function download(fileObj) {
     isDownloading = true;
-    if (quickCheck(fileObj)) {
-        downloadNext();
-        return;
-    }
 
     var dest = armaPath + fileObj.RelativPath;
     curFileObj = fileObj;
@@ -67,7 +79,7 @@ function download(fileObj) {
         });
     };
 
-    var stream = dwn._download('http://213.202.212.13/download/' + fileObj.RelativPath);
+    var stream = dwn._download('http://213.202.212.13/download/' + fileObj.RelativPath); //TODO hardcoded IP
 
     var str = progress({
         length: fileObj.Size,
@@ -110,6 +122,12 @@ function downloadNext() {
         download(downloadList[0]);
     } else {
         isDownloading = false;
+        var args = {
+            type: 1,
+            message: "ask-hash",
+            obj: {}
+        };
+        ipcRenderer.send('message-to-render', args);
     }
 
 }

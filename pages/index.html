@@ -70,6 +70,7 @@
                         <div class="progress" id="pb1" data-value="85" data-color="bg-green" data-role="progress" style="margin-left:2%"></div>
                     </div>
                     <div class="col-md-5" id="pb1text" style="margin-top:5px">
+
                     </div>
                 </div>
                 <div class="row" style="margin-top:0px">
@@ -102,6 +103,7 @@
         </p>
         <span class="dialog-close-button"></span>
     </div>
+    <!-- Arma Path Dialog -->
     <div data-role="dialog" id="dialog_defaultpath" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
         <h1>Arma Pfad gefunden</h1>
         <p id="armapathtext">
@@ -109,27 +111,20 @@
         <button class="button success" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('home.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:left">Richtig</button>
         <button class="button danger" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('settings.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:right">Falsch</button>
     </div>
+    <!-- Download Complete Hash Dialog -->
+    <div data-role="dialog" id="dialog_downloadComplete" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
+        <h1>Download abgeschlossen</h1>
+        <p>
+            Der Download ist abgeschlossen. <br/>
+            Wir empfehlen eine komplette überprüfung der Mod Dateien vorzunehmen. <br/>
+            Dies kann einiege Minuten dauern, dadruch ist aber sicher gestellt das der Mod korrekt geladen wurde.<br/>
+        </p>
+        <button class="button success" onclick="" style="float:right">Jetzt Prüfen</button>
+        <button class="button danger" onclick="var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');dwnCompleteDialog.close();" style="float:left">Nicht Prüfen</button>
+    </div>
 </body>
 <script>
     var interval1;
-
-    function runPB1() {
-        clearInterval(interval1);
-        var pb = $("#pb1").data('progress');
-        var val = 0;
-
-        interval1 = setInterval(function() {
-            val += 0.1;
-            pb.set(val);
-            if (val >= 100) {
-                val = 0;
-                clearInterval(interval1);
-                runPB1()
-            }
-        }, 10);
-    }
-
-    var fs = require('fs');
 
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
@@ -143,6 +138,11 @@
         curentPage = $(this).attr("data-navigate");
     });
 
+    $("#content").load("home.html");
+    curentPage = 'home';
+
+
+    //TODO move to index.js since its big and ugly @greeny
     $(document).ready(function() {
         curentPage = '';
         storage.get('settings', function(error, data) {
