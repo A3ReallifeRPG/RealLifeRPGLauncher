@@ -67,7 +67,7 @@
             <div class="app-bar darcula" data-role="appbar">
                 <div class="row" style="margin-top:0px">
                     <div class="col-md-7" style="margin-top:0px">
-                        <div class="progress" id="pb1" data-value="85" data-color="bg-green" data-role="progress" style="margin-left:2%"></div>
+                        <div class="progress" id="pb1" data-value="100" data-color="bg-green" data-role="progress" style="margin-left:2%"></div>
                     </div>
                     <div class="col-md-5" id="pb1text" style="margin-top:5px">
 
@@ -75,12 +75,13 @@
                 </div>
                 <div class="row" style="margin-top:0px">
                     <div class="col-md-7" style="margin-top:0px">
-                        <div class="progress" id="pb2" data-value="85" data-color="bg-blue" data-role="progress" style="margin-left:2%;margin-top:0px"></div>
+                        <div class="progress" id="pb2" data-value="100" data-color="bg-blue" data-role="progress" style="margin-left:2%;margin-top:0px"></div>
                     </div>
                     <div class="col-md-5" id="pb2text" style="margin-bottom:5px">
-                        Testtext
+                        ERROR Not Loaded
                     </div>
                 </div>
+                <button onclick="var args = {message: 'stop-download',obj: {}};ipcRenderer.send('message-to-download', args);">ABBRUCH</button>
                 <div class="app-bar-pullbutton automatic" style="display: none;height:48px;"></div>
                 <div class="clearfix" style="width: 0;"></div>
                 <nav class="app-bar-pullmenu hidden flexstyle-app-bar-menu" style="display: none;">

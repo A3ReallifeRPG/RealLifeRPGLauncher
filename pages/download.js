@@ -20,6 +20,7 @@ var curHashObj = null;
 var totalFileSize = 0;
 var currentDownloadSize = 0;
 
+var cancelDownload = false;
 var isDownloading = false;
 
 ipcRenderer.on('download-receiver', (event, arg) => {
@@ -45,6 +46,10 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                 getModHashList(18, getHashQuickCheckCallback);
             });
             break;
+        case 'stop-download':
+            if(debug_mode >= 2){console.log('stop download');};
+            cancelDownload = true;
+            break;
         default:
             if(debug_mode >= 2){console.log('Packet dropped');};
             break;
@@ -52,6 +57,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
 })
 
 function getHashListCallback(jsObj) {
+    cancelDownload = false;
     downloadList = jsObj;
     calcDownloadStats();
     preDownloadCheck();
@@ -59,12 +65,14 @@ function getHashListCallback(jsObj) {
 }
 
 function getHashFullCheckCallback(jsObj) {
+    cancelDownload = false;
     downloadList = jsObj;
     downloadListTotalSize = downloadList.length;
     fullCheck();
 }
 
 function getHashQuickCheckCallback(jsObj) {
+    cancelDownload = false;
     downloadList = jsObj;
     calcDownloadStats();
     preDownloadCheck();
@@ -105,6 +113,21 @@ function preDownloadCheck(){
 function download(fileObj) {
     isDownloading = true;
 
+    if(cancelDownload){
+        var args = {
+            progType: 2,
+            message: "update-progress",
+            obj: {
+                fileObj: curFileObj,
+                progressObj: progress,
+                totalFileSize : totalFileSize,
+                currentDownloadSize : currentDownloadSize
+            }
+        };
+        ipcRenderer.send('message-to-render', args);
+        return;
+    }
+
     var dest = armaPath + fileObj.RelativPath;
     curFileObj = fileObj;
     try {
@@ -128,7 +151,7 @@ function download(fileObj) {
     str.on('progress', function(progress) {
         document.getElementById('lbl_downInfo').innerHTML = (progress.percentage).toFixed(2) + "% - " + ((progress.speed) / 1048576).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName;
         var args = {
-            type: 1,
+            progType: 1,
             message: "update-progress",
             obj: {
                 fileObj: curFileObj,

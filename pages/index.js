@@ -97,6 +97,10 @@ function hashDialogConfirm(){
     dwnCompleteDialog.close();
 }
 
+function callDownloadStop(){
+    var args = {message: 'stop-download',obj: {}};
+    ipcRenderer.send('message-to-download', args);
+}
 //show Notification for hash
 function showHashDialog(arg){
     var dialog = $('#dialog_downloadComplete').data('dialog');
@@ -105,6 +109,7 @@ function showHashDialog(arg){
 
 //update status bar
 function updateDwnProgress(arg) {
+
     var totalProgress = ((100 / arg.obj.totalFileSize) * arg.obj.currentDownloadSize).toFixed(4);
     if(totalProgress > 100){
         totalProgress = 100; //i knwo its cheating but what should I do ?
@@ -122,11 +127,20 @@ function updateDwnProgress(arg) {
     if(curDownSize > maxDownSize){
         curDownSize = maxDownSize;
     }
-    document.getElementById('pb1text').innerHTML = totalProgress + "% - " + curDownSize + "GB/" + maxDownSize + "GB";
-    document.getElementById('pb2text').innerHTML = (arg.obj.progressObj.percentage).toFixed(2) + "% - " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s - " + arg.obj.fileObj.FileName;
+
+    if(arg.progType == 1){
+        document.getElementById('pb1text').innerHTML = totalProgress + "% - " + curDownSize + "GB/" + maxDownSize + "GB";
+        document.getElementById('pb2text').innerHTML = (arg.obj.progressObj.percentage).toFixed(2) + "% - " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s - " + arg.obj.fileObj.FileName;
+    }else if(arg.progType == 2){
+        document.getElementById('pb1text').innerHTML = "Download Angehalten";
+        document.getElementById('pb2text').innerHTML = "";
+    }
+
+    //TODO what is that ?
     if (curentPage == "home") {
         $('#lbl_downInfo').html(arg.obj);
     }
+
 }
 
 //update status bar for hashing

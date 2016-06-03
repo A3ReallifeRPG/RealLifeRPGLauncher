@@ -14,5 +14,6 @@ var mod_Changelog = "/News/GetNews/"; // url/<mod id>
 
 var launcher_Notification = "/LauncherSettings/GetSettings";
 
+var task_force_installer = "https://realliferpg.de/TFARReallifeRPG.ts3_plugin";
 
-var debug_mode = true;
+var debug_mode = 0;
