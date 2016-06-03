@@ -1,3 +1,4 @@
+const storage = require('electron-json-storage');
 var dwn = require('dwn');
 var progress = require('progress-stream');
 var fs = require('fs');
@@ -8,9 +9,9 @@ const {
     ipcRenderer
 } = require('electron');
 
-
-var armaPath = "D:/SteamLibrary/SteamApps/common/Arma 3/"; //TODO use settings path
+var armaPath = "";
 var downloadList = [];
+var downloadListTotalSize = 0;
 var checkList = [];
 var errorList = [];
 
@@ -25,12 +26,24 @@ ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
         case 'start-download':
             if(debug_mode >= 2){console.log('download start');};
-            getModHashList(18, getHashListCallback);
+            storage.get('settings', function(error, data) {
+                armaPath = data.armapath;
+                getModHashList(18, getHashListCallback);
+            });
             break;
         case 'start-fullcheck':
             if(debug_mode >= 2){console.log('fullCheck start');};
-            //TODO implement
-            debugger;
+            storage.get('settings', function(error, data) {
+                armaPath = data.armapath;
+                getModHashList(18, getHashFullCheckCallback);
+            });
+            break;
+        case 'start-quickcheck':
+            if(debug_mode >= 2){console.log('quickCheck start');};
+            storage.get('settings', function(error, data) {
+                armaPath = data.armapath;
+                getModHashList(18, getHashQuickCheckCallback);
+            });
             break;
         default:
             if(debug_mode >= 2){console.log('Packet dropped');};
@@ -43,7 +56,29 @@ function getHashListCallback(jsObj) {
     calcDownloadStats();
     preDownloadCheck();
     download(downloadList[0]);
-    //fullCheck();
+}
+
+function getHashFullCheckCallback(jsObj) {
+    downloadList = jsObj;
+    downloadListTotalSize = downloadList.length;
+    fullCheck();
+}
+
+function getHashQuickCheckCallback(jsObj) {
+    downloadList = jsObj;
+    calcDownloadStats();
+    preDownloadCheck();
+    if(downloadList.length > 0){
+        download(downloadList[0]); //TODO insted of auto updating, mark as update availible
+    }else{
+        var args = {
+            message: "quick-check-result",
+            obj: {
+                resultType : 1 //1 = success
+            }
+        };
+        ipcRenderer.send('message-to-render', args);
+    }
 }
 
 function calcDownloadStats() {
@@ -72,7 +107,6 @@ function download(fileObj) {
 
     var dest = armaPath + fileObj.RelativPath;
     curFileObj = fileObj;
-
     try {
         stats = fs.lstatSync(dest.replace(fileObj.FileName, ''));
         if (stats.isDirectory()) {};
@@ -153,6 +187,7 @@ function quickCheck(fileObj) {
 
 }
 
+//fully checks all file MD5 hashes
 function fullCheck() {
 
     if (downloadList.length > 0) {
@@ -160,6 +195,16 @@ function fullCheck() {
         var crypto = require('crypto');
 
         curHashObj = downloadList[0];
+
+        var args = {
+            message: "update-hash-progress",
+            obj: {
+                curObj : curHashObj,
+                totalFileCount : downloadListTotalSize,
+                leftFileCount : downloadList.length
+            }
+        };
+        ipcRenderer.send('message-to-render', args);
 
         var file = fs.createReadStream(armaPath + curHashObj.RelativPath);
 
@@ -188,7 +233,18 @@ function fullCheck() {
 
         file.pipe(hash);
     } else {
-        console.log('Error List length: ' + errorList.length);
+        if(errorList.length > 0){
+            console.log('Error List length: ' + errorList.length);
+            downloadList = errorList;
+            download(downloadList[0]);
+        }else{
+            var args = {
+                message: "full-check-result",
+                obj: {
+                    resultType : 1 //1 = success
+                }
+            };
+            ipcRenderer.send('message-to-render', args);
+        }
     }
-
 }

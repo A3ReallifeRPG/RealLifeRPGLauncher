@@ -119,8 +119,8 @@
             Wir empfehlen eine komplette überprüfung der Mod Dateien vorzunehmen. <br/>
             Dies kann einiege Minuten dauern, dadruch ist aber sicher gestellt das der Mod korrekt geladen wurde.<br/>
         </p>
-        <button class="button success" onclick="var args = {message: 'start-fullcheck',obj: {}};ipcRenderer.send('message-to-download', args);" style="float:right">Jetzt Prüfen</button>
-        <button class="button danger" onclick="var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');dwnCompleteDialog.close();" style="float:left">Nicht Prüfen</button>
+        <button class="button success" onclick="hashDialogConfirm();" style="float:right">Jetzt Prüfen</button>
+        <button class="button danger" onclick="hashDialogClose();" style="float:left">Nicht Prüfen</button>
     </div>
 </body>
 
@@ -141,7 +141,6 @@
 
     $("#content").load("home.html");
     curentPage = 'home';
-
 
     //TODO move to index.js since its big and ugly @greeny
     $(document).ready(function() {

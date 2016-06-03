@@ -12,6 +12,10 @@ const {
 } = require('electron');
 getLauncherNotification(showNotf);
 
+
+var args = {message: 'start-quickcheck',obj: {}};
+ipcRenderer.send('message-to-download', args);
+
 //show Notification if activated TODO move to extra thread
 function showNotf(jsonData, success) {
     if (success) {
@@ -32,14 +36,66 @@ ipcRenderer.on('render-receiver', (event, arg) => {
         case 'update-progress':
             updateDwnProgress(arg);
             break;
+        case 'update-hash-progress':
+            updateHashProgress(arg);
+            break;
         case 'ask-hash':
             showHashDialog(arg);
+            break;
+        case 'quick-check-result':
+            quickCheckResult(arg);
+            break;
+        case 'full-check-result':
+            fullCheckResult(arg);
             break;
         default:
             console.log('Packet dropped');
             break;
     }
 })
+
+//show quick check success (maybe later more status types)
+function quickCheckResult(arg){
+    if(arg.obj.resultType == 1){
+
+        var pb1 = $("#pb1").data('progress');
+        pb1.set(100)
+        var pb2 = $("#pb2").data('progress');
+        pb2.set(100);
+
+        document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
+        document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
+    }
+}
+
+//show quick check success (maybe later more status types)
+function fullCheckResult(arg){
+    if(arg.obj.resultType == 1){
+
+        var pb1 = $("#pb1").data('progress');
+        pb1.set(100)
+        var pb2 = $("#pb2").data('progress');
+        pb2.set(100);
+
+        document.getElementById('pb1text').innerHTML = "Komplette Überprüfung beendet";
+        document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
+    }
+}
+
+//ask hash dialog buttons
+function hashDialogClose(){
+    var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
+    dwnCompleteDialog.close();
+    document.getElementById('pb1text').innerHTML = "Download beendet";
+    document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
+}
+
+function hashDialogConfirm(){
+    var args = {message: 'start-fullcheck',obj: {}};
+    ipcRenderer.send('message-to-download', args);
+    var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
+    dwnCompleteDialog.close();
+}
 
 //show Notification for hash
 function showHashDialog(arg){
@@ -57,11 +113,10 @@ function updateDwnProgress(arg) {
     pb1.set(totalProgress);
     var pb2 = $("#pb2").data('progress');
     pb2.set(arg.obj.progressObj.percentage);
-    var winprogress = arg.obj.progressObj.percentage / 100;
     var args = {
         progress: totalProgress
     };
-    ipcRenderer.send('winprogress-change', args); //WHAT TODO @Greeny war ich das ?
+    ipcRenderer.send('winprogress-change', args);
     curDownSize = (arg.obj.currentDownloadSize/1073741824).toFixed(3);
     maxDownSize = (arg.obj.totalFileSize/1073741824).toFixed(3);
     if(curDownSize > maxDownSize){
@@ -69,6 +124,29 @@ function updateDwnProgress(arg) {
     }
     document.getElementById('pb1text').innerHTML = totalProgress + "% - " + curDownSize + "GB/" + maxDownSize + "GB";
     document.getElementById('pb2text').innerHTML = (arg.obj.progressObj.percentage).toFixed(2) + "% - " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s - " + arg.obj.fileObj.FileName;
+    if (curentPage == "home") {
+        $('#lbl_downInfo').html(arg.obj);
+    }
+}
+
+//update status bar for hashing
+function updateHashProgress(arg) {
+    curCount = arg.obj.totalFileCount - arg.obj.leftFileCount;
+    var totalProgress = ((100 / arg.obj.totalFileCount) * curCount).toFixed(1);
+    if(totalProgress > 100){
+        totalProgress = 100;
+    }
+    var pb1 = $("#pb1").data('progress');
+    pb1.set(totalProgress);
+    var pb2 = $("#pb2").data('progress');
+    pb2.set(100);
+    var args = {
+        progress: totalProgress
+    };
+    ipcRenderer.send('winprogress-change', args);
+
+    document.getElementById('pb1text').innerHTML = "Prüfe Datei: " + curCount + " / " + arg.obj.totalFileCount;
+    document.getElementById('pb2text').innerHTML = "Dateiname: " + arg.obj.curObj.FileName;
     if (curentPage == "home") {
         $('#lbl_downInfo').html(arg.obj);
     }

@@ -13,6 +13,17 @@ let win;
 let downWin;
 
 function createWindow() {
+
+    //download process
+    downWin = new BrowserWindow({
+        width: 1000,
+        height: 550
+    });
+    downWin.loadURL(`file://${__dirname}/pages/download.html`);
+    downWin.webContents.openDevTools({
+        detach: false
+    });
+
     // Create the browser window.
     win = new BrowserWindow({
         width: 1000,
@@ -26,14 +37,6 @@ function createWindow() {
         detach: true
     });
 
-    downWin = new BrowserWindow({
-        width: 1000,
-        height: 550
-    });
-    downWin.loadURL(`file://${__dirname}/pages/download.html`);
-    downWin.webContents.openDevTools({
-        detach: false
-    });
 
     win.on('closed', () => {
         downWin = null;
@@ -68,9 +71,8 @@ app.on('activate', () => {
 });
 
 ipcMain.on('winprogress-change',(event, arg) => {
-    win.setProgressBar(arg.progress);
+    //win.setProgressBar(arg.progress);
 });
-
 
 
 //
