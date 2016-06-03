@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "RealLifeRPG Launcher und Downloader",
   "main": "main.js",
-  "homepage": "www.realliferpg.de",
+  "homepage": "https://www.realliferpg.de",
   "scripts": {
     "start": "electron .",
     "postinstall": "install-app-deps",
