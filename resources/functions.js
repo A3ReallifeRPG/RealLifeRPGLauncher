@@ -13,7 +13,7 @@ function getLauncherNotification(callBackFnc) {
 
             callBackFnc(jsObj,true);
         }else if (this.readyState == 4 && !(this.status == 200)){
-            callBackFnc(this.status,true);
+            callBackFnc(this.status,false);
         }
     }
     xhr.send();
@@ -74,7 +74,7 @@ function getServerClients(serverid) {
 /*
     Query Panel for Mod Information
 */
-function getModInfo() {
+function getModInfo(callBackFnc) {
     var searchUrl = infoServerURL + mod_ModList;
 
     var xhr = new XMLHttpRequest();
@@ -82,13 +82,10 @@ function getModInfo() {
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var jsObj = JSON.parse(this.responseText);
-
-            for (var i = 0; i < jsObj.length; i++) {
-                document.write(jsObj[i].Id + ' - ' + jsObj[i].Name + ' - ' + jsObj[i].DownloadUrl + '<br/>')
-            };
+            callBackFnc(jsObj,true);
         }
         if (this.readyState == 4 && this.status == 404) {
-            document.write('Error 404');
+            callBackFnc(this.status,false);
         }
     }
     xhr.send();

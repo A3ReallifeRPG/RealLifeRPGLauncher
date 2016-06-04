@@ -3,62 +3,33 @@
     <div id="div_header">
         <h2 class="win-h2">RealLifeRPG Mods</h2>
     </div>
-    <div id="div_content" style="background-color:#444444;">
-        <table>
-            <tr>
-                <td>
-                    <div class="panel success">
-                        <div class="heading">
-                            <span class="title">RealLifeRPG 5.0</span>
-                        </div>
-                        <div class="content padding10">
-                            <p>
-                                RealLifeRPG 5.0 Mod Download
-                            </p>
-                            <button class="button loading-pulse lighten primary" id="downloadtfar">Download NOW</button>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div class="panel success">
-                        <div class="heading">
-                            <span class="title">RealLifeRPG 5.0</span>
-                        </div>
-                        <div class="content padding10">
-                            <p>
-                                RealLifeRPG 5.0 Mod Download
-                            </p>
-                            <button class="button loading-pulse lighten primary" id="testing">Download NOW</button>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div class="panel success">
-                        <div class="heading">
-                            <span class="title">RealLifeRPG 5.0</span>
-                        </div>
-                        <div class="content padding10">
-                            <p>
-                                RealLifeRPG 5.0 Mod Download
-                            </p>
-                            <button class="button loading-pulse lighten primary">Download NOW</button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+
+    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+
+        <div class="carousel-inner" role="listbox" data-interval="999999999999999999" id="crs_modList">
+
+        </div>
+        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev" id="car_left">
+            <span class="icon-prev" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next" id="car_right">
+            <span class="icon-next" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
     </div>
-    <div id="div_download" class="row" style="background-color:#333333;padding-top:3px;padding-bottom:3px;padding-right:3px;padding-left:3px">
-        <label id="lbl_downInfo">KEINE INFO</label>
-    </div>
+
 </div>
 
 <script>
     $('#downloadtfar').on('click', function() {
-        var args = { type:1,message:"start-download"}
-        ipcRenderer.send('message-to-download',args);
+        var args = {
+            type: 1,
+            message: "start-download"
+        }
+        ipcRenderer.send('message-to-download', args);
         let myNotification = new Notification('Title', {
-          body: 'Lorem Ipsum Dolor Sit Amet'
+            body: 'Lorem Ipsum Dolor Sit Amet'
         });
     });
 

@@ -26,9 +26,10 @@ function showNotf(jsonData, success) {
             dialog.open();
         }
     } else {
-        if(debug_mode >= 2){console.log('Error requesting Notification: ' + jsonData);};
+        if(debug_mode >= 1){console.log('Error requesting Notification: ' + jsonData);};
     }
 }
+
 
 //setup event handler for IPC
 ipcRenderer.on('render-receiver', (event, arg) => {
