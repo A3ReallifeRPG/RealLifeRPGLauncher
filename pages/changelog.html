@@ -1,9 +1,39 @@
 <h2 class="win-h2">Changelog</h2>
 <br>
-  	<div class="accordion" id="changelog" style="width:98%; height:-webkit-calc(100% - 60px); overflow-y:auto;" data-role="accordion" data-close-any="true"></div>
+
+<div class="accordion" id="changelog" style="width:98%; height:-webkit-calc(100% - 60px); overflow-y:auto;" data-role="accordion" data-close-any="true"
+data-on-frame-opened="markRead(frame)" ></div>
+
 <script>
-$(document).ready(function() {
-  $("")
-$("#changelog").load("https://service.realliferpg.de/include/changelog?gameid=1");
-});
+    var readLogs;
+
+    $(document).ready(function() {
+        $("");
+
+        storage.get('changelog', function(error, data) {
+            if (jQuery.isEmptyObject(data)) {
+                readLogs = [];
+            }else{
+                readLogs = data.readLogs;
+            }
+
+            $("#changelog").load("https://service.realliferpg.de/include/changelog?gameid=1",function(){
+                for(i = 0; i < readLogs.length; i++){
+                    $( "#" + readLogs[i] ).find( ".heading" ).prop('style','color:#000000;font-size:18px');
+                };
+            });
+        });
+
+    });
+
+    function markRead(frame){
+        var id = frame.attr('id');
+        $( "#" + id ).find( ".heading" ).prop('style','color:#000000;font-size:18px');
+        readLogs.push(id);
+        storage.set('changelog', {
+            readLogs : readLogs
+        }, function(error) {});
+
+    }
+
 </script>
