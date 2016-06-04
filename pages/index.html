@@ -164,6 +164,7 @@
                                     var pathdialog = $('#dialog_defaultpath').data('dialog');
                                     $('#armapathtext').html(path);
                                     pathdialog.open();
+                                    path = path + "\\";
                                     storage.set('settings', {
                                         armapath: path
                                     }, function(error) {});
@@ -196,6 +197,7 @@
                             var pathdialog = $('#dialog_defaultpath').data('dialog');
                             $('#armapathtext').html(path);
                             pathdialog.open();
+                            path = path + "\\";
                             storage.set('settings', {
                                 armapath: path
                             }, function(error) {});
@@ -226,6 +228,7 @@
                             var pathdialog = $('#dialog_defaultpath').data('dialog');
                             $('#armapathtext').html(path);
                             pathdialog.open();
+                            path = path + "\\";
                             storage.set('settings', {
                                 armapath: path
                             }, function(error) {});

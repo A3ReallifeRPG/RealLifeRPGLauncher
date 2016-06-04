@@ -119,8 +119,9 @@ function updateDwnProgress(arg) {
     pb1.set(totalProgress);
     var pb2 = $("#pb2").data('progress');
     pb2.set(arg.obj.progressObj.percentage);
+    var winprogress = totalProgress / 100;
     var args = {
-        progress: totalProgress
+        progress: winprogress
     };
     ipcRenderer.send('winprogress-change', args);
     curDownSize = (arg.obj.currentDownloadSize/1073741824).toFixed(3);
