@@ -132,7 +132,7 @@
         };
         path = String(dialog.showOpenDialog(options));
         if (path !== "undefined" && path.indexOf('\\arma3.exe') > -1) {
-          path = path.replace('\\arma3.exe','');
+          path = path.replace('arma3.exe','');
           $('#armapath').val(path);
           saveallsettings();
         } else {

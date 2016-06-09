@@ -71,7 +71,7 @@ app.on('activate', () => {
 });
 
 ipcMain.on('winprogress-change',(event, arg) => {
-    //win.setProgressBar(arg.progress);
+    win.setProgressBar(arg.progress);
 });
 
 
