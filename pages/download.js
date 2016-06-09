@@ -26,32 +26,63 @@ var isDownloading = false;
 ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
         case 'start-download':
-            if(debug_mode >= 2){console.log('download start');};
+            if (debug_mode >= 2) {
+                console.log('download start');
+            };
             storage.get('settings', function(error, data) {
-                armaPath = data.armapath;
-                getModHashList(arg.modId, getHashListCallback);
+                if (data.armapath == "") {
+                    var args = {
+                        message: "no-path-warning"
+                    };
+                    ipcRenderer.send('message-to-render', args);
+                } else {
+                    armaPath = data.armapath;
+                    getModHashList(arg.modId, getHashListCallback);
+                };
             });
             break;
         case 'start-fullcheck':
-            if(debug_mode >= 2){console.log('fullCheck start');};
+            if (debug_mode >= 2) {
+                console.log('fullCheck start');
+            };
             storage.get('settings', function(error, data) {
-                armaPath = data.armapath;
-                getModHashList(arg.modId, getHashFullCheckCallback);
+                if (data.armapath == "") {
+                    var args = {
+                        message: "no-path-warning"
+                    };
+                    ipcRenderer.send('message-to-render', args);
+                } else {
+                    armaPath = data.armapath;
+                    getModHashList(arg.modId, getHashFullCheckCallback);
+                };
             });
             break;
         case 'start-quickcheck':
-            if(debug_mode >= 2){console.log('quickCheck start');};
+            if (debug_mode >= 2) {
+                console.log('quickCheck start');
+            };
             storage.get('settings', function(error, data) {
-                armaPath = data.armapath;
-                getModHashList(arg.modId, getHashQuickCheckCallback);
+                if (data.armapath == "") {
+                    var args = {
+                        message: "no-path-warning"
+                    };
+                    ipcRenderer.send('message-to-render', args);
+                } else {
+                    armaPath = data.armapath;
+                    getModHashList(arg.modId, getHashQuickCheckCallback);
+                };
             });
             break;
         case 'stop-download':
-            if(debug_mode >= 2){console.log('stop download');};
+            if (debug_mode >= 2) {
+                console.log('stop download');
+            };
             cancelDownload = true;
             break;
         default:
-            if(debug_mode >= 2){console.log('Packet dropped');};
+            if (debug_mode >= 2) {
+                console.log('Packet dropped');
+            };
             break;
     }
 })
@@ -76,13 +107,13 @@ function getHashQuickCheckCallback(jsObj) {
     downloadList = jsObj;
     calcDownloadStats();
     preDownloadCheck();
-    if(downloadList.length > 0){
+    if (downloadList.length > 0) {
         download(downloadList[0]); //TODO insted of auto updating, mark as update availible
-    }else{
+    } else {
         var args = {
             message: "quick-check-result",
             obj: {
-                resultType : 1 //1 = success
+                resultType: 1 //1 = success
             }
         };
         ipcRenderer.send('message-to-render', args);
@@ -96,11 +127,11 @@ function calcDownloadStats() {
     }
 }
 
-function preDownloadCheck(){
+function preDownloadCheck() {
     currentDownloadSize = 0;
     checkList = [];
 
-    for(i = 0; i < downloadList.length; i++){
+    for (i = 0; i < downloadList.length; i++) {
         fileObj = downloadList[i];
         if (!quickCheck(fileObj)) {
             checkList.push(fileObj);
@@ -113,15 +144,15 @@ function preDownloadCheck(){
 function download(fileObj) {
     isDownloading = true;
 
-    if(cancelDownload){
+    if (cancelDownload) {
         var args = {
             progType: 2,
             message: "update-progress",
             obj: {
                 fileObj: curFileObj,
                 progressObj: progress,
-                totalFileSize : totalFileSize,
-                currentDownloadSize : currentDownloadSize
+                totalFileSize: totalFileSize,
+                currentDownloadSize: currentDownloadSize
             }
         };
         ipcRenderer.send('message-to-render', args);
@@ -135,7 +166,9 @@ function download(fileObj) {
         if (stats.isDirectory()) {};
     } catch (e) {
         mkpath(dest.replace(fileObj.FileName, ''), function() {
-            if(debug_mode >= 2){console.log('Directory created');};
+            if (debug_mode >= 2) {
+                console.log('Directory created');
+            };
             download(downloadList[0]);
             return;
         });
@@ -156,8 +189,8 @@ function download(fileObj) {
             obj: {
                 fileObj: curFileObj,
                 progressObj: progress,
-                totalFileSize : totalFileSize,
-                currentDownloadSize : currentDownloadSize
+                totalFileSize: totalFileSize,
+                currentDownloadSize: currentDownloadSize
             }
         };
         ipcRenderer.send('message-to-render', args);
@@ -173,7 +206,7 @@ function download(fileObj) {
 
 function downloadNext() {
 
-    if(!(quickCheck(curFileObj))){
+    if (!(quickCheck(curFileObj))) {
         errorList.push(curFileObj);
     }
 
@@ -222,9 +255,9 @@ function fullCheck() {
         var args = {
             message: "update-hash-progress",
             obj: {
-                curObj : curHashObj,
-                totalFileCount : downloadListTotalSize,
-                leftFileCount : downloadList.length
+                curObj: curHashObj,
+                totalFileCount: downloadListTotalSize,
+                leftFileCount: downloadList.length
             }
         };
         ipcRenderer.send('message-to-render', args);
@@ -234,20 +267,24 @@ function fullCheck() {
         var hash = crypto.createHash('md5');
         hash.setEncoding('hex');
 
-        file.on('end', function () {
+        file.on('end', function() {
             hash.end();
             var fileHash = hash.read().toUpperCase();
-            if(debug_mode >= 2){console.log('download: ' + fileHash + ' - original: ' + curHashObj.Hash + ' for file ' + curHashObj.FileName);};
+            if (debug_mode >= 2) {
+                console.log('download: ' + fileHash + ' - original: ' + curHashObj.Hash + ' for file ' + curHashObj.FileName);
+            };
 
-            if(!(fileHash === curHashObj.Hash)){
+            if (!(fileHash === curHashObj.Hash)) {
                 errorList.push(curHashObj);
-                if(debug_mode >= 2){console.log('invalid checksum for: ' + curHashObj.FileName);};
+                if (debug_mode >= 2) {
+                    console.log('invalid checksum for: ' + curHashObj.FileName);
+                };
             }
             downloadList.shift();
             fullCheck();
         });
 
-        file.on('error',function(){
+        file.on('error', function() {
             //console.log('invalid checksum for: ' + curHashObj.FileName);
             errorList.push(curHashObj);
             downloadList.shift();
@@ -256,15 +293,15 @@ function fullCheck() {
 
         file.pipe(hash);
     } else {
-        if(errorList.length > 0){
+        if (errorList.length > 0) {
             console.log('Error List length: ' + errorList.length);
             downloadList = errorList;
             download(downloadList[0]);
-        }else{
+        } else {
             var args = {
                 message: "full-check-result",
                 obj: {
-                    resultType : 1 //1 = success
+                    resultType: 1 //1 = success
                 }
             };
             ipcRenderer.send('message-to-render', args);

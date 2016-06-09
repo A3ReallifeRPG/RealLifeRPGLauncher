@@ -49,6 +49,10 @@ ipcRenderer.on('render-receiver', (event, arg) => {
         case 'full-check-result':
             fullCheckResult(arg);
             break;
+        case 'no-path-warning':
+            var dialog = $('#dialog_noPath').data('dialog');
+            dialog.open();
+            break;
         default:
             console.log('Packet dropped');
             break;
@@ -97,6 +101,15 @@ function hashDialogConfirm(){
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
 }
+
+//ask path dialog
+function noArmaPathSettings(){
+    var dialog_noPath = $('#dialog_noPath').data('dialog');
+    dialog_noPath.close();
+    $("#content").load("settings.html");
+    curentPage = 'settings';
+}
+
 
 function callDownloadStop(){
     var args = {message: 'stop-download',obj: {}};
