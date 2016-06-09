@@ -11,10 +11,7 @@ const {
     ipcRenderer
 } = require('electron');
 getLauncherNotification(showNotf);
-
-
-//var args = {message: 'start-quickcheck',obj: {}};
-//ipcRenderer.send('message-to-download', args);
+searchUpdates();
 
 //show Notification if activated TODO move to extra thread
 function showNotf(jsonData, success) {
@@ -71,6 +68,24 @@ function quickCheckResult(arg){
         document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
     }
+}
+
+//check for updates
+function searchUpdates(){
+
+    var installedMods;
+    storage.get('settings', function(error, data) {
+        if (jQuery.isEmptyObject(data.installedMods)) {
+            installedMods = [];
+        }else{
+            installedMods = data.installedMods;
+        }
+
+        for(i = 0; i < installedMods.length; i++){
+            var args = {message: 'start-quickcheck',modId: installedMods[i]};
+            ipcRenderer.send('message-to-download', args);
+        }
+    });
 }
 
 //show quick check success (maybe later more status types)
