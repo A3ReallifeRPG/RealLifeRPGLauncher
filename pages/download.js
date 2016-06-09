@@ -29,21 +29,21 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             if(debug_mode >= 2){console.log('download start');};
             storage.get('settings', function(error, data) {
                 armaPath = data.armapath;
-                getModHashList(18, getHashListCallback);
+                getModHashList(arg.modId, getHashListCallback);
             });
             break;
         case 'start-fullcheck':
             if(debug_mode >= 2){console.log('fullCheck start');};
             storage.get('settings', function(error, data) {
                 armaPath = data.armapath;
-                getModHashList(18, getHashFullCheckCallback);
+                getModHashList(arg.modId, getHashFullCheckCallback);
             });
             break;
         case 'start-quickcheck':
             if(debug_mode >= 2){console.log('quickCheck start');};
             storage.get('settings', function(error, data) {
                 armaPath = data.armapath;
-                getModHashList(18, getHashQuickCheckCallback);
+                getModHashList(arg.modId, getHashQuickCheckCallback);
             });
             break;
         case 'stop-download':

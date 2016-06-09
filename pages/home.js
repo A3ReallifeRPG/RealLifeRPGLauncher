@@ -78,3 +78,16 @@ function showModInfo(jsonData, success){
         if(debug_mode >= 1){console.log('Error requesting Mod List: ' + jsonData);};
     }
 }
+
+function modClick(id){
+    var args = {
+        type: 1,
+        message: "start-download",
+        modId: id
+    }
+    ipcRenderer.send('message-to-download', args);
+    
+    let myNotification = new Notification('Title', {
+        body: 'Lorem Ipsum Dolor Sit Amet'
+    });
+}

@@ -13,8 +13,8 @@ const {
 getLauncherNotification(showNotf);
 
 
-var args = {message: 'start-quickcheck',obj: {}};
-ipcRenderer.send('message-to-download', args);
+//var args = {message: 'start-quickcheck',obj: {}};
+//ipcRenderer.send('message-to-download', args);
 
 //show Notification if activated TODO move to extra thread
 function showNotf(jsonData, success) {
