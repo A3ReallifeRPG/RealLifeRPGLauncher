@@ -69,6 +69,14 @@ function quickCheckResult(arg) {
 
         document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
+    }else if(arg.obj.resultType == 2){
+
+        var lbl = document.getElementById('lbl_updateModInfo');
+
+        lbl.innerHTML = lbl.innerHTML + arg.obj.modId;
+
+        var dialog = $('#dialog_updateInfo').data('dialog');
+        dialog.open();
     }
 }
 
@@ -76,7 +84,7 @@ function quickCheckResult(arg) {
 function searchUpdates() {
 
     var installedMods;
-    storage.get('settings', function(error, data) {
+    storage.get('mods', function(error, data) {
         if (jQuery.isEmptyObject(data.installedMods)) {
             installedMods = [];
         } else {

@@ -19,6 +19,7 @@ var curFileObj = null;
 var curHashObj = null;
 var totalFileSize = 0;
 var currentDownloadSize = 0;
+var currentModId = 0;
 
 var cancelDownload = false;
 var isDownloading = false;
@@ -38,6 +39,21 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                 } else {
                     armaPath = data.armapath;
                     getModHashList(arg.modId, getHashListCallback);
+
+                    storage.get('settings', function(error, data) {
+                        if (jQuery.isEmptyObject(data.installedMods)) {
+                            installedMods = [];
+                        } else {
+                            installedMods = data.installedMods;
+                        }
+                        if(!(arg.modId in installedMods)){
+                            installedMods.push(arg.modId);
+                            storage.set('mods', {
+                                installedMods : installedMods
+                            }, function(error) {});
+                        }
+
+                    });
                 };
             });
             break;
@@ -68,6 +84,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                     };
                     ipcRenderer.send('message-to-render', args);
                 } else {
+                    currentModId = arg.modId;
                     armaPath = data.armapath;
                     getModHashList(arg.modId, getHashQuickCheckCallback);
                 };
@@ -108,12 +125,19 @@ function getHashQuickCheckCallback(jsObj) {
     calcDownloadStats();
     preDownloadCheck();
     if (downloadList.length > 0) {
-        download(downloadList[0]); //TODO insted of auto updating, mark as update availible
+        var args = {
+            message: "quick-check-result",
+            obj: {
+                resultType: 2, //1 = success, 2 = update
+                modId : currentModId
+            }
+        };
+        ipcRenderer.send('message-to-render', args);
     } else {
         var args = {
             message: "quick-check-result",
             obj: {
-                resultType: 1 //1 = success
+                resultType: 1 //1 = success, 2 = update
             }
         };
         ipcRenderer.send('message-to-render', args);
