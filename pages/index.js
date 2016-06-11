@@ -73,7 +73,7 @@ function quickCheckResult(arg) {
 
         var lbl = document.getElementById('lbl_updateModInfo');
 
-        lbl.innerHTML = lbl.innerHTML + arg.obj.modId;
+        lbl.innerHTML = lbl.innerHTML + arg.obj.modId + " ";
 
         var dialog = $('#dialog_updateInfo').data('dialog');
         dialog.open();

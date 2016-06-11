@@ -50,8 +50,13 @@ function showModInfo(jsonData, success){
             infoDivPar.setAttribute('class',"style='text-size:18'");
 
             var infoDivBold = document.createElement('b');
+
+            node = document.createTextNode(" Mod ID: " + jsonData[i].Id);
+            var br = document.createElement("br");
+            infoDivBold.appendChild(node);
+            infoDivBold.appendChild(br);
             node = document.createTextNode(jsonData[i].Description);
-            infoDivBold.appendChild(node)
+            infoDivBold.appendChild(node);
 
             var infoDivButton = document.createElement('button');
             infoDivButton.setAttribute('id','btn_mod_' + jsonData[i].Id);
@@ -86,7 +91,7 @@ function modClick(id){
         modId: id
     }
     ipcRenderer.send('message-to-download', args);
-    
+
     let myNotification = new Notification('Title', {
         body: 'Lorem Ipsum Dolor Sit Amet'
     });
