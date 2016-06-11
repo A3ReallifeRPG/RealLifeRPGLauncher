@@ -16,4 +16,4 @@ var launcher_Notification = "/LauncherSettings/GetSettings";
 
 var task_force_installer = "https://realliferpg.de/TFARReallifeRPG.ts3_plugin";
 
-var debug_mode = 0;
+var debug_mode = 1;

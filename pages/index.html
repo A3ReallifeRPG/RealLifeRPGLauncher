@@ -69,8 +69,10 @@
                     <div class="col-md-7" style="margin-top:0px">
                         <div class="progress" id="pb1" data-value="100" data-color="bg-green" data-role="progress" style="margin-left:2%"></div>
                     </div>
-                    <div class="col-md-5" id="pb1text" style="margin-top:5px">
-
+                    <div class="col-md-5" style="margin-top:5px">
+                      <span id="pb1text" style="margin-top:5px">
+                      </span>
+                      <button class="button danger" onclick="var args = {message: 'stop-download',obj: {}};ipcRenderer.send('message-to-download', args);" style="right: 0;position:fixed;margin-right:5px"><span class="icon mif-cancel"></span></button>
                     </div>
                 </div>
                 <div class="row" style="margin-top:0px">
@@ -79,9 +81,9 @@
                     </div>
                     <div class="col-md-5" id="pb2text" style="margin-bottom:5px">
                         Kein Download eingereiht.
+
                     </div>
                 </div>
-                <button onclick="var args = {message: 'stop-download',obj: {}};ipcRenderer.send('message-to-download', args);">ABBRUCH</button>
                 <div class="app-bar-pullbutton automatic" style="display: none;height:48px;"></div>
                 <div class="clearfix" style="width: 0;"></div>
                 <nav class="app-bar-pullmenu hidden flexstyle-app-bar-menu" style="display: none;">
@@ -109,16 +111,17 @@
         <h1>Arma Pfad gefunden</h1>
         <p id="armapathtext">
         </p>
-        <button class="button success" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('home.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:left">Richtig</button>
-        <button class="button danger" onclick="var pathdialog = $('#dialog_defaultpath').data('dialog');pathdialog.close();$('#content').load('settings.html');enterPage = WinJS.UI.Animation.enterPage(anim, null);" style="float:right">Falsch</button>
+        <button class="button success" onclick="armaPathisCorrect();" style="float:left">Richtig</button>
+        <button class="button danger" onclick="armaPathisFalse();" style="float:right">Falsch</button>
     </div>
     <!-- Download Complete Hash Dialog -->
     <div data-role="dialog" id="dialog_downloadComplete" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
         <h1>Download abgeschlossen</h1>
         <p>
-            Der Download ist abgeschlossen. <br/>
-            Wir empfehlen eine komplette überprüfung der Mod Dateien vorzunehmen. <br/>
-            Dies kann einiege Minuten dauern, dadruch ist aber sicher gestellt das der Mod korrekt geladen wurde.<br/>
+            Der Download ist abgeschlossen.
+            <br/> Wir empfehlen eine komplette überprüfung der Mod Dateien vorzunehmen.
+            <br/> Dies kann einiege Minuten dauern, dadurch ist aber sichergestellt das der Mod korrekt geladen wurde.
+            <br/>
         </p>
         <button class="button success" onclick="hashDialogConfirm();" style="float:right">Jetzt Prüfen</button>
         <button class="button danger" onclick="hashDialogClose();" style="float:left">Nicht Prüfen</button>
@@ -135,8 +138,6 @@
 </body>
 
 <script>
-    var interval1;
-
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
         new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
@@ -144,127 +145,19 @@
 
     var anim = document.getElementById("content");
     $(".nav-element").click(function() {
-        $("#content").load($(this).attr("data-navigate") + ".html");
-        enterPage = WinJS.UI.Animation.enterPage(anim, null);
-        curentPage = $(this).attr("data-navigate");
+        loadpage($(this).attr("data-navigate") + ".html");
     });
 
     $("#content").load("home.html");
     curentPage = 'home';
 
-    //TODO move to index.js since its big and ugly @greeny
     $(document).ready(function() {
-        curentPage = '';
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
-                regKey = new Winreg({
-                    hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
-                    key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
-                })
-
-                regKey.keyExists(function(err, exists /* array of RegistryItem */ ) {
-                    if (exists) {
-                        regKey.values(function(err, items /* array of RegistryItem */ ) {
-                            path = items[3].value;
-                            console.log(path);
-                            try {
-                                filepath = fs.lstatSync(path + "\\arma3.exe");
-                                if (filepath.isFile()) {
-                                    var pathdialog = $('#dialog_defaultpath').data('dialog');
-                                    $('#armapathtext').html(path);
-                                    pathdialog.open();
-                                    path = path + "\\";
-                                    storage.set('settings', {
-                                        armapath: path
-                                    }, function(error) {});
-                                };
-                            } catch (e) {
-                                checkregkey2();
-                            }
-                        });
-                    } else {
-                        checkregkey2();
-                    }
-                });
+                checkregkey1();
             };
-        });
+        })
     });
-
-    function checkregkey2() {
-        regKey2 = new Winreg({
-            hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
-            key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410' // Arma 3 Key
-        })
-
-        regKey2.keyExists(function(err, exists /* array of RegistryItem */ ) {
-            if (exists) {
-                regKey2.values(function(err, items /* array of RegistryItem */ ) {
-                    path = items[3].value;
-                    try {
-                        filepath = fs.lstatSync(path + "\\arma3.exe");
-                        if (filepath.isFile()) {
-                            var pathdialog = $('#dialog_defaultpath').data('dialog');
-                            $('#armapathtext').html(path);
-                            pathdialog.open();
-                            path = path + "\\";
-                            storage.set('settings', {
-                                armapath: path
-                            }, function(error) {});
-                        };
-                    } catch (e) {
-                        checkregkey3();
-                    }
-                });
-            } else {
-                checkregkey3();
-            }
-        });
-    };
-
-    function checkregkey3() {
-        regKey3 = new Winreg({
-            hive: Winreg.HKLM, // HKEY_LOCAL_MACHINE
-            key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3' // Arma 3 Key
-        })
-
-        regKey3.keyExists(function(err, exists /* array of RegistryItem */ ) {
-            if (exists) {
-                regKey3.values(function(err, items /* array of RegistryItem */ ) {
-                    path = items[0].value;
-                    try {
-                        filepath = fs.lstatSync(path + "\\arma3.exe");
-                        if (filepath.isFile()) {
-                            var pathdialog = $('#dialog_defaultpath').data('dialog');
-                            $('#armapathtext').html(path);
-                            pathdialog.open();
-                            path = path + "\\";
-                            storage.set('settings', {
-                                armapath: path
-                            }, function(error) {});
-                        } else {
-                            storage.set('settings', {
-                                armapath: ''
-                            }, function(error) {});
-                            $('#content').load('settings.html');
-                            enterPage = WinJS.UI.Animation.enterPage(anim, null);
-                        }
-                    } catch (e) {
-                        storage.set('settings', {
-                            armapath: ''
-                        }, function(error) {});
-                        $('#content').load('settings.html');
-                        enterPage = WinJS.UI.Animation.enterPage(anim, null);
-                    }
-                });
-            } else {
-                storage.set('settings', {
-                    armapath: ''
-                }, function(error) {});
-                $('#content').load('settings.html');
-                enterPage = WinJS.UI.Animation.enterPage(anim, null);
-            }
-        });
-    };
 </script>
 
 </html>
