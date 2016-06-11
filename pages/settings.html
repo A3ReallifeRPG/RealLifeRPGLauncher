@@ -145,14 +145,9 @@
             $('#armapath').val(path);
             saveallsettings();
         } else {
-            storage.get('settings', function(error, data) {
-                tmppath = data.armapath;
-            });
-            if (tmppath != "") {} else {
-                storage.set('settings', {
-                    armapath: ''
-                }, function(error) {});
-            };
+          storage.set('settings', {
+              armapath: ''
+          }, function(error) {});
             loadallsettings();
             $.Notify({
                 caption: 'Bitte wähle deine Arma3.exe aus',
