@@ -231,7 +231,7 @@ function updateHashProgress(arg) {
 function loadpage(file) {
     $("#content").load(file);
     enterPage = WinJS.UI.Animation.enterPage(anim, null);
-    curentPage = 'home';
+    curentPage = file.replace('.html','');
 }
 
 function checkregkey1() {

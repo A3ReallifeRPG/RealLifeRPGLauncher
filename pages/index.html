@@ -155,7 +155,9 @@
 
     var anim = document.getElementById("content");
     $(".nav-element").click(function() {
+        if(curentPage != $(this).attr("data-navigate")) {
         loadpage($(this).attr("data-navigate") + ".html");
+      };
     });
 
     $("#content").load("home.html");
