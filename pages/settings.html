@@ -33,10 +33,10 @@
                         <h5 class="win-h5">Max. Mem:&nbsp;&nbsp;</h5>
                     </td>
                     <td>
-                      <div class="input-control text" data-role="input">
-                        <input type="number" id="meminput" style="color:#444444">
-                        <button class="button" id="membutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Die Maximale Menge Arbeitsspeicher die Arma verwenden darf" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
-                      </div>
+                        <div class="input-control text" data-role="input">
+                            <input type="number" id="meminput" style="color:#444444">
+                            <button class="button" id="membutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Die Maximale Menge Arbeitsspeicher die Arma verwenden darf" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                        </div>
                     </td>
 
                 </tr>
@@ -56,10 +56,10 @@
                         <h5 class="win-h5">CPU Count:&nbsp;&nbsp;</h5>
                     </td>
                     <td>
-                      <div class="input-control text" data-role="input">
-                        <input type="number" id="cpuinput" style="color:#444444">
-                        <button class="button" id="cpubutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Gleich oder weniger als deine nativen CPU Kerne" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
-                      </div>
+                        <div class="input-control text" data-role="input">
+                            <input type="number" id="cpuinput" style="color:#444444">
+                            <button class="button" id="cpubutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Gleich oder weniger als deine nativen CPU Kerne" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -78,10 +78,10 @@
                         <h5 class="win-h5">Max. vRAM:&nbsp;&nbsp;</h5>
                     </td>
                     <td>
-                      <div class="input-control text" data-role="input">
-                      <input type="number" id="vraminput" style="color:#444444">
-                      <button class="button" id="vrambutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Die Maximale Menge Grafikspeicher die Arma verwenden darf" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
-                    </div>
+                        <div class="input-control text" data-role="input">
+                            <input type="number" id="vraminput" style="color:#444444">
+                            <button class="button" id="vrambutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="Die Maximale Menge Grafikspeicher die Arma verwenden darf" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -101,9 +101,18 @@
                     </td>
                     <td>
                         <div class="input-control text" data-role="input">
-                          <input type="number" id="threadinput" style="color:#444444">
-                          <button class="button" id="threadbutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="3 für Dualcore <br> 7 für Quadcore" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
+                            <input type="number" id="threadinput" style="color:#444444">
+                            <button class="button" id="threadbutton" data-role="popover" data-popover-mode="click" data-popover-position="right" data-popover-text="3 für Dualcore <br> 7 für Quadcore" data-popover-background="bg-cyan" data-popover-color="fg-white"><span class="mif-info"></span></button>
                         </div>
+                    </td>
+                    <td style="width:1%">
+                    </td>
+                    <td style="width:1%">
+                    </td>
+                    <td style="width:1%">
+                    </td>
+                    <td style="width:1%">
+                      <button class="button danger" onclick="resetallsettings();" <span class="icon mif-bin"></span> Zurücksetzen</button>
                     </td>
                 </tr>
             </table>
@@ -132,19 +141,24 @@
         };
         path = String(dialog.showOpenDialog(options));
         if (path !== "undefined" && path.indexOf('\\arma3.exe') > -1) {
-          path = path.replace('arma3.exe','');
-          $('#armapath').val(path);
-          saveallsettings();
+            path = path.replace('arma3.exe', '');
+            $('#armapath').val(path);
+            saveallsettings();
         } else {
-          storage.set('settings', {
-              armapath: ''
-          }, function(error) {});
-          loadallsettings();
-          $.Notify({
-              caption: 'Bitte wähle deine Arma3.exe aus',
-              content: ' ',
-              type: 'alert'
-          });
+            storage.get('settings', function(error, data) {
+                tmppath = data.armapath;
+            });
+            if (tmppath != "") {} else {
+                storage.set('settings', {
+                    armapath: ''
+                }, function(error) {});
+            };
+            loadallsettings();
+            $.Notify({
+                caption: 'Bitte wähle deine Arma3.exe aus',
+                content: ' ',
+                type: 'alert'
+            });
         }
     });
 
@@ -168,22 +182,22 @@
         saveallsettings();
     });
 
-    $("#meminput").on('change keydown paste input', function(){
+    $("#meminput").on('change keydown paste input', function() {
         mem = $("#meminput").val();
         saveallsettings();
     });
 
-    $("#cpuinput").on('change keydown paste input', function(){
+    $("#cpuinput").on('change keydown paste input', function() {
         cpu = $("#cpuinput").val();
         saveallsettings();
     });
 
-    $("#vraminput").on('change keydown paste input', function(){
+    $("#vraminput").on('change keydown paste input', function() {
         vram = $("#vraminput").val();
         saveallsettings();
     });
 
-    $("#threadinput").on('change keydown paste input', function(){
+    $("#threadinput").on('change keydown paste input', function() {
         thread = $("#threadinput").val();
         saveallsettings();
     });
@@ -200,15 +214,43 @@
             vram: vram,
             thread: thread
         }, function(error) {});
-        if(timert) {
-          $.Notify({
-              caption: 'Änderungen gespeichert',
-              content: ' ',
-              type: 'success'
-          });
-          timert = false;
-          setTimeout(function() { timert = true; }, 2000);
+        if (timert) {
+            $.Notify({
+                caption: 'Änderungen gespeichert',
+                content: ' ',
+                type: 'success'
+            });
+            timert = false;
+            setTimeout(function() {
+                timert = true;
+            }, 2000);
         };
+    }
+
+    function resetallsettings() {
+        storage.set('settings', {
+            armapath: '',
+            splash: '',
+            intro: '',
+            ht: '',
+            windowed: '',
+            mem: '',
+            cpu: '',
+            vram: '',
+            thread: ''
+        }, function(error) {});
+        if (timert) {
+            $.Notify({
+                caption: 'Alle Änderungen zurückgesetzt',
+                content: ' ',
+                type: 'success'
+            });
+            timert = false;
+            setTimeout(function() {
+                timert = true;
+            }, 2000);
+        };
+        loadallsettings();
     }
 
     function loadallsettings() {
@@ -218,7 +260,7 @@
             intro = data.intro;
             ht = data.ht;
             windowed = data.windowed;
-            mem =  data.mem;
+            mem = data.mem;
             cpu = data.cpu;
             vram = data.vram;
             thread = data.thread;
@@ -228,15 +270,15 @@
     }
 
     function loadsettingstoui() {
-      $('#armapath').val(path);
-      $('#splashswitch').prop('checked', splash);
-      $('#introswitch').prop('checked', intro);
-      $('#htswitch').prop('checked', ht);
-      $('#windowedswitch').prop('checked', windowed);
-      $("#meminput").val(mem);
-      $("#cpuinput").val(cpu);
-      $("#vraminput").val(vram);
-      $("#threadinput").val(thread);
+        $('#armapath').val(path);
+        $('#splashswitch').prop('checked', splash);
+        $('#introswitch').prop('checked', intro);
+        $('#htswitch').prop('checked', ht);
+        $('#windowedswitch').prop('checked', windowed);
+        $("#meminput").val(mem);
+        $("#cpuinput").val(cpu);
+        $("#vraminput").val(vram);
+        $("#threadinput").val(thread);
     }
 
     // To protect against untrusted code execution, all functions are required to be marked as supported for processing before they can be used inside a data-win-options attribute in HTML markup.
