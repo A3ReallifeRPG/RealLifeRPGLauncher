@@ -5,33 +5,44 @@
     <meta charset="UTF-8">
     <title>RealLifeRPG Launcher v3</title>
 
+    <!-- config -->
     <script src="../config.js"></script>
+
+    <!-- functions -->
     <script src="../resources/functions.js"></script>
 
+    <!-- Tether -->
+    <link href="../resources/tether/css/tether.min.css" rel="stylesheet">
+    <script src="../resources/tether/js/tether.min.js"></script>
+
+    <!-- JQuery -->
     <script type="text/javascript">
         window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
     </script>
 
+    <!-- bootstrap -->
     <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
     <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
 
+    <!-- winjs -->
     <link href="../resources/winjs/css/ui-dark.css" rel="stylesheet" />
     <script src="../resources/winjs/js/base.js"></script>
     <script src="../resources/winjs/js/ui.js"></script>
 
+    <!-- metroui -->
     <link href="../resources/metroui/css/metro.min.css" rel="stylesheet">
     <link href="../resources/metroui/css/metro-icons.min.css" rel="stylesheet">
     <link href="../resources/metroui/css/metro-schemes.css" rel="stylesheet">
     <script src="../resources/metroui/js/metro.js"></script>
 
-    <link href="../resources/tether/css/tether.min.css" rel="stylesheet">
-    <script src="../resources/tether/js/tether.min.js"></script>
-
+    <!-- Custom css/js -->
     <link rel="stylesheet" href="../resources/custom.css">
     <script src="index.js"></script>
+
 </head>
 
 <body>
+    <!-- preloader -->
     <script type="text/javascript">
         $(window).load(function() { // makes sure the whole site is loaded
             $('#status').fadeOut(); // will first fade out the loading animation
@@ -41,11 +52,13 @@
             });
         })
     </script>
+
     <div id="preloader">
         <div id="status">
             <div data-role="preloader" data-type="cycle" data-style="color"></div>
         </div>
     </div>
+
     <div id="app">
         <div class="splitView" data-win-control="WinJS.UI.SplitView">
             <!-- Pane area -->
@@ -64,27 +77,32 @@
                     <div class="nav-element" data-navigate="settings" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Einstellungen', icon: 'settings'}"></div>
                 </div>
             </div>
+
+            <!-- app-bar -->
             <div class="app-bar darcula" data-role="appbar">
+                <!-- pg bar 1 -->
                 <div class="row" style="margin-top:0px">
                     <div class="col-md-7" style="margin-top:0px">
                         <div class="progress" id="pb1" data-value="100" data-color="bg-green" data-role="progress" style="margin-left:2%;"></div>
                     </div>
                     <div class="col-md-5" style="margin-top:5px">
-                      <span id="pb1text" style="margin-top:5px;">
+                        <span id="pb1text" style="margin-top:5px;margin-left:2%;">
                       </span>
                     </div>
                 </div>
+                <!-- pg bar 2 -->
                 <div class="row" style="margin-top:0px">
                     <div class="col-md-7" style="margin-top:0px">
                         <div class="progress" id="pb2" data-value="100" data-color="bg-blue" data-role="progress" style="margin-left:2%;margin-top:0px;"></div>
                     </div>
-                    <div class="col-md-5"  style="margin-bottom:5px;margin-bottom:10px;">
-                      <span id="pb2text" style="margin-bottom:5px;margin-left:2%;">
+                    <div class="col-md-5" style="margin-bottom:5px;margin-bottom:10px;">
+                        <span id="pb2text" style="margin-bottom:5px;margin-left:2%;">
                         Kein Download eingereiht.
                       </span>
-                      <button class="button danger" onclick="callDownloadStop();" style="right: 0;top:0;position:fixed;margin-right:5px;margin-top:7px"><span class="icon mif-cancel"></span></button>
-                        </div>
+                        <button class="button danger" onclick="callDownloadStop();" style="right: 0;top:0;position:fixed;margin-right:5px;margin-top:7px"><span class="icon mif-cancel"></span></button>
+                    </div>
                 </div>
+
                 <div class="app-bar-pullbutton automatic" style="display: none;height:48px;"></div>
                 <div class="clearfix" style="width: 0;"></div>
                 <nav class="app-bar-pullmenu hidden flexstyle-app-bar-menu" style="display: none;">
@@ -137,17 +155,20 @@
         <button class="button success" onclick="noArmaPathSettings();" style="float:right">Jetzt Einstellen</button>
     </div>
 
-    <!-- No Path Dialog -->
+    <!-- Update Dialog -->
     <div data-role="dialog" id="dialog_updateInfo" class="padding20 dialog success" data-close-button="true" data-type="warning" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
         <h1>Update verfügbar</h1>
         <p>
-            Für Mod(s) mit folgender Mod ID ist ein Update verfügbar: <label id="lbl_updateModInfo"></label>
+            Für Mod(s) mit folgender Mod ID ist ein Update verfügbar:
+            <label id="lbl_updateModInfo"></label>
         </p>
         <span class="dialog-close-button"></span>
     </div>
 </body>
 
 <script>
+
+    // winjs splitview
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
         new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
@@ -155,14 +176,16 @@
 
     var anim = document.getElementById("content");
     $(".nav-element").click(function() {
-        if(curentPage != $(this).attr("data-navigate")) {
-        loadpage($(this).attr("data-navigate") + ".html");
-      };
+        if (curentPage != $(this).attr("data-navigate")) {
+            loadpage($(this).attr("data-navigate") + ".html");
+        };
     });
 
+    // load home
     $("#content").load("home.html");
     curentPage = 'home';
 
+    // First launch
     $(document).ready(function() {
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
