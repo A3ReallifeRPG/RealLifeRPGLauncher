@@ -244,7 +244,7 @@ function downloadNext() {
         var args = {
             type: 1,
             message: "ask-hash",
-            obj: {}
+            modId : currentModId
         };
         ipcRenderer.send('message-to-render', args);
     }

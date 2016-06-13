@@ -1,4 +1,14 @@
-getModInfo(showModInfo);
+var installedMods = [];
+
+storage.get('mods', function(error, data) {
+    if (jQuery.isEmptyObject(data.installedMods)) {
+        installedMods = [];
+    } else {
+        installedMods = data.installedMods;
+    }
+
+    getModInfo(showModInfo);
+});
 
 /*
 <div class="carousel-item active" >
@@ -61,14 +71,32 @@ function showModInfo(jsonData, success){
             var infoDivButton = document.createElement('button');
             infoDivButton.setAttribute('id','btn_mod_' + jsonData[i].Id);
             infoDivButton.setAttribute('class','btn btn-success');
-            infoDivButton.setAttribute('onClick','modClick(' + jsonData[i].Id + ')');
-            node = document.createTextNode("Download");
-            infoDivButton.appendChild(node)
+
+            if($.inArray(jsonData[i].Id,updateMods) > -1){
+                node = document.createTextNode("Update");
+                infoDivButton.setAttribute('onClick','modClick(' + jsonData[i].Id + ')');
+            }else if($.inArray(jsonData[i].Id,installedMods) < 0){
+                node = document.createTextNode("Installieren");
+                infoDivButton.setAttribute('onClick','modClick(' + jsonData[i].Id + ')');
+            }else{
+                node = document.createTextNode("Spielen");
+                infoDivButton.setAttribute('onClick','modClickPlay(' + jsonData[i].Id + ')');
+            }
+
+            infoDivButton.appendChild(node);
+
+            var fullCheckButton = document.createElement('button');
+            fullCheckButton.setAttribute('id','btn_full_' + jsonData[i].Id);
+            fullCheckButton.setAttribute('class','btn btn-warning');
+            node = document.createTextNode("Prüfen");
+            fullCheckButton.setAttribute('onClick','fullCheckClick(' + jsonData[i].Id + ')');
+            fullCheckButton.appendChild(node)
 
             infoDivPar.appendChild(infoDivBold);
             infoDiv.appendChild(infoDivHeading);
             infoDiv.appendChild(infoDivPar);
             infoDiv.appendChild(infoDivButton);
+            infoDiv.appendChild(fullCheckButton);
             carItem.appendChild(img);
             carItem.appendChild(infoDiv);
 
@@ -82,6 +110,19 @@ function showModInfo(jsonData, success){
     } else {
         if(debug_mode >= 1){console.log('Error requesting Mod List: ' + jsonData);};
     }
+}
+
+function modClickPlay(id){
+
+}
+
+function fullCheckClick(id){
+    var args = {
+        message: 'start-fullcheck',
+        modId : id
+    };
+
+    ipcRenderer.send('message-to-download', args);
 }
 
 function modClick(id){

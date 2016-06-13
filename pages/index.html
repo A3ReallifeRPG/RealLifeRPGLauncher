@@ -181,17 +181,13 @@
         };
     });
 
-    // load home
-    $("#content").load("home.html");
-    curentPage = 'home';
-
     // First launch
     $(document).ready(function() {
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
                 checkregkey1();
             };
-        })
+        });
     });
 </script>
 

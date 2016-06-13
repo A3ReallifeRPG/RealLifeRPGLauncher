@@ -10,8 +10,26 @@ const {
 const {
     ipcRenderer
 } = require('electron');
-getLauncherNotification(showNotf);
+
+var updateMods = [];
+var curModId = 0;
+var checkListMods = [];
+
 searchUpdates();
+
+//wait for finished starup loop
+function waitForStartup(){
+
+    if(checkListMods.length > 0){
+        return;
+    }
+
+    //load Notification
+    getLauncherNotification(showNotf);
+    // load home
+    $("#content").load("home.html");
+    curentPage = 'home';
+}
 
 //show Notification if activated TODO move to extra thread
 function showNotf(jsonData, success) {
@@ -67,11 +85,23 @@ function quickCheckResult(arg) {
         var pb2 = $("#pb2").data('progress');
         pb2.set(100);
 
+        var index = checkListMods.indexOf(arg.obj.modId);
+        checkListMods.splice(index, 1);
+
+        waitForStartup();
+
         document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
     }else if(arg.obj.resultType == 2){
 
         var lbl = document.getElementById('lbl_updateModInfo');
+
+        updateMods.push(arg.obj.modId);
+
+        var index = checkListMods.indexOf(arg.obj.modId);
+        checkListMods.splice(index, 1);
+
+        waitForStartup();
 
         lbl.innerHTML = lbl.innerHTML + arg.obj.modId + " ";
 
@@ -90,7 +120,9 @@ function searchUpdates() {
         } else {
             installedMods = data.installedMods;
         }
+        checkListMods = installedMods;
 
+        waitForStartup();
         for (i = 0; i < installedMods.length; i++) {
             var args = {
                 message: 'start-quickcheck',
@@ -126,8 +158,9 @@ function hashDialogClose() {
 function hashDialogConfirm() {
     var args = {
         message: 'start-fullcheck',
-        obj: {}
+        modId : curModId
     };
+
     ipcRenderer.send('message-to-download', args);
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
@@ -165,6 +198,7 @@ function callDownloadStop() {
 //show Notification for hash
 function showHashDialog(arg) {
     var dialog = $('#dialog_downloadComplete').data('dialog');
+    curModId = arg.modId;
     dialog.open();
 }
 
@@ -219,7 +253,7 @@ function updateHashProgress(arg) {
     var args = {
         progress: totalProgress
     };
-    ipcRenderer.send('winprogress-change', args);
+    //ipcRenderer.send('winprogress-change', args); //TODO broken
 
     document.getElementById('pb1text').innerHTML = "Prüfe Datei: " + curCount + " / " + arg.obj.totalFileCount;
     document.getElementById('pb2text').innerHTML = "Dateiname: " + arg.obj.curObj.FileName;
