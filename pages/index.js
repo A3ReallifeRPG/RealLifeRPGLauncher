@@ -224,9 +224,17 @@ function updateDwnProgress(arg) {
         curDownSize = maxDownSize;
     }
 
+    var fName = arg.obj.fileObj.FileName;
+    fName.replace('.pbo','');
+
+    if(fName.length > 24){
+        fName = fName.substr(0,24);
+        fName = fName + "...";
+    }
+
     if (arg.progType == 1) {
         document.getElementById('pb1text').innerHTML = totalProgress + "% - " + curDownSize + "GB/" + maxDownSize + "GB";
-        document.getElementById('pb2text').innerHTML = (arg.obj.progressObj.percentage).toFixed(2) + "% - " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s - " + arg.obj.fileObj.FileName;
+        document.getElementById('pb2text').innerHTML = fName + " " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s";
     } else if (arg.progType == 2) {
         document.getElementById('pb1text').innerHTML = "Download Angehalten";
         document.getElementById('pb2text').innerHTML = "";
@@ -256,7 +264,17 @@ function updateHashProgress(arg) {
     //ipcRenderer.send('winprogress-change', args); //TODO broken
 
     document.getElementById('pb1text').innerHTML = "Prüfe Datei: " + curCount + " / " + arg.obj.totalFileCount;
-    document.getElementById('pb2text').innerHTML = "Dateiname: " + arg.obj.curObj.FileName;
+
+    var fName = arg.obj.curObj.FileName;
+    fName.replace('.pbo','');
+
+    if(fName.length > 24){
+        fName = fName.substr(0,24);
+        fName = fName + "...";
+    }
+
+    document.getElementById('pb2text').innerHTML = "Dateiname: " + fName;
+    document.getElementById('pb2text').setAttribute('title',arg.obj.curObj.FileName);
     if (curentPage == "home") {
         $('#lbl_downInfo').html(arg.obj);
     }
