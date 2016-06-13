@@ -24,25 +24,28 @@ function waitForStartup(){
         return;
     }
 
-    //load Notification
-    getLauncherNotification(showNotf);
+    var args = {
+        message: "search-notf"
+    };
+    ipcRenderer.send('message-to-download', args);
+
     // load home
     $("#content").load("home.html");
     curentPage = 'home';
 }
 
 //show Notification if activated TODO move to extra thread
-function showNotf(jsonData, success) {
-    if (success) {
-        document.getElementById('dialog_notf_text').innerHTML = jsonData.Notification;
+function showNotf(arg) {
+    if (arg.success) {
+        document.getElementById('dialog_notf_text').innerHTML = arg.jsonObj.Notification;
 
-        if (jsonData.UseNotification) {
+        if (arg.jsonObj.UseNotification) {
             var dialog = $('#dialog_notf').data('dialog');
             dialog.open();
         }
     } else {
         if (debug_mode >= 1) {
-            console.log('Error requesting Notification: ' + jsonData);
+            console.log('Error requesting Notification: ' + arg.jsonObj);
         };
     }
 }
@@ -53,6 +56,9 @@ ipcRenderer.on('render-receiver', (event, arg) => {
     switch (arg.message) {
         case 'update-progress':
             updateDwnProgress(arg);
+            break;
+        case 'update-notf-dialog':
+            showNotf(arg);
             break;
         case 'update-hash-progress':
             updateHashProgress(arg);

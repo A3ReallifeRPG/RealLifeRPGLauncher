@@ -96,6 +96,10 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             };
             cancelDownload = true;
             break;
+        case 'search-notf':
+            //load Notification
+            getLauncherNotification(notfCallback);
+            break;
         default:
             if (debug_mode >= 2) {
                 console.log('Packet dropped');
@@ -103,6 +107,16 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             break;
     }
 })
+
+function notfCallback (json,success){
+
+    var args = {
+        message: "update-notf-dialog",
+        jsonObj: json,
+        success: success
+    };
+    ipcRenderer.send('message-to-render', args);
+}
 
 function getHashListCallback(jsObj) {
     cancelDownload = false;
