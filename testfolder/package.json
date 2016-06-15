@@ -1,16 +1,14 @@
 {
   "name": "realliferpg",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "RealLifeRPG Launcher und Downloader",
-  "main": "main.js",
+  "main": "/app/main.js",
+  "homepage": "https://www.realliferpg.de",
   "scripts": {
-    "start": "electron .",
-    "postinstall": "install-app-deps",
-    "pack": "build --target dir",
-    "dist": "build"
+    "start": "electron ."
   },
-  "license": "CC BY-NC-SA 4.0",
   "author": "RealLifeRPG",
+  "license": "CC BY-NC-SA 4.0",
   "devDependencies": {
     "devtron": "^1.1.1",
     "dwn": "^0.0.2",
@@ -20,13 +18,6 @@
     "electron-squirrel-startup": "^1.0.0",
     "mkpath": "^1.0.0",
     "progress-stream": "1.2.0"
-  },
-  "build": {
-    "app-bundle-id": "realliferpg.de",
-    "app-category-type": "launcher.application",
-    "win": {
-      "iconUrl": "https://upload.realliferpg.de/favicon.ico"
-    }
   },
   "dependencies": {
     "winreg": "^1.2.1"

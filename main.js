@@ -1,4 +1,4 @@
-if(require('electron-squirrel-startup')) return;
+if (require('electron-squirrel-startup')) return;
 
 const electron = require('electron');
 
@@ -9,76 +9,7 @@ const {
     ipcMain
 } = require('electron');
 
-let win;
-let downWin;
-
-function createWindow() {
-
-    //download process
-    downWin = new BrowserWindow({
-        width: 1000,
-        height: 550
-    });
-    downWin.loadURL(`file://${__dirname}/pages/download.html`);
-    downWin.webContents.openDevTools({
-        detach: false
-    });
-
-    // Create the browser window.
-    win = new BrowserWindow({
-        width: 1000,
-        height: 550,
-        minWidth: 1000,
-        minHeight: 550
-    });
-    win.loadURL(`file://${__dirname}/pages/index.html`);
-
-    win.webContents.openDevTools({
-        detach: true
-    });
-
-
-    win.on('closed', () => {
-        downWin.close();
-        downWin = null;
-        win = null;
-    });
-
-    setUpIpcHandlers();
-}
-
-function setUpIpcHandlers() {
-    ipcMain.on('message-to-download', (event, arg) => {
-        downWin.webContents.send('download-receiver',arg);
-    });
-
-    ipcMain.on('message-to-render', (event, arg) => {
-        win.webContents.send('render-receiver',arg);
-    });
-}
-
-app.on('ready', createWindow);
-
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
-
-app.on('activate', () => {
-    if (win === null) {
-        createWindow();
-    }
-});
-
-ipcMain.on('winprogress-change',(event, arg) => {
-    win.setProgressBar(arg.progress);
-});
-
-
-//
-//  WIN AUTO UPDATE STUFF
-//
+// ------------------------------------------- squirrel stuff (for updating) ----------------------------------------------------------------
 
 // this should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
@@ -147,3 +78,70 @@ function handleSquirrelEvent() {
       return true;
   }
 };
+
+// ------------------------------------------- real stuff that does something ----------------------------------------------------------------
+let win;
+let downWin;
+
+function createWindow() {
+
+    //download process
+    downWin = new BrowserWindow({
+        width: 1000,
+        height: 550
+    });
+    downWin.loadURL(`file://${__dirname}/pages/download.html`);
+    downWin.webContents.openDevTools({
+        detach: false
+    });
+
+    // Create the browser window.
+    win = new BrowserWindow({
+        width: 1000,
+        height: 550,
+        minWidth: 1000,
+        minHeight: 550
+    });
+    win.loadURL(`file://${__dirname}/pages/index.html`);
+
+    win.webContents.openDevTools({
+        detach: true
+    });
+
+
+    win.on('closed', () => {
+        downWin.close();
+        downWin = null;
+        win = null;
+    });
+
+    setUpIpcHandlers();
+}
+
+function setUpIpcHandlers() {
+    ipcMain.on('message-to-download', (event, arg) => {
+        downWin.webContents.send('download-receiver',arg);
+    });
+
+    ipcMain.on('message-to-render', (event, arg) => {
+        win.webContents.send('render-receiver',arg);
+    });
+}
+
+app.on('ready', createWindow);
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (win === null) {
+        createWindow();
+    }
+});
+
+ipcMain.on('winprogress-change',(event, arg) => {
+    win.setProgressBar(arg.progress);
+});
