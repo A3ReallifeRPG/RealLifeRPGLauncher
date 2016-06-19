@@ -96,6 +96,7 @@ function quickCheckResult(arg) {
 
         waitForStartup();
 
+        resetWinProgress();
         document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
     }else if(arg.obj.resultType == 2){
@@ -147,7 +148,7 @@ function fullCheckResult(arg) {
         pb1.set(100)
         var pb2 = $("#pb2").data('progress');
         pb2.set(100);
-
+        resetWinProgress();
         document.getElementById('pb1text').innerHTML = "Komplette Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
     }
@@ -157,6 +158,10 @@ function fullCheckResult(arg) {
 function hashDialogClose() {
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
+    var args = {
+        progress: winprogress
+    };
+    ipcRenderer.send('winprogress-change', args);
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
 }
@@ -242,6 +247,7 @@ function updateDwnProgress(arg) {
         document.getElementById('pb1text').innerHTML = totalProgress + "% - " + curDownSize + "GB/" + maxDownSize + "GB";
         document.getElementById('pb2text').innerHTML = fName + " " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s";
     } else if (arg.progType == 2) {
+        resetWinProgress();
         document.getElementById('pb1text').innerHTML = "Download Angehalten";
         document.getElementById('pb2text').innerHTML = "";
     }
@@ -264,10 +270,11 @@ function updateHashProgress(arg) {
     pb1.set(totalProgress);
     var pb2 = $("#pb2").data('progress');
     pb2.set(100);
+    var winprogress = totalProgress / 100;
     var args = {
-        progress: totalProgress
+        progress: winprogress
     };
-    //ipcRenderer.send('winprogress-change', args); //TODO broken
+    ipcRenderer.send('winprogress-change', args);
 
     document.getElementById('pb1text').innerHTML = "Prüfe Datei: " + curCount + " / " + arg.obj.totalFileCount;
 
@@ -434,4 +441,12 @@ function checkregkey3() {
             loadpage('settings.html');
         }
     });
+}
+
+
+function resetWinProgress() {
+  var args = {
+      progress: 0
+  };
+  ipcRenderer.send('winprogress-change', args);
 }

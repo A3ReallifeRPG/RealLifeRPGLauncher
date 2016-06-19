@@ -87,6 +87,7 @@ function createWindow() {
 
     //download process
     downWin = new BrowserWindow({
+        icon: 'img/icon.ico',
         width: 1000,
         height: 550
     });
@@ -97,6 +98,7 @@ function createWindow() {
 
     // Create the browser window.
     win = new BrowserWindow({
+        icon: 'img/icon.ico',
         width: 1000,
         height: 550,
         minWidth: 1000,
@@ -110,9 +112,7 @@ function createWindow() {
 
 
     win.on('closed', () => {
-        downWin.close();
-        downWin = null;
-        win = null;
+        app.quit();
     });
 
     setUpIpcHandlers();
