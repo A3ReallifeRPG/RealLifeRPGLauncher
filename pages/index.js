@@ -143,7 +143,6 @@ function searchUpdates() {
 //show quick check success (maybe later more status types)
 function fullCheckResult(arg) {
     if (arg.obj.resultType == 1) {
-
         var pb1 = $("#pb1").data('progress');
         pb1.set(100)
         var pb2 = $("#pb2").data('progress');
@@ -158,10 +157,7 @@ function fullCheckResult(arg) {
 function hashDialogClose() {
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
-    var args = {
-        progress: winprogress
-    };
-    ipcRenderer.send('winprogress-change', args);
+    resetWinProgress();
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
 }
