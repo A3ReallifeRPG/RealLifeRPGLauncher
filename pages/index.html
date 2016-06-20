@@ -45,17 +45,18 @@
     <!-- preloader -->
     <script type="text/javascript">
         $(window).load(function() { // makes sure the whole site is loaded
-            $('#status').fadeOut(); // will first fade out the loading animation
-            $('#preloader').delay(350).fadeOut('slow'); // will fade out the white DIV that covers the website.
-            $('body').delay(350).css({
+            $('#status').delay(200).fadeOut('slow');
+            $('#preloader').delay(500).fadeOut('slow'); // will fade out the white DIV that covers the website.
+            $('body').delay(340).css({
                 'overflow': 'visible'
             });
         })
     </script>
 
     <div id="preloader">
-        <div id="status">
-            <div data-role="preloader" data-type="cycle" data-style="color"></div>
+        <div id="status" style="text-align: center;">
+            <img src="../img/icon.png">
+            <h4 style="color:#000000;font-size:24px">ReallifeRPG Launcher</h4>
         </div>
     </div>
 
