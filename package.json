@@ -1,15 +1,10 @@
 {
-    "name": "realliferpg",
-    "version": "0.3.0",
-    "description": "RealLifeRPG Launcher und Downloader",
-    "main": "main.js",
     "scripts": {
         "start": "electron .",
         "postinstall": "install-app-deps",
         "pack": "build --target dir",
         "dist": "build"
     },
-    "author": "RealLifeRPG",
     "devDependencies": {
         "devtron": "^1.1.1",
         "electron-builder": "^5.4.2",
