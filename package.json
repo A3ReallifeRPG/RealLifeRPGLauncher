@@ -9,16 +9,16 @@
         "pack": "build --target dir",
         "dist": "build"
     },
-    "license": "CC BY-NC-SA 4.0",
     "author": "RealLifeRPG",
     "devDependencies": {
         "devtron": "^1.1.1",
         "electron-builder": "^5.4.2",
         "electron-prebuilt": "^1.1.0",
-        "electron-winstaller": "^2.3.1"
+        "electron-winstaller": "^2.3.1",
+        "electron-squirrel-startup": "^1.0.0"
     },
     "build": {
-        "app-bundle-id": "realliferpg.de",
+        "appId": "realliferpg.de",
         "app-category-type": "launcher.application",
         "win": {
             "iconUrl": "https://upload.realliferpg.de/favicon.ico"

@@ -1,0 +1,14 @@
+{
+    "name": "realliferpg",
+    "version": "0.3.0",
+    "description": "RealLifeRPG Launcher und Downloader",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "postinstall": "install-app-deps",
+        "pack": "build --target dir",
+        "dist": "build"
+    },
+    "license": "CC BY-NC-SA 4.0",
+    "author": "RealLifeRPG"
+}
