@@ -16,6 +16,7 @@
         "appId": "realliferpg.de",
         "app-category-type": "launcher.application",
         "win": {
+            "title" : "RealLifeRPG Launcher",
             "iconUrl": "https://upload.realliferpg.de/favicon.ico"
         }
     },
