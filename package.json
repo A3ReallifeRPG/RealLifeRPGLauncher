@@ -26,6 +26,7 @@
         "progress-stream": "1.2.0",
         "dwn": "^0.0.2",
         "electron-squirrel-startup": "^1.0.0",
-        "winreg": "^1.2.1"
+        "winreg": "^1.2.1",
+		"node-notifier": "^1.2.1"
     }
 }

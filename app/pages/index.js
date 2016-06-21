@@ -4,6 +4,8 @@ const app = require('electron').remote
 const shell = require('electron').shell;
 const storage = require('electron-json-storage')
 const Winreg = require('winreg')
+const notifier = require('node-notifier');
+const path = require('path');
 const {
     dialog
 } = require('electron').remote
@@ -18,9 +20,9 @@ var checkListMods = [];
 searchUpdates();
 
 //wait for finished starup loop
-function waitForStartup(){
+function waitForStartup() {
 
-    if(checkListMods.length > 0){
+    if (checkListMods.length > 0) {
         return;
     }
 
@@ -99,7 +101,7 @@ function quickCheckResult(arg) {
         resetWinProgress();
         document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
-    }else if(arg.obj.resultType == 2){
+    } else if (arg.obj.resultType == 2) {
 
         var lbl = document.getElementById('lbl_updateModInfo');
 
@@ -148,6 +150,7 @@ function fullCheckResult(arg) {
         var pb2 = $("#pb2").data('progress');
         pb2.set(100);
         resetWinProgress();
+        notifyWin('RealLifeRPG Launcher','Komplette Überprüfung beendet');
         document.getElementById('pb1text').innerHTML = "Komplette Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
     }
@@ -158,6 +161,7 @@ function hashDialogClose() {
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
     resetWinProgress();
+    notifyWin('RealLifeRPG Launcher','Download abgeschlossen')
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
 }
@@ -165,7 +169,7 @@ function hashDialogClose() {
 function hashDialogConfirm() {
     var args = {
         message: 'start-fullcheck',
-        modId : curModId
+        modId: curModId
     };
 
     ipcRenderer.send('message-to-download', args);
@@ -232,10 +236,10 @@ function updateDwnProgress(arg) {
     }
 
     var fName = arg.obj.fileObj.FileName;
-    fName.replace('.pbo','');
+    fName.replace('.pbo', '');
 
-    if(fName.length > 24){
-        fName = fName.substr(0,24);
+    if (fName.length > 24) {
+        fName = fName.substr(0, 24);
         fName = fName + "...";
     }
 
@@ -275,15 +279,15 @@ function updateHashProgress(arg) {
     document.getElementById('pb1text').innerHTML = "Prüfe Datei: " + curCount + " / " + arg.obj.totalFileCount;
 
     var fName = arg.obj.curObj.FileName;
-    fName.replace('.pbo','');
+    fName.replace('.pbo', '');
 
-    if(fName.length > 24){
-        fName = fName.substr(0,24);
+    if (fName.length > 24) {
+        fName = fName.substr(0, 24);
         fName = fName + "...";
     }
 
     document.getElementById('pb2text').innerHTML = "Dateiname: " + fName;
-    document.getElementById('pb2text').setAttribute('title',arg.obj.curObj.FileName);
+    document.getElementById('pb2text').setAttribute('title', arg.obj.curObj.FileName);
     if (curentPage == "home") {
         $('#lbl_downInfo').html(arg.obj);
     }
@@ -292,7 +296,7 @@ function updateHashProgress(arg) {
 function loadpage(file) {
     $("#content").load(file);
     enterPage = WinJS.UI.Animation.enterPage(anim, null);
-    curentPage = file.replace('.html','');
+    curentPage = file.replace('.html', '');
 }
 
 function checkregkey1() {
@@ -439,10 +443,21 @@ function checkregkey3() {
     });
 }
 
-
 function resetWinProgress() {
-  var args = {
-      progress: 0
-  };
-  ipcRenderer.send('winprogress-change', args);
+    var args = {
+        progress: 0
+    };
+    ipcRenderer.send('winprogress-change', args);
+}
+
+function notifyWin(title,text) {
+  notifier.notify({
+  title: title,
+  message: text,
+  icon: path.join(__dirname, '../img/icon.png'),
+  sound: true,
+  wait: true
+  }, function (err, response) {
+  // Response is response from notification
+  });
 }
