@@ -1,14 +1,14 @@
 const electron = require('electron');
-const BrowserWindow = require('electron').remote
-const app = require('electron').remote
+const BrowserWindow = require('electron').remote;
+const app = require('electron').remote;
 const shell = require('electron').shell;
-const storage = require('electron-json-storage')
-const Winreg = require('winreg')
+const storage = require('electron-json-storage');
+const Winreg = require('winreg');
 const notifier = require('node-notifier');
 const path = require('path');
 const {
     dialog
-} = require('electron').remote
+} = require('electron').remote;
 const {
     ipcRenderer
 } = require('electron');
@@ -150,7 +150,7 @@ function fullCheckResult(arg) {
         var pb2 = $("#pb2").data('progress');
         pb2.set(100);
         resetWinProgress();
-        notifyWin('RealLifeRPG Launcher','Komplette Überprüfung beendet');
+        notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung beendet');
         document.getElementById('pb1text').innerHTML = "Komplette Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
     }
@@ -161,7 +161,7 @@ function hashDialogClose() {
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
     resetWinProgress();
-    notifyWin('RealLifeRPG Launcher','Download abgeschlossen')
+    notifyWin('RealLifeRPG Launcher', 'Download abgeschlossen')
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
 }
@@ -450,14 +450,14 @@ function resetWinProgress() {
     ipcRenderer.send('winprogress-change', args);
 }
 
-function notifyWin(title,text) {
-  notifier.notify({
-  title: title,
-  message: text,
-  icon: path.join(__dirname, '../img/icon.png'),
-  sound: true,
-  wait: true
-  }, function (err, response) {
-  // Response is response from notification
-  });
+function notifyWin(title, text) {
+    notifier.notify({
+        title: title,
+        message: text,
+        icon: path.join(__dirname, '../img/icon.png'),
+        sound: true,
+        wait: true
+    }, function(err, response) {
+        // Response is response from notification
+    });
 }

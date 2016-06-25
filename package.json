@@ -1,4 +1,8 @@
 {
+    "name": "RealLifeRPG",
+    "version": "1.0.0",
+    "description": "RealLifeRPG Launcher und Downloader",
+    "main": "./app/main.js",
     "scripts": {
         "start": "electron .",
         "postinstall": "install-app-deps",
@@ -6,26 +10,26 @@
         "dist": "build"
     },
     "devDependencies": {
-        "devtron": "^1.1.1",
-        "electron-builder": "^5.4.2",
-        "electron-prebuilt": "^1.1.0",
-        "electron-winstaller": "^2.3.1"
+        "devtron": "1.1.1",
+        "electron-builder": "5.4.2",
+        "electron-prebuilt": "1.1.0",
+        "electron-winstaller": "2.3.1"
     },
     "build": {
         "appId": "realliferpg.de",
         "app-category-type": "launcher.application",
         "win": {
             "title" : "RealLifeRPG Launcher",
-            "iconUrl": "https://upload.realliferpg.de/favicon.ico"
+            "iconUrl": "https://upload.realliferpg.de/icon.ico"
         }
     },
     "dependencies": {
-        "electron-json-storage": "^2.0.0",
-        "mkpath": "^1.0.0",
-        "progress-stream": "^1.2.0",
-        "dwn": "^0.0.2",
-        "electron-squirrel-startup": "^1.0.0",
-        "winreg": "^1.2.1",
-	      "node-notifier": "^4.6.0"
+        "electron-json-storage": "2.0.0",
+        "mkpath": "1.0.0",
+        "progress-stream": "1.2.0",
+        "dwn": "0.0.2",
+        "electron-squirrel-startup": "1.0.0",
+        "winreg": "1.2.1",
+	      "node-notifier": "4.6.0"
     }
 }
