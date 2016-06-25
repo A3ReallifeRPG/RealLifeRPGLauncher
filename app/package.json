@@ -20,7 +20,6 @@
         "electron-squirrel-startup": "1.0.0",
         "winreg": "1.2.1",
         "node-notifier": "4.6.0",
-        "recursive-readdir": "^2.0.0",
-
+        "recursive-readdir": "^2.0.0"
     }
 }
