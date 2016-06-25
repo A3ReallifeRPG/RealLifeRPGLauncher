@@ -117,7 +117,7 @@ function createWindow() {
         icon: 'img/icon.ico',
         width: 1000,
         height: 550,
-        show: false
+        show: true
     });
     downWin.loadURL(`file://${__dirname}/pages/download.html`);
     downWin.webContents.openDevTools({

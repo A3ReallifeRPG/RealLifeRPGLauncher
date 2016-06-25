@@ -11,6 +11,7 @@ const {
 
 var armaPath = "";
 var downloadList = [];
+var delList = [];
 var downloadListTotalSize = 0;
 var checkList = [];
 var errorList = [];
@@ -46,10 +47,10 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                         } else {
                             installedMods = data.installedMods;
                         }
-                        if(!(arg.modId in installedMods)){
+                        if (!(arg.modId in installedMods)) {
                             installedMods.push(arg.modId);
                             storage.set('mods', {
-                                installedMods : installedMods
+                                installedMods: installedMods
                             }, function(error) {});
                         }
 
@@ -108,7 +109,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
     }
 })
 
-function notfCallback (json,success){
+function notfCallback(json, success) {
 
     var args = {
         message: "update-notf-dialog",
@@ -123,6 +124,7 @@ function getHashListCallback(jsObj) {
     downloadList = jsObj;
     calcDownloadStats();
     preDownloadCheck();
+    deleteFiles(downloadList);
     download(downloadList[0]);
 }
 
@@ -130,6 +132,7 @@ function getHashFullCheckCallback(jsObj) {
     cancelDownload = false;
     downloadList = jsObj;
     downloadListTotalSize = downloadList.length;
+    deleteFiles(downloadList);
     fullCheck();
 }
 
@@ -143,7 +146,7 @@ function getHashQuickCheckCallback(jsObj) {
             message: "quick-check-result",
             obj: {
                 resultType: 2, //1 = success, 2 = update
-                modId : currentModId
+                modId: currentModId
             }
         };
         ipcRenderer.send('message-to-render', args);
@@ -156,6 +159,28 @@ function getHashQuickCheckCallback(jsObj) {
         };
         ipcRenderer.send('message-to-render', args);
     }
+}
+
+//D:\SteamLibrary\SteamApps\common\Arma 3\@RealLifeRPG5.0\addons\abramia.pbo.RL_RPG_201605151413.bisign
+function deleteFiles(fileList) {
+    var fs = require('fs');
+    var rec = require('recursive-readdir');
+
+    var name =  fileList[1].RelativPath.split('\\');
+
+    for(i = 0; i < fileList.length; i++){
+        delList.push(fileList[i].RelativPath);
+    };
+    fileList = [];
+
+    rec((armaPath + name[0]), function(err, files) {
+        if (err) throw err;
+        files.forEach(function(file) {
+            if(delList.indexOf(file.replace(armaPath,'')) == -1){
+                fs.unlinkSync(file);
+            };
+        });
+    });
 }
 
 function calcDownloadStats() {
@@ -258,7 +283,7 @@ function downloadNext() {
         var args = {
             type: 1,
             message: "ask-hash",
-            modId : currentModId
+            modId: currentModId
         };
         ipcRenderer.send('message-to-render', args);
     }
@@ -283,6 +308,10 @@ function quickCheck(fileObj) {
 
 //fully checks all file MD5 hashes
 function fullCheck() {
+
+    if(cancelDownload){
+        return;
+    };
 
     if (downloadList.length > 0) {
         var fs = require('fs');
