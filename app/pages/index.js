@@ -5,7 +5,7 @@ const shell = require('electron').shell;
 const storage = require('electron-json-storage');
 const Winreg = require('winreg');
 const notifier = require('node-notifier');
-const path = require('path');
+const winpath = require('path');
 const {
     dialog
 } = require('electron').remote;
@@ -16,6 +16,7 @@ const {
 var updateMods = [];
 var curModId = 0;
 var checkListMods = [];
+curentPage = "";
 
 searchUpdates();
 
@@ -31,19 +32,17 @@ function waitForStartup() {
     };
     ipcRenderer.send('message-to-download', args);
 
-    // load home
-    $("#content").load("home.html");
-    curentPage = 'home';
+    loadpage('home.html');
 }
 
 //show Notification if activated TODO move to extra thread
 function showNotf(arg) {
     if (arg.success) {
         document.getElementById('dialog_notf_text').innerHTML = arg.jsonObj.Notification;
-
         if (arg.jsonObj.UseNotification) {
             var dialog = $('#dialog_notf').data('dialog');
             dialog.open();
+            notifyWin('RealLifeRPG Launcher', 'Wichtige Informationen','ic_error_outline_white_36dp_2x.png');
         }
     } else {
         if (debug_mode >= 1) {
@@ -150,7 +149,7 @@ function fullCheckResult(arg) {
         var pb2 = $("#pb2").data('progress');
         pb2.set(100);
         resetWinProgress();
-        notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung beendet');
+        notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung beendet', 'ic_done_all_white_36dp_2x.png');
         document.getElementById('pb1text').innerHTML = "Komplette Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
     }
@@ -161,17 +160,18 @@ function hashDialogClose() {
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
     resetWinProgress();
-    notifyWin('RealLifeRPG Launcher', 'Download abgeschlossen')
+    notifyWin('RealLifeRPG Launcher', 'Download abgeschlossen','ic_done_white_36dp_2x.png');
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
 }
 
 function hashDialogConfirm() {
+  resetWinProgress();
+  notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet','ic_description_white_36dp_2x.png');
     var args = {
         message: 'start-fullcheck',
         modId: curModId
     };
-
     ipcRenderer.send('message-to-download', args);
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
@@ -450,11 +450,11 @@ function resetWinProgress() {
     ipcRenderer.send('winprogress-change', args);
 }
 
-function notifyWin(title, text) {
+function notifyWin(title, text, icon) {
     notifier.notify({
         title: title,
         message: text,
-        icon: path.join(__dirname, '../img/icon.png'),
+        icon: winpath.join(__dirname, '../icon/' + icon),
         sound: true,
         wait: true
     }, function(err, response) {
