@@ -1,6 +1,6 @@
 {
     "name": "RealLifeRPG",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "RealLifeRPG Launcher und Downloader",
     "main": "./app/main.js",
     "scripts": {
@@ -20,7 +20,8 @@
         "app-category-type": "launcher.application",
         "win": {
             "title" : "RealLifeRPG Launcher",
-            "iconUrl": "https://upload.realliferpg.de/icon.ico"
+            "iconUrl": "https://upload.realliferpg.de/icon.ico",
+            "remoteReleases" : "http://89.163.140.216:8000/"
         }
     },
     "dependencies": {
