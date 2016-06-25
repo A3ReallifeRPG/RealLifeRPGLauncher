@@ -86,7 +86,13 @@ autoUpdater.addListener("update-available", function(event) {
 
 });
 autoUpdater.addListener("update-downloaded", function(event, releaseNotes, releaseName, releaseDate, updateURL) {
-
+  var args = {
+      releaseNotes: releaseNotes,
+      releaseName: releaseName,
+      releaseDate: releaseDate,
+      updateURL: updateURL
+  };
+  win.webContents.send('update-downloaded', args);
 });
 autoUpdater.addListener("error", function(error) {
 
@@ -130,8 +136,7 @@ function createWindow() {
         width: 1000,
         height: 550,
         minWidth: 1000,
-        minHeight: 550,
-        darkTheme: true
+        minHeight: 550
     });
     win.loadURL(`file://${__dirname}/pages/index.html`);
 
