@@ -22,7 +22,7 @@ function getLauncherNotification(callBackFnc) {
 /*
     Query Panel for Server Information
 */
-function getServerInfo() {
+function getServerInfo(callBackFnc) {
     var searchUrl = infoServerURL + server_ListPath;
 
     var xhr = new XMLHttpRequest();
@@ -30,16 +30,10 @@ function getServerInfo() {
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var jsObj = JSON.parse(this.responseText);
-
-            for (var i = 0; i < jsObj.length; i++) {
-                document.write(jsObj[i].Id + ' - ' + jsObj[i].Servername + ' - ' + jsObj[i].IpAddress + '<br/>')
-
-
-            };
-
+            callBackFnc(jsObj);
         }
         if (this.readyState == 4 && this.status == 404) {
-            document.write('Error 404');
+            callBackFnc(this.status,false);
         }
     }
     xhr.send();
