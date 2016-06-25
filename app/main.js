@@ -116,7 +116,8 @@ function createWindow() {
     downWin = new BrowserWindow({
         icon: 'img/icon.ico',
         width: 1000,
-        height: 550
+        height: 550,
+        show: false
     });
     downWin.loadURL(`file://${__dirname}/pages/download.html`);
     downWin.webContents.openDevTools({
@@ -129,7 +130,8 @@ function createWindow() {
         width: 1000,
         height: 550,
         minWidth: 1000,
-        minHeight: 550
+        minHeight: 550,
+        darkTheme: true
     });
     win.loadURL(`file://${__dirname}/pages/index.html`);
 

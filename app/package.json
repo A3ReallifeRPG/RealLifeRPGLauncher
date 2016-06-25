@@ -9,19 +9,18 @@
     "license": "CC BY-NC-SA 4.0",
     "author": "RealLifeRPG",
     "dependencies": {
-        "electron-json-storage": "2.0.0",
+        "electron-json-storage": "^2.0.0",
         "mkpath": "^1.0.0",
-        "progress-stream": "1.2.0",
+        "progress-stream": "^1.2.0",
         "dwn": "^0.0.2",
         "electron-squirrel-startup": "^1.0.0",
-        "winreg": "^1.2.1"
+        "winreg": "^1.2.1",
+        "node-notifier": "^4.6.0"
     },
 	 "devDependencies": {
         "devtron": "^1.1.1",
         "electron-builder": "^5.4.2",
         "electron-prebuilt": "^1.1.0",
-        "electron-winstaller": "^2.3.1",
-        "electron-squirrel-startup": "^1.0.0",
-		"node-notifier": "^4.6.0"
+        "electron-winstaller": "^2.3.1"
     }
 }
