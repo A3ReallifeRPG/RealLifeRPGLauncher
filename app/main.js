@@ -92,7 +92,7 @@ autoUpdater.addListener("update-downloaded", function(event, releaseNotes, relea
       releaseDate: releaseDate,
       updateURL: updateURL
   };
-  win.webContents.send('update-downloaded', arg);
+  win.webContents.send('update-downloaded', args);
 });
 autoUpdater.addListener("error", function(error) {
 

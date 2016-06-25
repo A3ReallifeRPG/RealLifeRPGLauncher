@@ -451,9 +451,9 @@ function resetWinProgress() {
 }
 
 ipcRenderer.on('update-downloaded', (event, arg) => {
-    notifyWin('Update heruntergeladen', 'Bitte neustarten','ic_done_white_36dp_2x.png');
+    notifyWin('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten','ic_done_white_36dp_2x.png');
     console.log(args);
-};
+});
 
 function notifyWin(title, text, icon) {
     notifier.notify({

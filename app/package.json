@@ -1,6 +1,6 @@
 {
     "name": "RealLifeRPG",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "RealLifeRPG Launcher und Downloader",
     "main": "main.js",
     "scripts": {
