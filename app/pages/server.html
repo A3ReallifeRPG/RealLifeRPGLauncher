@@ -4,16 +4,12 @@
 <link rel="stylesheet" href="../resources/server.css">
 <h2 class="win-h2">Server</h2>
 <br>
-<div class="tabcontrol" data-role="tabcontrol" data-on-tab-click="tab_click" style="width:98%">
+<div id="serverpreloader" data-role="preloader" data-type="cycle" data-style="dark"></div>
+<div class="tabcontrol" id="tabcontroller" data-on-tab-click="tab_click" style="width:98%;visibility:hidden">
     <ul class="tabs" id="server_tabHost">
-        
+
     </ul>
     <div class="frames" id="server_tabs">
 
     </div>
 </div>
-<script>
-$(document).ready(function() {
-    loadHighCharts(58,8,5,4);
-});
-</script>

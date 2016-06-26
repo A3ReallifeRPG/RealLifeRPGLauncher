@@ -4,6 +4,13 @@ function getServerCallback(jsObj) {
     for (var i = 0; i < jsObj.length; i++) {
         insertServerTab(jsObj[i],i);
     };
+    $(function(){
+        $("#tabcontroller").tabcontrol();
+    });
+    $('#tabcontroller').css({
+        'visibility': 'visible'
+    });
+    $('#serverpreloader').remove();
 }
 
 /*
@@ -39,6 +46,7 @@ function getServerCallback(jsObj) {
 <li><a href="#mod1">Server 1</a></li>
 */
 function insertServerTab(serverObj,index) {
+  if(serverObj.Slots != 0) {
     var wrapper = document.createElement('div');
     wrapper.setAttribute('class', 'frame');
     wrapper.setAttribute('id', ('server_' + serverObj.Id));
@@ -85,6 +93,7 @@ function insertServerTab(serverObj,index) {
     document.getElementById('server_tabHost').appendChild(li);
 
     loadHighCharts(("char_server_" + serverObj.Id),serverObj.Civilians, serverObj.Cops, serverObj.Medics, serverObj.Adac);
+  };
 }
 
 function loadHighCharts(chart,civ, cop, med, adac) {

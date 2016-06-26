@@ -25,6 +25,8 @@ var currentModId = 0;
 var cancelDownload = false;
 var isDownloading = false;
 
+var timert = true;
+
 ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
         case 'start-download':
@@ -125,9 +127,9 @@ function getHashListCallback(jsObj) {
     deleteFiles(downloadList);
     calcDownloadStats();
     preDownloadCheck();
-    if(downloadList.length > 0){
+    if (downloadList.length > 0) {
         download(downloadList[0]);
-    }else{
+    } else {
         isDownloading = false;
         var args = {
             type: 1,
@@ -176,9 +178,9 @@ function deleteFiles(fileList) {
     var fs = require('fs');
     var rec = require('recursive-readdir');
 
-    var name =  fileList[1].RelativPath.split('\\');
+    var name = fileList[1].RelativPath.split('\\');
 
-    for(i = 0; i < fileList.length; i++){
+    for (i = 0; i < fileList.length; i++) {
         delList.push(fileList[i].RelativPath);
     };
     fileList = [];
@@ -186,7 +188,7 @@ function deleteFiles(fileList) {
     rec((armaPath + name[0]), function(err, files) {
         if (err) throw err;
         files.forEach(function(file) {
-            if(delList.indexOf(file.replace(armaPath,'')) == -1){
+            if (delList.indexOf(file.replace(armaPath, '')) == -1) {
                 fs.unlinkSync(file);
             };
         });
@@ -247,6 +249,21 @@ function download(fileObj) {
         });
     };
 
+    if (timert) {
+        $.ajax({
+            url: "https://service.realliferpg.de/launcher/report.php",
+            type: "POST",
+            data: {
+                'type': 'downloading'
+            },
+            success: function() {}
+        });
+        timert = false;
+        setTimeout(function() {
+            timert = true;
+        }, 300000);
+    };
+
     var stream = dwn._download('http://213.202.212.13/download/' + fileObj.RelativPath); //TODO hardcoded IP
 
     var str = progress({
@@ -256,6 +273,7 @@ function download(fileObj) {
 
     str.on('progress', function(progress) {
         document.getElementById('lbl_downInfo').innerHTML = (progress.percentage).toFixed(2) + "% - " + ((progress.speed) / 1048576).toFixed(2) + " MB/s - noch " + progress.eta + "s - " + curFileObj.FileName;
+        document.title = curFileObj.FileName;
         var args = {
             progType: 1,
             message: "update-progress",
@@ -319,7 +337,7 @@ function quickCheck(fileObj) {
 //fully checks all file MD5 hashes
 function fullCheck() {
 
-    if(cancelDownload){
+    if (cancelDownload) {
         return;
     };
 
@@ -328,6 +346,9 @@ function fullCheck() {
         var crypto = require('crypto');
 
         curHashObj = downloadList[0];
+
+        document.getElementById('lbl_downInfo').innerHTML = curHashObj.FileName;
+        document.title = curHashObj.FileName;
 
         var args = {
             message: "update-hash-progress",
