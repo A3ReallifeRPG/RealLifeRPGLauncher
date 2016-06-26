@@ -452,17 +452,38 @@ function resetWinProgress() {
 
 ipcRenderer.on('update-downloaded', (event, arg) => {
     notifyWin('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten','ic_done_white_36dp_2x.png');
-    console.log(args);
+    console.log(arg);
 });
 
 function notifyWin(title, text, icon) {
     notifier.notify({
         title: title,
         message: text,
-        icon: winpath.join(__dirname, '../icon/' + icon),
+        icon: winpath.join(__dirname, '../../extracted/icon/' + icon),
         sound: true,
         wait: true
     }, function(err, response) {
         // Response is response from notification
     });
+}
+
+function extractIconsFromAsar() {
+  var fs = require('fs');
+  var dir1 = 'resources/extracted';
+  var dir2 = 'resources/extracted/icon';
+
+  if (!fs.existsSync(dir1)){
+      fs.mkdirSync(dir1);
+  };
+  if (!fs.existsSync(dir2)){
+      fs.mkdirSync(dir2);
+  };
+  filesToExtract.forEach(function(entry) {
+    fs.createReadStream('resources/app.asar/icon/' + entry).pipe(fs.createWriteStream('resources/extracted/icon/' + entry));
+  });
+}
+
+function restartOnUpdate() {
+    var args = {};
+    ipcRenderer.send('restartOnUpdate', args);
 }

@@ -17,3 +17,5 @@ var launcher_Notification = "/LauncherSettings/GetSettings";
 var task_force_installer = "https://realliferpg.de/TFARReallifeRPG.ts3_plugin";
 
 var debug_mode = 1;
+
+var filesToExtract = ['ic_description_white_36dp_2x.png','ic_done_all_white_36dp_2x.png','ic_done_white_36dp_2x.png','ic_error_outline_white_36dp_2x.png','ic_file_download_white_36dp_2x.png'];

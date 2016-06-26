@@ -187,6 +187,7 @@
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
                 checkregkey1();
+                extractIconsFromAsar();
             };
         });
     });

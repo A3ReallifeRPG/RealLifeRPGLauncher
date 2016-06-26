@@ -15,70 +15,72 @@ const {
 
 // this should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
-  // squirrel event handled and app will exit in 1000ms, so don't do anything else
-  return;
+    // squirrel event handled and app will exit in 1000ms, so don't do anything else
+    return;
 }
 
 function handleSquirrelEvent() {
-  if (process.argv.length === 1) {
-    return false;
-  }
+    if (process.argv.length === 1) {
+        return false;
+    }
 
-  const ChildProcess = require('child_process');
-  const path = require('path');
+    const ChildProcess = require('child_process');
+    const path = require('path');
 
-  const appFolder = path.resolve(process.execPath, '..');
-  const rootAtomFolder = path.resolve(appFolder, '..');
-  const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-  const exeName = path.basename(process.execPath);
+    const appFolder = path.resolve(process.execPath, '..');
+    const rootAtomFolder = path.resolve(appFolder, '..');
+    const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+    const exeName = path.basename(process.execPath);
 
-  const spawn = function(command, args) {
-    let spawnedProcess, error;
+    const spawn = function(command, args) {
+        let spawnedProcess, error;
 
-    try {
-      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
-    } catch (error) {}
+        try {
+            spawnedProcess = ChildProcess.spawn(command, args, {
+                detached: true
+            });
+        } catch (error) {}
 
-    return spawnedProcess;
-  };
+        return spawnedProcess;
+    };
 
-  const spawnUpdate = function(args) {
-    return spawn(updateDotExe, args);
-  };
+    const spawnUpdate = function(args) {
+        return spawn(updateDotExe, args);
+    };
 
-  const squirrelEvent = process.argv[1];
-  switch (squirrelEvent) {
-    case '--squirrel-install':
-    case '--squirrel-updated':
-      // Optionally do things such as:
-      // - Add your .exe to the PATH
-      // - Write to the registry for things like file associations and
-      //   explorer context menus
+    const squirrelEvent = process.argv[1];
+    switch (squirrelEvent) {
+        case '--squirrel-install':
+        case '--squirrel-updated':
+            // Optionally do things such as:
+            // - Add your .exe to the PATH
+            // - Write to the registry for things like file associations and
+            //   explorer context menus
 
-      // Install desktop and start menu shortcuts
-      spawnUpdate(['--createShortcut', exeName]);
+            // Install desktop and start menu shortcuts
+            spawnUpdate(['--createShortcut', exeName]);
 
-      setTimeout(app.quit, 1000);
-      return true;
+            setTimeout(app.quit, 1000);
+            return true;
 
-    case '--squirrel-uninstall':
-      // Undo anything you did in the --squirrel-install and
-      // --squirrel-updated handlers
+        case '--squirrel-uninstall':
+            // Undo anything you did in the --squirrel-install and
+            // --squirrel-updated handlers
 
-      // Remove desktop and start menu shortcuts
-      spawnUpdate(['--removeShortcut', exeName]);
+            // Remove desktop and start menu shortcuts
+            spawnUpdate(['--removeShortcut', exeName]);
 
-      setTimeout(app.quit, 1000);
-      return true;
+            setTimeout(app.quit, 1000);
+            return true;
 
-    case '--squirrel-obsolete':
-      // This is called on the outgoing version of your app before
-      // we update to the new version - it's the opposite of
-      // --squirrel-updated
+        case '--squirrel-obsolete':
+            // This is called on the outgoing version of your app before
+            // we update to the new version - it's the opposite of
+            // --squirrel-updated
 
-      app.quit();
-      return true;
-  }
+            app.quit();
+            return true;
+    }
 };
 
 
@@ -86,13 +88,13 @@ autoUpdater.addListener("update-available", function(event) {
 
 });
 autoUpdater.addListener("update-downloaded", function(event, releaseNotes, releaseName, releaseDate, updateURL) {
-  var args = {
-      releaseNotes: releaseNotes,
-      releaseName: releaseName,
-      releaseDate: releaseDate,
-      updateURL: updateURL
-  };
-  win.webContents.send('update-downloaded', args);
+    var args = {
+        releaseNotes: releaseNotes,
+        releaseName: releaseName,
+        releaseDate: releaseDate,
+        updateURL: updateURL
+    };
+    win.webContents.send('update-downloaded', args);
 });
 autoUpdater.addListener("error", function(error) {
 
@@ -103,7 +105,6 @@ autoUpdater.addListener("checking-for-update", function(event) {
 autoUpdater.addListener("update-not-available", function(event) {
 
 });
-
 
 var os = require('electron').os;
 var version = app.getVersion();
@@ -165,7 +166,7 @@ function setUpIpcHandlers() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-        app.quit();
+    app.quit();
 });
 
 app.on('activate', () => {
@@ -176,4 +177,8 @@ app.on('activate', () => {
 
 ipcMain.on('winprogress-change', (event, arg) => {
     win.setProgressBar(arg.progress);
+});
+
+ipcMain.on('restartOnUpdate', (event, arg) => {
+    autoUpdater.quitAndInstall();
 });

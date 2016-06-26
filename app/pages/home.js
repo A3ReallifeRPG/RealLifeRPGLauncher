@@ -133,7 +133,4 @@ function modClick(id){
     }
     ipcRenderer.send('message-to-download', args);
     notifyWin('RealLifeRPG Launcher', 'Download gestartet','ic_file_download_white_36dp_2x.png');
-    let myNotification = new Notification('Title', {
-        body: 'Lorem Ipsum Dolor Sit Amet'
-    });
 }
