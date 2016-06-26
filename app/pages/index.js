@@ -152,6 +152,9 @@ function fullCheckResult(arg) {
         notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung beendet', 'ic_done_all_white_36dp_2x.png');
         document.getElementById('pb1text').innerHTML = "Komplette Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
+
+        document.getElementById('btn_mod_' + curModId).innerHTML = "Spielen";
+        document.getElementById('btn_mod_' + curModId).setAttribute('onClick','modClickPlay(' + curModId + ')');
     }
 }
 
@@ -163,6 +166,9 @@ function hashDialogClose() {
     notifyWin('RealLifeRPG Launcher', 'Download abgeschlossen','ic_done_white_36dp_2x.png');
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
+    
+    document.getElementById('btn_mod_' + curModId).innerHTML = "Spielen";
+    document.getElementById('btn_mod_' + curModId).setAttribute('onClick','modClickPlay(' + curModId + ')');
 }
 
 function hashDialogConfirm() {

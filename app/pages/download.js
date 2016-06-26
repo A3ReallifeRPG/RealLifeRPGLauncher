@@ -122,10 +122,20 @@ function notfCallback(json, success) {
 function getHashListCallback(jsObj) {
     cancelDownload = false;
     downloadList = jsObj;
+    deleteFiles(downloadList);
     calcDownloadStats();
     preDownloadCheck();
-    deleteFiles(downloadList);
-    download(downloadList[0]);
+    if(downloadList.length > 0){
+        download(downloadList[0]);
+    }else{
+        isDownloading = false;
+        var args = {
+            type: 1,
+            message: "ask-hash",
+            modId: currentModId
+        };
+        ipcRenderer.send('message-to-render', args);
+    };
 }
 
 function getHashFullCheckCallback(jsObj) {
