@@ -119,12 +119,23 @@ let downWin;
 
 function createWindow() {
 
+    //web process
+    webWin = new BrowserWindow({
+        icon: 'img/icon.ico',
+        width: 1000,
+        height: 550,
+        //show: false
+    });
+    webWin.loadURL(`file://${__dirname}/pages/web.html`);
+    webWin.webContents.openDevTools({
+        detach: false
+    });
     //download process
     downWin = new BrowserWindow({
         icon: 'img/icon.ico',
         width: 1000,
         height: 550,
-        show: true
+        //show: false
     });
     downWin.loadURL(`file://${__dirname}/pages/download.html`);
     downWin.webContents.openDevTools({
