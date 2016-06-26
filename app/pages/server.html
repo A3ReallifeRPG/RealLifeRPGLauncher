@@ -6,91 +6,14 @@
 <br>
 <div class="tabcontrol" data-role="tabcontrol" data-on-tab-click="tab_click" style="width:98%">
     <ul class="tabs" id="server_tabHost">
-        <li><a href="#mod1">Server 1</a></li>
-        <li><a href="#mod2">Server 2</a></li>
-        <li><a href="#mod3">Server 3</a></li>
+        
     </ul>
-    <div class="frames">
-        <div class="frame" id="mod1">
-            <div class="row">
-                <div class="col-md-4" style="height:100%">
-                    <div id="piechart1" style="min-width: 20%; height: 200px;"></div>
-                    Aktuelle Spieler: 1337<br>
-                    IP: 46.20.46.31:2302<br>
-                    <button class="button loading-pulse lighten success" style="margin-top:20px"> Server beitreten</button>
-                </div>
-                <div class="col-md-8">
-                    <div id="table-wrapper">
-                        <div id="table-scroll">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th><span class="text">Name</span></th>
-                                        <th><span class="text">Online seit</span></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Vabene</td>
-                                        <td>1337:1337</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Kaibu</td>
-                                        <td>69:69</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Vabene</td>
-                                        <td>1337:1337</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Kaibu</td>
-                                        <td>69:69</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Vabene</td>
-                                        <td>1337:1337</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Kaibu</td>
-                                        <td>69:69</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Kaibu</td>
-                                        <td>69:69</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Kaibu</td>
-                                        <td>69:69</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="frame" id="mod2">
-            <div class="row">
-                <div class="col-md-4">
-                    <div id="piechart2"></div>
-                </div>
-                <div class="col-md-8">
-                </div>
-            </div>
-        </div>
-        <div class="frame" id="mod3">
-            <div class="row">
-                <div class="col-md-4">
-                    <div id="piechart3"></div>
-                </div>
-                <div class="col-md-8">
-                </div>
-            </div>
-        </div>
+    <div class="frames" id="server_tabs">
+
     </div>
 </div>
 <script>
 $(document).ready(function() {
-    loadHighCharts();
+    loadHighCharts(58,8,5,4);
 });
 </script>
