@@ -63,6 +63,7 @@ function insertServerTab(serverObj,index) {
     charDiv.setAttribute('style', 'min-width: 20%; height: 200px;');
 
     var br = document.createElement("br");
+    var br2 = document.createElement("br");
     var txtPlayers = document.createTextNode("Aktuelle Spieler: " + serverObj.Players + "/" + serverObj.Slots);
     var txtIp = document.createTextNode("IP: " + serverObj.IpAddress + " Port: " + serverObj.Port);
 
@@ -78,6 +79,7 @@ function insertServerTab(serverObj,index) {
     col4.appendChild(txtPlayers);
     col4.appendChild(br);
     col4.appendChild(txtIp);
+    col4.appendChild(br2);
     col4.appendChild(btnJoin);
     row.appendChild(col4);
     wrapper.appendChild(row);

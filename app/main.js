@@ -148,7 +148,9 @@ function createWindow() {
         width: 1000,
         height: 550,
         minWidth: 1000,
-        minHeight: 550
+        minHeight: 550,
+        maxWidth: 1920,
+        maxnHeight: 1080
     });
     win.loadURL(`file://${__dirname}/pages/index.html`);
 
@@ -167,6 +169,10 @@ function createWindow() {
 function setUpIpcHandlers() {
     ipcMain.on('message-to-download', (event, arg) => {
         downWin.webContents.send('download-receiver', arg);
+    });
+
+    ipcMain.on('message-to-webwin', (event, arg) => {
+        webWin.webContents.send('webwin-receiver', arg);
     });
 
     ipcMain.on('message-to-render', (event, arg) => {

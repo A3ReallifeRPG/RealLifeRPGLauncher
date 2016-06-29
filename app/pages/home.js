@@ -117,6 +117,7 @@ function modClickPlay(id){
 }
 
 function fullCheckClick(id){
+    $('#btn_cancel_progress').delay(500).fadeIn('slow');
     var args = {
         message: 'start-fullcheck',
         modId : id
@@ -126,6 +127,7 @@ function fullCheckClick(id){
 }
 
 function modClick(id){
+    $('#btn_cancel_progress').delay(500).fadeIn('slow');
     var args = {
         type: 1,
         message: "start-download",

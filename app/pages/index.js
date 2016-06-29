@@ -19,6 +19,7 @@ var checkListMods = [];
 curentPage = "";
 
 searchUpdates();
+checkVersion();
 
 //wait for finished starup loop
 function waitForStartup() {
@@ -42,7 +43,7 @@ function showNotf(arg) {
         if (arg.jsonObj.UseNotification) {
             var dialog = $('#dialog_notf').data('dialog');
             dialog.open();
-            notifyWin('RealLifeRPG Launcher', 'Wichtige Informationen','ic_error_outline_white_36dp_2x.png');
+            notifyWin('RealLifeRPG Launcher', 'Wichtige Informationen', 'ic_error_outline_white_36dp_2x.png');
         }
     } else {
         if (debug_mode >= 1) {
@@ -72,6 +73,9 @@ ipcRenderer.on('render-receiver', (event, arg) => {
             break;
         case 'full-check-result':
             fullCheckResult(arg);
+            break;
+        case 'update-tfar-progress':
+            updateTFARProgress(arg);
             break;
         case 'no-path-warning':
             var dialog = $('#dialog_noPath').data('dialog');
@@ -154,7 +158,7 @@ function fullCheckResult(arg) {
         document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
 
         document.getElementById('btn_mod_' + curModId).innerHTML = "Spielen";
-        document.getElementById('btn_mod_' + curModId).setAttribute('onClick','modClickPlay(' + curModId + ')');
+        document.getElementById('btn_mod_' + curModId).setAttribute('onClick', 'modClickPlay(' + curModId + ')');
     }
 }
 
@@ -163,17 +167,17 @@ function hashDialogClose() {
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
     resetWinProgress();
-    notifyWin('RealLifeRPG Launcher', 'Download abgeschlossen','ic_done_white_36dp_2x.png');
+    notifyWin('RealLifeRPG Launcher', 'Download abgeschlossen', 'ic_done_white_36dp_2x.png');
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
-    
+
     document.getElementById('btn_mod_' + curModId).innerHTML = "Spielen";
-    document.getElementById('btn_mod_' + curModId).setAttribute('onClick','modClickPlay(' + curModId + ')');
+    document.getElementById('btn_mod_' + curModId).setAttribute('onClick', 'modClickPlay(' + curModId + ')');
 }
 
 function hashDialogConfirm() {
-  resetWinProgress();
-  notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet','ic_description_white_36dp_2x.png');
+    resetWinProgress();
+    notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet', 'ic_description_white_36dp_2x.png');
     var args = {
         message: 'start-fullcheck',
         modId: curModId
@@ -219,6 +223,42 @@ function showHashDialog(arg) {
     dialog.open();
 }
 
+
+function updateTFARProgress(arg) {
+    var pb2 = $("#pb2").data('progress');
+    if (arg.progType == 1) {
+        pb2.set(arg.obj.progressObj.percentage);
+        var winprogress = arg.obj.progressObj.percentage / 100;
+        var args = {
+            progress: winprogress
+        };
+        ipcRenderer.send('winprogress-change', args);
+        document.title = "RealLifeRPG Launcher - " + arg.obj.progressObj.percentage.toFixed(1) + "%";
+        document.getElementById('pb2text').innerHTML = "TFAR Download " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s";
+    } else if (arg.progType == 2) {
+        notifyWin('RealLifeRPG Launcher', 'TFAR heruntergeladen, wird ausgeführt...', 'ic_done_white_36dp_2x.png');
+        setTimeout(function() {
+            resetWinProgress();
+            var fs = require('fs');
+            fs.writeFile("runtfar.bat", "start TFARReallifeRPG.ts3_plugin", function(err) {
+                if (err) {
+                    return console.log(err);
+                }
+                var exec = require('child_process').execFile;
+                var execTFAR = function() {
+                    exec('runtfar.bat', function(err, data) {
+                        console.log(err)
+                        console.log(data.toString());
+                    });
+                }
+                execTFAR();
+            });
+        }, 500);
+    };
+}
+
+
+
 //update status bar
 function updateDwnProgress(arg) {
 
@@ -235,6 +275,7 @@ function updateDwnProgress(arg) {
         progress: winprogress
     };
     ipcRenderer.send('winprogress-change', args);
+    document.title = "RealLifeRPG Launcher - " + totalProgress + "%";
     curDownSize = (arg.obj.currentDownloadSize / 1073741824).toFixed(3);
     maxDownSize = (arg.obj.totalFileSize / 1073741824).toFixed(3);
     if (curDownSize > maxDownSize) {
@@ -254,13 +295,6 @@ function updateDwnProgress(arg) {
         document.getElementById('pb2text').innerHTML = fName + " " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s";
     } else if (arg.progType == 2) {
         resetWinProgress();
-        document.getElementById('pb1text').innerHTML = "Download Angehalten";
-        document.getElementById('pb2text').innerHTML = "";
-    }
-
-    //TODO what is that ?
-    if (curentPage == "home") {
-        $('#lbl_downInfo').html(arg.obj);
     }
 
 }
@@ -281,6 +315,8 @@ function updateHashProgress(arg) {
         progress: winprogress
     };
     ipcRenderer.send('winprogress-change', args);
+
+    document.title = "RealLifeRPG Launcher - " + totalProgress + "%";
 
     document.getElementById('pb1text').innerHTML = "Prüfe Datei: " + curCount + " / " + arg.obj.totalFileCount;
 
@@ -450,15 +486,24 @@ function checkregkey3() {
 }
 
 function resetWinProgress() {
+    $('#btn_cancel_progress').delay(500).fadeOut('slow');
+    document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
     var args = {
         progress: 0
     };
     ipcRenderer.send('winprogress-change', args);
+    document.getElementById('pb1text').innerHTML = "";
+    document.getElementById('pb2text').innerHTML = "";
 }
 
 ipcRenderer.on('update-downloaded', (event, arg) => {
-    notifyWin('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten','ic_done_white_36dp_2x.png');
-    console.log(arg);
+    $('#btn_update_restart').css({
+        'visibility': 'visible'
+    });
+    notifyWin('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten', 'ic_done_white_36dp_2x.png');
+    if (debug_mode >= 1) {
+        console.log(arg);
+    };
 });
 
 function notifyWin(title, text, icon) {
@@ -474,22 +519,41 @@ function notifyWin(title, text, icon) {
 }
 
 function extractIconsFromAsar() {
-  var fs = require('fs');
-  var dir1 = 'resources/extracted';
-  var dir2 = 'resources/extracted/icon';
+    var fs = require('fs');
+    var dir1 = 'resources/extracted';
+    var dir2 = 'resources/extracted/icon';
 
-  if (!fs.existsSync(dir1)){
-      fs.mkdirSync(dir1);
-  };
-  if (!fs.existsSync(dir2)){
-      fs.mkdirSync(dir2);
-  };
-  filesToExtract.forEach(function(entry) {
-    fs.createReadStream('resources/app.asar/icon/' + entry).pipe(fs.createWriteStream('resources/extracted/icon/' + entry));
-  });
+    if (!fs.existsSync(dir1)) {
+        fs.mkdirSync(dir1);
+    };
+    if (!fs.existsSync(dir2)) {
+        fs.mkdirSync(dir2);
+    };
+    filesToExtract.forEach(function(entry) {
+        fs.createReadStream('resources/app.asar/icon/' + entry).pipe(fs.createWriteStream('resources/extracted/icon/' + entry));
+    });
 }
 
 function restartOnUpdate() {
     var args = {};
     ipcRenderer.send('restartOnUpdate', args);
+}
+
+function checkVersion() {
+    var version = app.app.getVersion();
+    storage.get('version', function(error, data) {
+        if (jQuery.isEmptyObject(data)) {
+            setVersion();
+        } else if (data.version != version) {
+            notifyWin('RealLifeRPG Launcher', 'Launcher geupdated!', 'ic_done_white_36dp_2x.png');
+            setVersion();
+        }
+    });
+}
+
+function setVersion() {
+    var version = app.app.getVersion();
+    storage.set('version', {
+        version: version
+    }, function(error) {});
 }

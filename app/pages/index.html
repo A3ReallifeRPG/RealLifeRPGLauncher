@@ -45,6 +45,7 @@
     <!-- preloader -->
     <script type="text/javascript">
         $(window).load(function() { // makes sure the whole site is loaded
+            $('#btn_cancel_progress').fadeOut('slow');
             $('#status').delay(200).fadeOut('slow');
             $('#preloader').delay(500).fadeOut('slow'); // will fade out the white DIV that covers the website.
             $('body').delay(340).css({
@@ -71,6 +72,7 @@
 
                 <div class="nav-commands">
                     <div class="nav-element" data-navigate="home" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                    <div class="nav-element" data-navigate="tfar" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'TFAR', icon: 'microphone'}"></div>
                     <div class="nav-element" data-navigate="server" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Server', icon: 'world'}"></div>
                     <div class="nav-element" data-navigate="changelog" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Changelog', icon: 'previewlink'}"></div>
                     <!--<div class="nav-element" data-navigate="info" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Info', icon: 'contact'}"></div>-->
@@ -98,9 +100,9 @@
                     </div>
                     <div class="col-md-5" style="margin-bottom:5px;margin-bottom:10px;">
                         <span id="pb2text" style="margin-bottom:5px;margin-left:2%;">
-                        Kein Download eingereiht.
                       </span>
-                        <button class="button danger" onclick="callDownloadStop();" style="right: 0;top:0;position:fixed;margin-right:5px;margin-top:7px"><span class="icon mif-cancel"></span></button>
+                        <span id="btn_cancel_progress" data-role="hint" data-hint-background="bg-green" data-hint-color="fg-white" data-hint-mode="2" data-hint="Abbrechen" data-hint-position="left" style="right: 0;top:0;position:fixed;margin-right:46px;margin-top:23px"><button class="button danger" onclick="callDownloadStop();" style="right: 0;top:0;position:fixed;margin-right:5px;margin-top:7px;"><span class="icon mif-cancel"></span></button>
+                        </span>
                     </div>
                 </div>
 
@@ -113,6 +115,9 @@
 
             <!-- Content area -->
             <div class="contenttext" id="content"></div>
+            <span id="btn_update_restart" data-role="hint" data-hint-background="bg-green" data-hint-color="fg-white" data-hint-mode="2" data-hint="Update geladen | Launcher neustarten!" data-hint-position="left" style="right: 0;bottom:0;position:fixed;margin-right:5px;margin-bottom:7px;visibility:hidden;"><button class="button danger" onclick="restartOnUpdate();"> <span class="icon mif-file-download"></span>
+            </button>
+            </span>
         </div>
 
     </div>
@@ -168,7 +173,6 @@
 </body>
 
 <script>
-
     // winjs splitview
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
@@ -193,7 +197,6 @@
     });
 
     document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
-
 </script>
 
 </html>
