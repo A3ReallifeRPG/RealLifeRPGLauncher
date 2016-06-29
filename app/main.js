@@ -150,7 +150,7 @@ function createWindow() {
         minWidth: 1000,
         minHeight: 550,
         maxWidth: 1920,
-        maxnHeight: 1080
+        maxHeight: 1080
     });
     win.loadURL(`file://${__dirname}/pages/index.html`);
 
