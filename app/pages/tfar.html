@@ -8,22 +8,52 @@
 <br/>
 <div class="container">
     <div class="row">
-      <h3 class="win-h3">Teamspeak Installationsdatei</h3>
-      <br/>
-        <div class="col-md-8">
-          Downloaded eine .ts3_plugin Datei und führt sie aus.
+        <h3 class="win-h3">TFAR Komplettinstallation</h3>
+        <br/>
+        <div class="col-md-8" style="font-size:17px">
+            Installiert TFAR komplett,
+            <br> führe dies aus wenn du TFAR noch nicht installiert hast.
         </div>
         <div class="col-md-4">
-          <button class="button loading-pulse lighten success" id="downloadtfar">Download</button>
+            <button class="button loading-pulse lighten success" id="installfull">Starten</button>
         </div>
     </div>
+    <hr>
+    <br>
+    <div class="row">
+        <h3 class="win-h3">Teamspeak Installationsdatei</h3>
+        <br/>
+        <div class="col-md-8" style="font-size:17px">
+            Downloaded eine .ts3_plugin Datei und führt diese aus.
+            <br> Hilfreich zur Reperatur der TFAR Installation
+        </div>
+        <div class="col-md-4">
+            <button class="button loading-pulse lighten success" id="downloadtfar">Download</button>
+        </div>
+    </div>
+    <hr>
+    <br>
+    <div class="row">
+        <h3 class="win-h3">TFAR Userconfig</h3>
+        <br/>
+        <div class="col-md-8" style="font-size:17px">
+            Legt eine TFAR Einstellungsdatei in deinem Arma3/userconfig Ordner an.
+            <br>
+        </div>
+        <div class="col-md-4">
+            <button class="button loading-pulse lighten success" id="userconfig">Starten</button>
+        </div>
+    </div>
+    <hr>
 </div>
 <script>
-$('#downloadtfar').on('click', function() {
-    var args = {
-        type: 1,
-        message: "download-tfar"
-    }
-    ipcRenderer.send('message-to-webwin', args);
-});
+    $('#downloadtfar').on('click', function() {
+        downloadTFAR();
+    });
+    $('#installfull').on('click', function() {
+        installFull();
+    });
+    $('#userconfig').on('click', function() {
+        installUserconfigOnly();
+    });
 </script>

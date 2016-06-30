@@ -16,7 +16,6 @@
     "dwn": "^0.0.2",
     "electron-json-storage": "^2.0.0",
     "electron-squirrel-startup": "^1.0.0",
-    "getmac": "^1.2.1",
     "highcharts": "^4.2.5",
     "mkpath": "^1.0.0",
     "node-notifier": "^4.6.0",

@@ -77,7 +77,11 @@ ipcRenderer.on('render-receiver', (event, arg) => {
         case 'update-tfar-progress':
             updateTFARProgress(arg);
             break;
+        case 'progress-cancelled':
+            progressCancelled();
+            break;
         case 'no-path-warning':
+            progressCancelled();
             var dialog = $('#dialog_noPath').data('dialog');
             dialog.open();
             break;
@@ -101,7 +105,7 @@ function quickCheckResult(arg) {
 
         waitForStartup();
 
-        resetWinProgress();
+        resetProgress();
         document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
     } else if (arg.obj.resultType == 2) {
@@ -152,7 +156,7 @@ function fullCheckResult(arg) {
         pb1.set(100)
         var pb2 = $("#pb2").data('progress');
         pb2.set(100);
-        resetWinProgress();
+        resetProgress();
         notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung beendet', 'ic_done_all_white_36dp_2x.png');
         document.getElementById('pb1text').innerHTML = "Komplette Überprüfung beendet";
         document.getElementById('pb2text').innerHTML = "Alle Dateien sind auf dem neuesten Stand";
@@ -166,7 +170,7 @@ function fullCheckResult(arg) {
 function hashDialogClose() {
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
     dwnCompleteDialog.close();
-    resetWinProgress();
+    resetProgress();
     notifyWin('RealLifeRPG Launcher', 'Download abgeschlossen', 'ic_done_white_36dp_2x.png');
     document.getElementById('pb1text').innerHTML = "Download beendet";
     document.getElementById('pb2text').innerHTML = "Spieldateien NICHT auf Fehler geprüft.";
@@ -176,7 +180,7 @@ function hashDialogClose() {
 }
 
 function hashDialogConfirm() {
-    resetWinProgress();
+    resetProgress();
     notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet', 'ic_description_white_36dp_2x.png');
     var args = {
         message: 'start-fullcheck',
@@ -199,7 +203,9 @@ function armaPathisFalse() {
     pathdialog.close();
     loadpage('settings.html');
     storage.set('settings', {
-        armapath: ''
+        armapath: '',
+        toast: true,
+        sounds: true
     }, function(error) {});
 }
 
@@ -212,6 +218,11 @@ function armaPathisCorrect() {
 function callDownloadStop() {
     var args = {
         message: 'stop-download',
+        obj: {}
+    };
+    ipcRenderer.send('message-to-download', args);
+    var args = {
+        message: 'stop-hashing',
         obj: {}
     };
     ipcRenderer.send('message-to-download', args);
@@ -238,7 +249,7 @@ function updateTFARProgress(arg) {
     } else if (arg.progType == 2) {
         notifyWin('RealLifeRPG Launcher', 'TFAR heruntergeladen, wird ausgeführt...', 'ic_done_white_36dp_2x.png');
         setTimeout(function() {
-            resetWinProgress();
+            resetProgress();
             var fs = require('fs');
             fs.writeFile("runtfar.bat", "start TFARReallifeRPG.ts3_plugin", function(err) {
                 if (err) {
@@ -246,10 +257,7 @@ function updateTFARProgress(arg) {
                 }
                 var exec = require('child_process').execFile;
                 var execTFAR = function() {
-                    exec('runtfar.bat', function(err, data) {
-                        console.log(err)
-                        console.log(data.toString());
-                    });
+                    exec('runtfar.bat', function(err, data) {});
                 }
                 execTFAR();
             });
@@ -294,7 +302,7 @@ function updateDwnProgress(arg) {
         document.getElementById('pb1text').innerHTML = totalProgress + "% - " + curDownSize + "GB/" + maxDownSize + "GB";
         document.getElementById('pb2text').innerHTML = fName + " " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s";
     } else if (arg.progType == 2) {
-        resetWinProgress();
+        resetProgress();
     }
 
 }
@@ -369,7 +377,9 @@ function checkregkey1() {
                     pathdialog.open();
                     path = path + "\\";
                     storage.set('settings', {
-                        armapath: path
+                        armapath: path,
+                        toast: true,
+                        sounds: true
                     }, function(error) {});
                 } else {
                     if (debug_mode >= 1) {
@@ -415,7 +425,9 @@ function checkregkey2() {
                     pathdialog.open();
                     path = path + "\\";
                     storage.set('settings', {
-                        armapath: path
+                        armapath: path,
+                        toast: true,
+                        sounds: true
                     }, function(error) {});
                 } else {
                     if (debug_mode >= 1) {
@@ -461,14 +473,18 @@ function checkregkey3() {
                     pathdialog.open();
                     path = path + "\\";
                     storage.set('settings', {
-                        armapath: path
+                        armapath: path,
+                        toast: true,
+                        sounds: true
                     }, function(error) {});
                 } else {
                     if (debug_mode >= 1) {
                         console.log("RegKeySearch3: '" + filepath + "'  is not a file");
                     };
                     storage.set('settings', {
-                        armapath: ''
+                        armapath: '',
+                        toast: true,
+                        sounds: true
                     }, function(error) {});
                     loadpage('settings.html');
                 };
@@ -478,14 +494,16 @@ function checkregkey3() {
                 console.log("RegKeySearch3: No Regkey found");
             };
             storage.set('settings', {
-                armapath: ''
+                armapath: '',
+                toast: true,
+                sounds: true
             }, function(error) {});
             loadpage('settings.html');
         }
     });
 }
 
-function resetWinProgress() {
+function resetProgress() {
     $('#btn_cancel_progress').delay(500).fadeOut('slow');
     document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
     var args = {
@@ -494,6 +512,10 @@ function resetWinProgress() {
     ipcRenderer.send('winprogress-change', args);
     document.getElementById('pb1text').innerHTML = "";
     document.getElementById('pb2text').innerHTML = "";
+    var pb1 = $("#pb1").data('progress');
+    pb1.set(100)
+    var pb2 = $("#pb2").data('progress');
+    pb2.set(100);
 }
 
 ipcRenderer.on('update-downloaded', (event, arg) => {
@@ -507,15 +529,30 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
 });
 
 function notifyWin(title, text, icon) {
-    notifier.notify({
-        title: title,
-        message: text,
-        icon: winpath.join(__dirname, '../../extracted/icon/' + icon),
-        sound: true,
-        wait: true
-    }, function(err, response) {
-        // Response is response from notification
+    storage.get('settings', function(error, data) {
+        if(data.toast == "") {
+          toast = false;
+        } else {
+          toast = data.toast;
+        };
+        if(data.sounds == "") {
+          sounds = false;
+        } else {
+          sounds = data.sounds;
+        };
+        if (toast) {
+            notifier.notify({
+                title: title,
+                message: text,
+                icon: winpath.join(__dirname, '../../extracted/icon/' + icon),
+                sound: sounds,
+                wait: true
+            }, function(err, response) {
+                // Response is response from notification
+            });
+        }
     });
+
 }
 
 function extractIconsFromAsar() {
@@ -545,6 +582,7 @@ function checkVersion() {
         if (jQuery.isEmptyObject(data)) {
             setVersion();
         } else if (data.version != version) {
+            extractIconsFromAsar();
             notifyWin('RealLifeRPG Launcher', 'Launcher geupdated!', 'ic_done_white_36dp_2x.png');
             setVersion();
         }
@@ -556,4 +594,15 @@ function setVersion() {
     storage.set('version', {
         version: version
     }, function(error) {});
+}
+
+function progressCancelled() {
+    notifyWin('RealLifeRPG Launcher', 'Abgebrochen', 'ic_clear_white_36dp_2x.png');
+    resetProgress();
+    $.Notify({
+        caption: 'Abgebrochen',
+        content: ' ',
+        type: 'warning'
+    });
+
 }

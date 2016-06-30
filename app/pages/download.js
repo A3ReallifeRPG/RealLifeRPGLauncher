@@ -338,6 +338,10 @@ function quickCheck(fileObj) {
 function fullCheck() {
 
     if (cancelDownload) {
+        var args = {
+            message: "progress-cancelled"
+        };
+        ipcRenderer.send('message-to-render', args);
         return;
     };
 

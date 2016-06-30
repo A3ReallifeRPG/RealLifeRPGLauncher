@@ -119,6 +119,39 @@
             </table>
         </div>
     </div>
+    <div class="row">
+        <h3 class="win-h3">Launcher Einstellungen</h3>
+        <div class="col-md-12">
+            <table>
+                <tr>
+                    <td>
+                        <h5 class="win-h5">Windows Meldungen:</h5>
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" id="toastswitch">
+                            <span class="check"></span>
+                        </label>
+                    </td>
+                    <td style="width:5%">
+                    </td>
+                    <td>
+                        <h5 class="win-h5">Sounds:</h5>
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" id="soundswitch">
+                            <span class="check"></span>
+                        </label>
+                    </td>
+                    <td style="width:1%">
+                        <button class="button danger" onclick="resetallsettingswin();" <span class="icon mif-bin">
+                            </span> Zurücksetzen</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 <script>
     $(document).ready(function() {
@@ -178,6 +211,16 @@
         saveallsettings();
     });
 
+    document.getElementById("toastswitch").addEventListener("click", function() {
+        toast = $("#toastswitch").is(':checked');
+        saveallsettings();
+    });
+
+    document.getElementById("soundswitch").addEventListener("click", function() {
+        sounds = $("#soundswitch").is(':checked');
+        saveallsettings();
+    });
+
     $("#meminput").on('change keydown paste input', function() {
         mem = $("#meminput").val();
         saveallsettings();
@@ -208,7 +251,8 @@
             mem: mem,
             cpu: cpu,
             vram: vram,
-            thread: thread
+            toast: toast,
+            sounds: sounds
         }, function(error) {});
         if (timert) {
             $.Notify({
@@ -233,11 +277,42 @@
             mem: '',
             cpu: '',
             vram: '',
-            thread: ''
+            thread: '',
+            toast: '',
+            sounds: ''
         }, function(error) {});
         if (timert) {
             $.Notify({
                 caption: 'Alle Änderungen zurückgesetzt',
+                content: ' ',
+                type: 'success'
+            });
+            timert = false;
+            setTimeout(function() {
+                timert = true;
+            }, 2000);
+        };
+        setTimeout(function() {
+            loadallsettings();
+        }, 100);
+    }
+
+    function resetallsettingswin() {
+        storage.set('settings', {
+            armapath: path,
+            splash: splash,
+            intro: intro,
+            ht: ht,
+            windowed: windowed,
+            mem: mem,
+            cpu: cpu,
+            vram: vram,
+            toast: '',
+            sounds: ''
+        }, function(error) {});
+        if (timert) {
+            $.Notify({
+                caption: 'Alle Launcher Einstellungen zurückgesetzt',
                 content: ' ',
                 type: 'success'
             });
@@ -262,9 +337,10 @@
             cpu = data.cpu;
             vram = data.vram;
             thread = data.thread;
+            toast = data.toast;
+            sounds = data.sounds;
             loadsettingstoui();
         });
-
     }
 
     function loadsettingstoui() {
@@ -272,6 +348,8 @@
         $('#splashswitch').prop('checked', splash);
         $('#introswitch').prop('checked', intro);
         $('#htswitch').prop('checked', ht);
+        $('#toastswitch').prop('checked', toast);
+        $('#soundswitch').prop('checked', sounds);
         $('#windowedswitch').prop('checked', windowed);
         $("#meminput").val(mem);
         $("#cpuinput").val(cpu);

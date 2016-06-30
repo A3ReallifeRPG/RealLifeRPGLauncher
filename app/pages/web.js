@@ -9,20 +9,6 @@ const {
     ipcRenderer
 } = require('electron');
 
-require('getmac').getMac(function(err, macAddress) {
-    if (err) throw err
-    $.ajax({
-        url: "https://service.realliferpg.de/launcher/report.php",
-        type: "POST",
-        data: {
-            'type': 'opened',
-            'mac': macAddress
-        },
-        success: function() {}
-    });
-})
-
-
 ipcRenderer.on('webwin-receiver', (event, arg) => {
     switch (arg.message) {
         case 'download-tfar':
