@@ -85,6 +85,11 @@ ipcRenderer.on('render-receiver', (event, arg) => {
             var dialog = $('#dialog_noPath').data('dialog');
             dialog.open();
             break;
+        case 'player-list-callback':
+            if(curentPage == "server"){
+                setPlayerList(arg.obj.serverId,arg.obj.playerArray);
+            };
+            break;
         default:
             console.log('Packet dropped');
             break;

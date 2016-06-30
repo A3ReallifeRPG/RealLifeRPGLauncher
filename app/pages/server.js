@@ -1,16 +1,25 @@
 getServerInfo(getServerCallback);
 
 function getServerCallback(jsObj) {
-    for (var i = 0; i < jsObj.length; i++) {
-        insertServerTab(jsObj[i],i);
-    };
-    $(function(){
-        $("#tabcontroller").tabcontrol();
-    });
-    $('#tabcontroller').css({
-        'visibility': 'visible'
-    });
-    $('#serverpreloader').remove();
+    if(jsObj.length > 0){
+        defaultServer = jsObj[0].Id;
+        for (var i = 0; i < jsObj.length; i++) {
+            insertServerTab(jsObj[i],i);
+        };
+        $(function(){
+            $("#tabcontroller").tabcontrol();
+        });
+        $('#tabcontroller').css({
+            'visibility': 'visible'
+        });
+        $('#serverpreloader').remove();
+
+        var args = {
+            message: 'get-server-player',
+            serverId: defaultServer
+        };
+        ipcRenderer.send('message-to-webwin', args);
+    }
 }
 
 /*
@@ -45,6 +54,11 @@ function getServerCallback(jsObj) {
 
 <li><a href="#mod1">Server 1</a></li>
 */
+
+function setPlayerList(serverId,playerList){
+    debugger;
+}
+
 function insertServerTab(serverObj,index) {
   if(serverObj.Slots != 0) {
     var wrapper = document.createElement('div');

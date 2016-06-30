@@ -17,6 +17,12 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
             };
             downloadTFAR();
             break;
+        case 'get-server-player':
+            if (debug_mode >= 2) {
+                console.log('Server Player Query started');
+            };
+            getServerClients(arg.serverId,queryPlayerInfocallback);
+            break;
         default:
             if (debug_mode >= 2) {
                 console.log('Packet dropped');
@@ -24,6 +30,22 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
             break;
     }
 })
+
+function queryPlayerInfocallback(jsObj,sId){
+    array = [];
+    for(i = 0; i < jsObj.Playernames.length; i++){
+        array.push(jsObj.Playernames[i]);
+    }
+
+    var args = {
+        message: "player-list-callback",
+        obj: {
+            serverId: sId,
+            playerArray: array
+        }
+    };
+    ipcRenderer.send('message-to-render', args);
+}
 
 function downloadTFAR() {
     isDownloading = true;

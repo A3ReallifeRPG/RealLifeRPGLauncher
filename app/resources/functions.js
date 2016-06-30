@@ -42,7 +42,7 @@ function getServerInfo(callBackFnc) {
 /*
     Query Panel for Connnected Clients
 */
-function getServerClients(serverid) {
+function getServerClients(serverid,callBackFnc) {
     var searchUrl = infoServerURL + server_PlayerListPath + serverid;
 
     var xhr = new XMLHttpRequest();
@@ -51,17 +51,13 @@ function getServerClients(serverid) {
         if (this.readyState == 4 && this.status == 200) {
             var jsObj = JSON.parse(this.responseText);
 
-            var arr = [];
-
-            for(var x in jsObj){
-              arr.push("title: " + jsObj[x]);
-            };
-            return arr;
+            callBackFnc(jsObj,this.data);
         }
         if (this.readyState == 4 && this.status == 404) {
             document.write('Error 404');
         }
     }
+    xhr.data = serverid;
     xhr.send();
 }
 
