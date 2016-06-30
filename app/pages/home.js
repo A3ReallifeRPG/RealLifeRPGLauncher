@@ -90,13 +90,22 @@ function showModInfo(jsonData, success){
             fullCheckButton.setAttribute('class','btn btn-warning');
             node = document.createTextNode("Prüfen");
             fullCheckButton.setAttribute('onClick','fullCheckClick(' + jsonData[i].Id + ')');
-            fullCheckButton.appendChild(node)
+            fullCheckButton.appendChild(node);
 
             infoDivPar.appendChild(infoDivBold);
             infoDiv.appendChild(infoDivHeading);
             infoDiv.appendChild(infoDivPar);
             infoDiv.appendChild(infoDivButton);
             infoDiv.appendChild(fullCheckButton);
+
+            if($.inArray(jsonData[i].Id,updateMods) > -1){
+                fullCheckButton.disabled = false;
+            }else if($.inArray(jsonData[i].Id,installedMods) < 0){
+                fullCheckButton.disabled = true;
+            }else{
+                fullCheckButton.disabled = false;
+            }
+
             carItem.appendChild(img);
             carItem.appendChild(infoDiv);
 

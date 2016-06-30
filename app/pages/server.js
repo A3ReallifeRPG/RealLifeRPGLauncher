@@ -13,12 +13,6 @@ function getServerCallback(jsObj) {
             'visibility': 'visible'
         });
         $('#serverpreloader').remove();
-
-        var args = {
-            message: 'get-server-player',
-            serverId: defaultServer
-        };
-        ipcRenderer.send('message-to-webwin', args);
     }
 }
 
@@ -144,6 +138,12 @@ function insertServerTab(serverObj, index) {
         document.getElementById('server_tabHost').appendChild(li);
 
         loadHighCharts(("char_server_" + serverObj.Id), serverObj.Civilians, serverObj.Cops, serverObj.Medics, serverObj.Adac);
+
+        var args = {
+            message: 'get-server-player',
+            serverId: defaultServer
+        };
+        ipcRenderer.send('message-to-webwin', args);
     };
 }
 

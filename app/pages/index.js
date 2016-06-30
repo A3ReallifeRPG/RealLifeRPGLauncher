@@ -168,6 +168,7 @@ function fullCheckResult(arg) {
 
         document.getElementById('btn_mod_' + curModId).innerHTML = "Spielen";
         document.getElementById('btn_mod_' + curModId).setAttribute('onClick', 'modClickPlay(' + curModId + ')');
+        document.getElementById('btn_full_' + curModId).disabled = false;
     }
 }
 
@@ -182,6 +183,7 @@ function hashDialogClose() {
 
     document.getElementById('btn_mod_' + curModId).innerHTML = "Spielen";
     document.getElementById('btn_mod_' + curModId).setAttribute('onClick', 'modClickPlay(' + curModId + ')');
+    document.getElementById('btn_full_' + curModId).disabled = false;
 }
 
 function hashDialogConfirm() {
