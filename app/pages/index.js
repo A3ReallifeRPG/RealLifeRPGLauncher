@@ -86,8 +86,8 @@ ipcRenderer.on('render-receiver', (event, arg) => {
             dialog.open();
             break;
         case 'player-list-callback':
-            if(curentPage == "server"){
-                setPlayerList(arg.obj.serverId,arg.obj.playerArray);
+            if (curentPage == "server") {
+                setPlayerList(arg.obj.serverId, arg.obj.playerArray);
             };
             break;
         default:
@@ -257,17 +257,7 @@ function updateTFARProgress(arg) {
         notifyWin('RealLifeRPG Launcher', 'TFAR heruntergeladen, wird ausgeführt...', 'ic_done_white_36dp_2x.png');
         setTimeout(function() {
             resetProgress();
-            var fs = require('fs');
-            fs.writeFile("runtfar.bat", "start TFARReallifeRPG.ts3_plugin", function(err) {
-                if (err) {
-                    return console.log(err);
-                }
-                var exec = require('child_process').execFile;
-                var execTFAR = function() {
-                    exec('runtfar.bat', function(err, data) {});
-                }
-                execTFAR();
-            });
+            shell.openItem("TFARReallifeRPG.ts3_plugin");
         }, 500);
     };
 }
@@ -537,15 +527,15 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
 
 function notifyWin(title, text, icon) {
     storage.get('settings', function(error, data) {
-        if(data.toast == "") {
-          toast = false;
+        if (data.toast == "") {
+            toast = true;
         } else {
-          toast = data.toast;
+            toast = data.toast;
         };
-        if(data.sounds == "") {
-          sounds = false;
+        if (data.sounds == "") {
+            sounds = true;
         } else {
-          sounds = data.sounds;
+            sounds = data.sounds;
         };
         if (toast) {
             notifier.notify({
@@ -559,7 +549,6 @@ function notifyWin(title, text, icon) {
             });
         }
     });
-
 }
 
 function extractIconsFromAsar() {
@@ -611,5 +600,8 @@ function progressCancelled() {
         content: ' ',
         type: 'warning'
     });
+}
 
+function openUrl(url){
+    shell.openExternal(url);
 }

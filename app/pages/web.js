@@ -49,7 +49,7 @@ function queryPlayerInfocallback(jsObj,sId){
 
 function downloadTFAR() {
     isDownloading = true;
-
+    
     var dest = 'TFARReallifeRPG.ts3_plugin';
 
     var stream = dwn._download(task_force_installer);

@@ -18,14 +18,28 @@ function installUserconfig() {
         if (!fs.existsSync(dir2)) {
             fs.mkdirSync(dir2);
         };
-        fs.writeFile(path + 'userconfig/task_force_radio/radio_settings.hpp', tfarhpp, function(err) {
-            if (err) {
-                return console.log(err);
+        fs.stat(path + 'userconfig/task_force_radio/radio_settings.hpp', function(err, stat) {
+            if (err == null) {
+              var dialog = $('#dialog_hppExists').data('dialog');
+              dialog.open();
+            } else if (err.code == 'ENOENT') {
+                writeHPPFile();
             }
         });
     })
 }
 
+function writeHPPFile() {
+  var fs = require('fs');
+  fs.writeFile(path + 'userconfig/task_force_radio/radio_settings.hpp', tfarhpp, function(err) {
+      if (err) {
+          return console.log(err);
+      }
+      notifyWin('RealLifeRPG Launcher', 'TFAR Settings Datei erstellt', 'ic_done_white_36dp_2x.png');
+      var dialog = $('#dialog_hppExists').data('dialog');
+      dialog.close();
+  });
+}
 
 function installFull() {
     storage.get('settings', function(error, data) {

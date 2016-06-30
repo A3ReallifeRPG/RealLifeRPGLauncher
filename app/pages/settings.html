@@ -179,9 +179,8 @@
             $('#armapath').val(path);
             saveallsettings();
         } else {
-            storage.set('settings', {
-                armapath: ''
-            }, function(error) {});
+            path = '';
+            saveallsettings();
             loadallsettings();
             $.Notify({
                 caption: 'Bitte wähle deine Arma3.exe aus',
@@ -278,8 +277,8 @@
             cpu: '',
             vram: '',
             thread: '',
-            toast: '',
-            sounds: ''
+            toast: toast,
+            sounds: sounds
         }, function(error) {});
         if (timert) {
             $.Notify({

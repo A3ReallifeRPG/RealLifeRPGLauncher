@@ -1,0 +1,33 @@
+<script src="../config.js"></script>
+<script src="../resources/functions.js"></script>
+<h2 class="win-h2">About</h2>
+<br>
+<span class="fake-link" onclick="openUrl('https://github.com/A3ReallifeRPG/RealLifeRPGLauncher')"><h2 class="win-h3">RealLifeRPG Launcher Version 1.0.7</h2></span>
+<br>
+<br>
+<span style="font-size:17px">
+This Software is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).<br>
+Permissions beyond the scope of this license may be available at www.realliferpg.de.<br>
+<br>
+Created with ❤ by <span class="fake-link" onclick="openUrl('https://github.com/vabene1111')">vaBene</span> and <span class="fake-link" onclick="openUrl('https://github.com/Kaibu')">Kaibu</span>
+<br>
+<br> Running Electron <span id="electron_version"></span>
+<br>
+<br>
+Using:
+<br><span class="fake-link" onclick="openUrl('https://github.com/twbs/bootstrap/tree/v4-dev')">Bootstrap 4.0.0.alpha3 (MIT)</span>
+<br><span class="fake-link" onclick="openUrl('https://github.com/olton/Metro-UI-CSS')">Metro UI 3.0 (MIT)</span>
+<br><span class="fake-link" onclick="openUrl('https://github.com/winjs/winjs')">WinJS (MIT)</span>
+</span>
+<br>
+<img onclick="openUrl('https://creativecommons.org/licenses/by-nc-sa/4.0/')" style="margin-top:20px" src="../img/license.png" />
+<style>
+    .fake-link {
+        color: #0099ff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+</style>
+<script>
+    document.getElementById("electron_version").innerHTML = process.version;
+</script>

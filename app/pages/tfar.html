@@ -3,7 +3,7 @@
 <script src="tfar.js"></script>
 
 
-<h2 class="win-h2">TFAR</h2>
+<h2 class="win-h2">TFAR - Task Force Radio</h2>
 <br/>
 <br/>
 <div class="container">
@@ -15,7 +15,7 @@
             <br> führe dies aus wenn du TFAR noch nicht installiert hast.
         </div>
         <div class="col-md-4">
-            <button class="button loading-pulse lighten success" id="installfull">Starten</button>
+            <button class="button loading-pulse lighten success" id="installfull" style="width:35%">Starten</button>
         </div>
     </div>
     <hr>
@@ -28,7 +28,7 @@
             <br> Hilfreich zur Reperatur der TFAR Installation
         </div>
         <div class="col-md-4">
-            <button class="button loading-pulse lighten success" id="downloadtfar">Download</button>
+            <button class="button loading-pulse lighten success" id="downloadtfar" style="width:35%">Download</button>
         </div>
     </div>
     <hr>
@@ -41,10 +41,18 @@
             <br>
         </div>
         <div class="col-md-4">
-            <button class="button loading-pulse lighten success" id="userconfig">Starten</button>
+            <button class="button loading-pulse lighten success" id="userconfig" style="width:35%">Starten</button>
         </div>
     </div>
     <hr>
+</div>
+<div data-role="dialog" id="dialog_hppExists" class="padding20 dialog success" data-close-button="true" data-type="warning" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
+    <h1>Die Datei existiert bereits</h1>
+    <p>
+        Die TFAR settings.hpp existiert, ersetzen ?
+    </p>
+    <button class="button success" onclick="writeHPPFile();" style="float:left">Ersetzen</button>
+    <button class="button danger" onclick="var dialog = $('#dialog_hppExists').data('dialog'); dialog.close();" style="float:right">Abbrechen</button>
 </div>
 <script>
     $('#downloadtfar').on('click', function() {
