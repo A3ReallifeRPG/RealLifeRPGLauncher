@@ -114,6 +114,7 @@ autoUpdater.setFeedURL('http://deploy.realliferpg.de/update/win/' + version);
 autoUpdater.checkForUpdates();
 
 // ------------------------------------------- real stuff that does something ----------------------------------------------------------------
+
 let win;
 let downWin;
 
@@ -202,4 +203,8 @@ ipcMain.on('restartOnUpdate', (event, arg) => {
 
 ipcMain.on('check-for-update', (event) => {
     autoUpdater.checkForUpdates();
+});
+
+ipcMain.on('focus-window', (event) => {
+    win.focus();
 });

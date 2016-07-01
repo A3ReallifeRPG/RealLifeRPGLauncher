@@ -548,7 +548,33 @@ function notifyWin(title, text, icon) {
                 sound: sounds,
                 wait: true
             }, function(err, response) {
-                // Response is response from notification
+                ipcRenderer.send('focus-window');
+            });
+        }
+    });
+}
+
+function notifyWinRestart(title, text, icon) {
+    storage.get('settings', function(error, data) {
+        if (data.toast == "") {
+            toast = true;
+        } else {
+            toast = data.toast;
+        };
+        if (data.sounds == "") {
+            sounds = true;
+        } else {
+            sounds = data.sounds;
+        };
+        if (toast) {
+            notifier.notify({
+                title: title,
+                message: text,
+                icon: winpath.join(__dirname, '../../extracted/icon/' + icon),
+                sound: sounds,
+                wait: true
+            }, function(err, response) {
+                restartOnUpdate();
             });
         }
     });
@@ -582,7 +608,7 @@ function checkVersion() {
             setVersion();
         } else if (data.version != version) {
             extractIconsFromAsar();
-            notifyWin('RealLifeRPG Launcher', 'Launcher geupdated!', 'ic_done_white_36dp_2x.png');
+            notifyWinRestart('RealLifeRPG Launcher', 'Launcher geupdated!', 'ic_done_white_36dp_2x.png');
             setVersion();
         }
     });
