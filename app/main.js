@@ -121,7 +121,7 @@ function createWindow() {
 
     //web process
     webWin = new BrowserWindow({
-        icon: 'img/icon.ico',
+        icon: 'icon/workericon.ico',
         width: 1000,
         height: 550,
         //show: false
@@ -132,7 +132,7 @@ function createWindow() {
     });
     //download process
     downWin = new BrowserWindow({
-        icon: 'img/icon.ico',
+        icon: 'icon/workericon.ico',
         width: 1000,
         height: 550,
         //show: false
@@ -144,7 +144,7 @@ function createWindow() {
 
     // Create the browser window.
     win = new BrowserWindow({
-        icon: 'img/icon.ico',
+        icon: 'icon/appicon.ico',
         width: 1100,
         height: 600,
         minWidth: 1100,
