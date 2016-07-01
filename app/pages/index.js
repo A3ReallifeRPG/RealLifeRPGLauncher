@@ -80,8 +80,11 @@ ipcRenderer.on('render-receiver', (event, arg) => {
         case 'progress-cancelled':
             progressCancelled();
             break;
+        case 'update-available':
+            updateAvailable();
+            break;
         case 'no-path-warning':
-            progressCancelled();
+            resetProgress();
             var dialog = $('#dialog_noPath').data('dialog');
             dialog.open();
             break;
@@ -133,8 +136,8 @@ function quickCheckResult(arg) {
 
 //check for updates
 function searchUpdates() {
-
     var installedMods;
+
     storage.get('mods', function(error, data) {
         if (jQuery.isEmptyObject(data.installedMods)) {
             installedMods = [];
@@ -602,6 +605,6 @@ function progressCancelled() {
     });
 }
 
-function openUrl(url){
+function openUrl(url) {
     shell.openExternal(url);
 }

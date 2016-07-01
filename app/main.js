@@ -199,3 +199,7 @@ ipcMain.on('winprogress-change', (event, arg) => {
 ipcMain.on('restartOnUpdate', (event, arg) => {
     autoUpdater.quitAndInstall();
 });
+
+ipcMain.on('check-for-update', (event) => {
+    autoUpdater.checkForUpdates();
+});

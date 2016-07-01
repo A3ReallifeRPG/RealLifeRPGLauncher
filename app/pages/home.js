@@ -122,7 +122,7 @@ function showModInfo(jsonData, success){
 }
 
 function modClickPlay(id){
-
+  loadpage('server.html');
 }
 
 function fullCheckClick(id){
