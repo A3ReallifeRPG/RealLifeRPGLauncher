@@ -160,6 +160,14 @@ function createWindow() {
         app.quit();
     });
 
+    webWin.on('closed', () => {
+        app.quit();
+    });
+
+    downWin.on('closed', () => {
+        app.quit();
+    });
+
     setUpIpcHandlers();
 }
 
