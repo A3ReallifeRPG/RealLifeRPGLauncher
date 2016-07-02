@@ -74,7 +74,7 @@ function showModInfo(jsonData, success) {
 
             var infoDivButton = document.createElement('button');
             infoDivButton.setAttribute('id', 'btn_mod_' + jsonData[i].Id);
-            infoDivButton.setAttribute('class', 'btn btn-success');
+            infoDivButton.setAttribute('class', 'button success');
 
             if ($.inArray(jsonData[i].Id, updateMods) > -1) {
                 node = document.createTextNode("Update");
@@ -91,7 +91,7 @@ function showModInfo(jsonData, success) {
 
             var fullCheckButton = document.createElement('button');
             fullCheckButton.setAttribute('id', 'btn_full_' + jsonData[i].Id);
-            fullCheckButton.setAttribute('class', 'btn btn-warning');
+            fullCheckButton.setAttribute('class', 'button warning');
             node = document.createTextNode("Prüfen");
             fullCheckButton.setAttribute('onClick', 'fullCheckClick(' + jsonData[i].Id + ')');
             fullCheckButton.appendChild(node);

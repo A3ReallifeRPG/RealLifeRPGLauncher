@@ -76,7 +76,7 @@ function insertServerTab(serverObj, index) {
         btnJoin.setAttribute('class', 'button loading-pulse lighten success');
         btnJoin.setAttribute('style', 'margin-top:20px');
         btnJoin.setAttribute('id', ('btn_start_' + serverObj.Id));
-        btnJoin.setAttribute('onClick', ('joinServer(' + serverObj.Id + ')'));
+        btnJoin.setAttribute('onclick', 'joinServer("' + serverObj.IpAddress + '","' + serverObj.Port + '","' + serverObj.ServerPassword + '","' + serverObj.StartParameters + '")');
         var txtBtnJoin = document.createTextNode(" Server beitreten");
         btnJoin.appendChild(txtBtnJoin);
 
@@ -99,7 +99,7 @@ function insertServerTab(serverObj, index) {
         tbScroll.setAttribute('id', 'table-scroll');
 
         var tbl = document.createElement('table');
-        tbl.setAttribute('class','table');
+        tbl.setAttribute('class', 'table');
 
 
         var tblHead = document.createElement('thead');
@@ -114,7 +114,7 @@ function insertServerTab(serverObj, index) {
         tblHead.appendChild(tblHeadRow);
 
         var tblBody = document.createElement('tbody');
-        tblBody.setAttribute('id',('tb_list_' + serverObj.Id));
+        tblBody.setAttribute('id', ('tb_list_' + serverObj.Id));
 
         tbl.appendChild(tblHead);
         tbl.appendChild(tblBody);
@@ -145,6 +145,12 @@ function insertServerTab(serverObj, index) {
         };
         ipcRenderer.send('message-to-webwin', args);
     };
+}
+// ('joinServer(' + serverObj.IpAddress + ','+serverObj.Port+','+serverObj.ServerPassword+','+serverObj.StartParameters+')'));
+function joinServer(serverIp, serverPort, serverPw, serverParams) {
+    //var cp = require("child_process");
+    //cp.exec('start "D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe" -nosplash -skipIntro -cpucount=4 -maxmem=12288 -connect=server -port=port "-mod=" -nolauncher -useBE');
+    shell.openItem('D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe -nosplash -skipIntro -connect=' + serverIp + ' -port=' + serverPort + ' -mod="' + serverParams + '" -password=' + serverPw + ' -nolauncher -useBE');
 }
 
 function setPlayerList(serverId, playerList) {
