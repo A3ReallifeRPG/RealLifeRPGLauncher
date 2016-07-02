@@ -1,8 +1,14 @@
-<h2 class="win-h2">Changelog</h2>
+<div class="row" style="width:98%;">
+    <div class="col-md-10">
+        <h2 class="win-h2">Changelog</h2>
+    </div>
+    <div class="col-md-2">
+        <button class="button success" style="float: right;" onclick="readAll();"><span class="mif-checkmark"></span> Alle Gelesen</button>
+    </div>
+</div>
 <br>
 
-<div class="accordion" id="changelog" style="width:98%; height:-webkit-calc(100% - 60px); overflow-y:auto;" data-role="accordion" data-close-any="true"
-data-on-frame-opened="markRead(frame)" ></div>
+<div class="accordion" id="changelog" style="width:98%; height:-webkit-calc(100% - 60px); overflow-y:auto;" data-role="accordion" data-close-any="true" data-on-frame-opened="markRead(frame)"></div>
 
 <script>
     var readLogs;
@@ -13,27 +19,38 @@ data-on-frame-opened="markRead(frame)" ></div>
         storage.get('changelog', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
                 readLogs = [];
-            }else{
+            } else {
                 readLogs = data.readLogs;
             }
 
-            $("#changelog").load("https://service.realliferpg.de/include/changelog?gameid=1",function(){
-                for(i = 0; i < readLogs.length; i++){
-                    $( "#" + readLogs[i] ).find( ".heading" ).prop('style','color:#000000;font-size:18px');
+            $("#changelog").load("https://service.realliferpg.de/include/changelog?gameid=1", function() {
+                for (i = 0; i < readLogs.length; i++) {
+                    $("#" + readLogs[i]).find(".heading").prop('style', 'color:#000000;font-size:18px');
                 };
             });
         });
 
     });
 
-    function markRead(frame){
+    function markRead(frame) {
         var id = frame.attr('id');
-        $( "#" + id ).find( ".heading" ).prop('style','color:#000000;font-size:18px');
+        $("#" + id).find(".heading").prop('style', 'color:#000000;font-size:18px');
         readLogs.push(id);
         storage.set('changelog', {
-            readLogs : readLogs
+            readLogs: readLogs
         }, function(error) {});
 
+    }
+
+    function readAll(){
+        $('.frame').each(function(i, obj) {
+            var id = obj.id;
+            $("#" + id).find(".heading").prop('style', 'color:#000000;font-size:18px');
+            readLogs.push(id);
+            storage.set('changelog', {
+                readLogs: readLogs
+            }, function(error) {});
+        });
     }
 
 </script>
