@@ -192,13 +192,14 @@
     $(document).ready(function() {
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
+                if (debug_mode >= 1) {
+                    console.log('Runing first launch');
+                };
                 checkregkey1();
                 extractIconsFromAsar();
             };
         });
     });
-
-    document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
 </script>
 
 </html>

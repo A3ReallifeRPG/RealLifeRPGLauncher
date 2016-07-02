@@ -117,6 +117,7 @@ autoUpdater.checkForUpdates();
 
 let win;
 let downWin;
+let webWin;
 
 function createWindow() {
 
@@ -154,11 +155,6 @@ function createWindow() {
         maxHeight: 1080
     });
     win.loadURL(`file://${__dirname}/pages/index.html`);
-
-    win.webContents.openDevTools({
-        detach: true
-    });
-
 
     win.on('closed', () => {
         app.quit();
@@ -207,4 +203,32 @@ ipcMain.on('check-for-update', (event) => {
 
 ipcMain.on('focus-window', (event) => {
     win.focus();
+});
+
+ipcMain.on('open-devtools', (event) => {
+    win.webContents.openDevTools({
+        detach: true
+    });
+    webWin.show()
+    downWin.show()
+});
+
+ipcMain.on('close-devtools', (event) => {
+    win.webContents.closeDevTools()
+    webWin.hide()
+    downWin.hide()
+});
+
+ipcMain.on('toggle-devtools', (event) => {
+    if (win.webContents.isDevToolsOpened()) {
+        win.webContents.closeDevTools()
+        webWin.hide()
+        downWin.hide()
+    } else {
+        win.webContents.openDevTools({
+            detach: true
+        });
+        webWin.show()
+        downWin.show()
+    }
 });

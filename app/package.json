@@ -1,27 +1,28 @@
 {
-  "name": "RealLifeRPG",
-  "version": "1.0.9",
-  "description": "RealLifeRPG Launcher",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher"
-  },
-  "license": "CC-BY-NC-ND-4.0",
-  "author": "RealLifeRPG",
-  "dependencies": {
-    "dwn": "^0.0.2",
-    "electron-json-storage": "^2.0.0",
-    "electron-squirrel-startup": "^1.0.0",
-    "highcharts": "^4.2.5",
-    "mkpath": "^1.0.0",
-    "node-notifier": "^4.6.0",
-    "progress-stream": "^1.2.0",
-    "recursive-readdir": "^2.0.0",
-    "shelljs": "^0.7.0",
-    "winreg": "^1.2.1"
-  }
+    "name": "RealLifeRPG",
+    "version": "1.0.10",
+    "description": "RealLifeRPG Launcher",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher"
+    },
+    "license": "CC-BY-NC-ND-4.0",
+    "author": "RealLifeRPG",
+    "dependencies": {
+        "devtron": "^1.2.1",
+        "dwn": "^0.0.2",
+        "electron-json-storage": "^2.0.0",
+        "electron-squirrel-startup": "^1.0.0",
+        "highcharts": "^4.2.5",
+        "mkpath": "^1.0.0",
+        "node-notifier": "^4.6.0",
+        "progress-stream": "^1.2.0",
+        "recursive-readdir": "^2.0.0",
+        "shelljs": "^0.7.0",
+        "winreg": "^1.2.1"
+    }
 }

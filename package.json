@@ -1,39 +1,38 @@
 {
-  "name": "RealLifeRPG",
-  "version": "1.0.9",
-  "description": "RealLifeRPG Launcher",
-  "main": "./app/main.js",
-  "scripts": {
-    "start": "electron .",
-    "postinstall": "install-app-deps",
-    "pack": "build --target dir",
-    "dist": "build"
-  },
-  "devDependencies": {
-    "devtron": "^1.1.1",
-    "electron-builder": "^5.4.2",
-    "electron-prebuilt": "^1.1.0",
-    "electron-winstaller": "^2.3.1"
-  },
-  "build": {
-    "appId": "realliferpg.de",
-    "app-category-type": "launcher.application",
-    "win": {
-      "title": "RealLifeRPG Launcher",
-      "iconUrl": "https://upload.realliferpg.de/icon.ico",
-      "remoteReleases": "http://89.163.140.216:8000/"
+    "name": "RealLifeRPG",
+    "version": "1.0.10",
+    "description": "RealLifeRPG Launcher",
+    "main": "./app/main.js",
+    "scripts": {
+        "start": "electron .",
+        "postinstall": "install-app-deps",
+        "pack": "build --target dir",
+        "dist": "build"
+    },
+    "devDependencies": {
+        "electron-builder": "^5.10.3",
+        "electron-prebuilt": "^1.2.5"
+    },
+    "build": {
+        "appId": "realliferpg.de",
+        "app-category-type": "launcher.application",
+        "win": {
+            "title": "RealLifeRPG Launcher",
+            "iconUrl": "https://upload.realliferpg.de/icon.ico",
+            "remoteReleases": "http://89.163.140.216:8000/"
+        }
+    },
+    "dependencies": {
+        "devtron": "^1.2.1",
+        "dwn": "^0.0.2",
+        "electron-json-storage": "^2.0.0",
+        "electron-squirrel-startup": "^1.0.0",
+        "highcharts": "^4.2.5",
+        "mkpath": "^1.0.0",
+        "node-notifier": "^4.6.0",
+        "progress-stream": "^1.2.0",
+        "recursive-readdir": "^2.0.0",
+        "shelljs": "^0.7.0",
+        "winreg": "^1.2.1"
     }
-  },
-  "dependencies": {
-    "dwn": "^0.0.2",
-    "electron-json-storage": "^2.0.0",
-    "electron-squirrel-startup": "^1.0.0",
-    "highcharts": "^4.2.5",
-    "mkpath": "^1.0.0",
-    "node-notifier": "^4.6.0",
-    "progress-stream": "^1.2.0",
-    "recursive-readdir": "^2.0.0",
-    "shelljs": "^0.7.0",
-    "winreg": "^1.2.1"
-  }
 }

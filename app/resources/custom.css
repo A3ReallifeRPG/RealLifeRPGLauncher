@@ -9,6 +9,12 @@
   -ms-user-select: none;
 }
 
+.fake-link {
+    color: #0099ff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .content,
 #app {
     height: 100%;

@@ -18,8 +18,11 @@ var curModId = 0;
 var checkListMods = [];
 curentPage = "";
 
+checkDebug();
 searchUpdates();
 checkVersion();
+
+require('devtron').install();
 
 //wait for finished starup loop
 function waitForStartup() {
@@ -136,6 +139,9 @@ function quickCheckResult(arg) {
 
 //check for updates
 function searchUpdates() {
+    if (debug_mode >= 1) {
+        console.log('Searching for installed mods...');
+    };
     var installedMods;
 
     storage.get('mods', function(error, data) {
@@ -203,12 +209,18 @@ function hashDialogConfirm() {
 
 //ask path dialog
 function noArmaPathSettings() {
+    if (debug_mode >= 1) {
+        console.log('No arma path found');
+    };
     var dialog_noPath = $('#dialog_noPath').data('dialog');
     dialog_noPath.close();
     loadpage('settings.html');
 }
 
 function armaPathisFalse() {
+    if (debug_mode >= 1) {
+        console.log('Arma path is not viable...');
+    };
     var pathdialog = $('#dialog_defaultpath').data('dialog');
     pathdialog.close();
     loadpage('settings.html');
@@ -226,6 +238,9 @@ function armaPathisCorrect() {
 }
 
 function callDownloadStop() {
+    if (debug_mode >= 1) {
+        console.log('Stopping progress');
+    };
     var args = {
         message: 'stop-download',
         obj: {}
@@ -504,8 +519,11 @@ function checkregkey3() {
 }
 
 function resetProgress() {
+    if (debug_mode >= 1) {
+        console.log('Resetting progress');
+    };
     $('#btn_cancel_progress').delay(500).fadeOut('slow');
-    document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
+    setTitle();
     var args = {
         progress: 0
     };
@@ -519,6 +537,9 @@ function resetProgress() {
 }
 
 ipcRenderer.on('update-downloaded', (event, arg) => {
+    if (debug_mode >= 1) {
+        console.log('Launcher update downloaded');
+    };
     $('#btn_update_restart').css({
         'visibility': 'visible'
     });
@@ -581,6 +602,9 @@ function notifyWinRestart(title, text, icon) {
 }
 
 function extractIconsFromAsar() {
+    if (debug_mode >= 1) {
+        console.log('Extracting icons from asar');
+    };
     var fs = require('fs');
     var dir1 = 'resources/extracted';
     var dir2 = 'resources/extracted/icon';
@@ -597,11 +621,16 @@ function extractIconsFromAsar() {
 }
 
 function restartOnUpdate() {
-    var args = {};
-    ipcRenderer.send('restartOnUpdate', args);
+    if (debug_mode >= 1) {
+        console.log('Restarting');
+    };
+    ipcRenderer.send('restartOnUpdate');
 }
 
 function checkVersion() {
+    if (debug_mode >= 1) {
+        console.log('Checking version');
+    };
     var version = app.app.getVersion();
     storage.get('version', function(error, data) {
         if (jQuery.isEmptyObject(data)) {
@@ -622,6 +651,9 @@ function setVersion() {
 }
 
 function progressCancelled() {
+    if (debug_mode >= 1) {
+        console.log('Progress cancelled');
+    };
     notifyWin('RealLifeRPG Launcher', 'Abgebrochen', 'ic_clear_white_36dp_2x.png');
     resetProgress();
     $.Notify({
@@ -632,5 +664,50 @@ function progressCancelled() {
 }
 
 function openUrl(url) {
+    if (debug_mode >= 1) {
+        console.log('Opening url: ' + url);
+    };
     shell.openExternal(url);
+}
+
+function toggleDebug(state) {
+    ipcRenderer.send('toggle-devtools');
+    if (state) {
+        document.title = "RealLifeRPG Launcher - " + app.app.getVersion() + " - Debug";
+        if (debug_mode >= 1) {
+            console.log('Enabling debug mode');
+        };
+    } else {
+        document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
+        if (debug_mode >= 1) {
+            console.log('Disabling debug mode');
+        };
+    }
+}
+
+function checkDebug() {
+    storage.get('settings', function(error, data) {
+        var debug = data.debug;
+        if (debug) {
+            document.title = "RealLifeRPG Launcher - " + app.app.getVersion() + " - Debug";
+                console.log('Running in Debug mode');
+            debug_mode = 2;
+            ipcRenderer.send('open-devtools');
+        } else {
+          debug_mode = 0;
+        }
+    });
+}
+
+function setTitle() {
+    storage.get('settings', function(error, data) {
+        var debug = data.debug;
+        if (debug) {
+            debug_mode = 2;
+            document.title = "RealLifeRPG Launcher - " + app.app.getVersion() + " - Debug";
+        } else {
+            debug_mode = 0;
+            document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
+        }
+    });
 }

@@ -4,7 +4,6 @@ var progress = require('progress-stream');
 var fs = require('fs');
 var mkpath = require('mkpath');
 window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
-var task_force_installer = "https://realliferpg.de/TFARReallifeRPG.ts3_plugin";
 const {
     ipcRenderer
 } = require('electron');
@@ -49,13 +48,13 @@ function queryPlayerInfocallback(jsObj,sId){
 
 function downloadTFAR() {
     isDownloading = true;
-    
+
     var dest = 'TFARReallifeRPG.ts3_plugin';
 
     var stream = dwn._download(task_force_installer);
 
     var str = progress({
-        length: "9299813",
+        length: task_force_installer_size,
         time: 100
     });
 

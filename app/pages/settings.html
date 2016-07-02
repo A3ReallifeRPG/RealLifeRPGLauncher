@@ -121,6 +121,7 @@
     </div>
     <div class="row">
         <h3 class="win-h3">Launcher Einstellungen</h3>
+        <br>
         <div class="col-md-12">
             <table>
                 <tr>
@@ -141,6 +142,29 @@
                     <td>
                         <label class="switch">
                             <input type="checkbox" id="soundswitch">
+                            <span class="check"></span>
+                        </label>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <h5 class="win-h5">Debug:</h5>
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" id="debugswitch">
+                            <span class="check"></span>
+                        </label>
+                    </td>
+                    <td style="width:5%">
+                    </td>
+                    <td>
+                        <h5 class="win-h5">Download Fenster</h5>
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" id="winswitch">
                             <span class="check"></span>
                         </label>
                     </td>
@@ -220,6 +244,17 @@
         saveallsettings();
     });
 
+    document.getElementById("debugswitch").addEventListener("click", function() {
+        debug = $("#debugswitch").is(':checked');
+        toggleDebug(debug);
+        saveallsettings();
+    });
+
+    document.getElementById("winswitch").addEventListener("click", function() {
+        win = $("#winswitch").is(':checked');
+        saveallsettings();
+    });
+
     $("#meminput").on('change keydown paste input', function() {
         mem = $("#meminput").val();
         saveallsettings();
@@ -251,7 +286,9 @@
             cpu: cpu,
             vram: vram,
             toast: toast,
-            sounds: sounds
+            sounds: sounds,
+            debug: debug,
+            win: win
         }, function(error) {});
         if (timert) {
             $.Notify({
@@ -278,7 +315,9 @@
             vram: '',
             thread: '',
             toast: toast,
-            sounds: sounds
+            sounds: sounds,
+            debug: debug,
+            win: win
         }, function(error) {});
         if (timert) {
             $.Notify({
@@ -307,8 +346,11 @@
             cpu: cpu,
             vram: vram,
             toast: true,
-            sounds: true
+            sounds: true,
+            debug: false,
+            win: false
         }, function(error) {});
+        ipcRenderer.send('close-devtools');
         if (timert) {
             $.Notify({
                 caption: 'Alle Launcher Einstellungen zurückgesetzt',
@@ -338,6 +380,8 @@
             thread = data.thread;
             toast = data.toast;
             sounds = data.sounds;
+            debug = data.debug;
+            win = data.win;
             loadsettingstoui();
         });
     }
@@ -350,6 +394,8 @@
         $('#toastswitch').prop('checked', toast);
         $('#soundswitch').prop('checked', sounds);
         $('#windowedswitch').prop('checked', windowed);
+        $('#debugswitch').prop('checked', debug);
+        $('#winswitch').prop('checked', win);
         $("#meminput").val(mem);
         $("#cpuinput").val(cpu);
         $("#vraminput").val(vram);

@@ -1,18 +1,8 @@
 <script src="../config.js"></script>
 <script src="../resources/functions.js"></script>
-<style>
-    .fake-link {
-        color: #0099ff;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-</style>
 <h2 class="win-h2">About</h2>
 <br>
 <span style="font-size:17px">RealLifeRPG Launcher Version <span id="launcher_version"></span></span>
-<br>
-<br>
-<span id="update_check" style="font-size:17px"><button class="button primary" onclick="checkForUpdates();">Auf Updates prüfen</button></span>
 <br>
 <br>
 <span style="font-size:17px">
@@ -21,7 +11,7 @@ Permissions beyond the scope of this license may be available at www.realliferpg
 <br>
 Created with ❤ by <span class="fake-link" onclick="openUrl('https://github.com/vabene1111')">vaBene</span> and <span class="fake-link" onclick="openUrl('https://github.com/Kaibu')">Kaibu</span>
 <br>
-<br> Running Electron <span id="electron_version"></span>
+<br> Running Node.JS <span id="electron_version"></span>
 <br>
 <br> Using:
 <br><span class="fake-link" onclick="openUrl('https://github.com/twbs/bootstrap/tree/v4-dev')">Bootstrap 4.0.0.alpha3 (MIT)</span>
@@ -33,8 +23,4 @@ Created with ❤ by <span class="fake-link" onclick="openUrl('https://github.com
 <script>
     document.getElementById("electron_version").innerHTML = process.version;
     document.getElementById("launcher_version").innerHTML = app.app.getVersion();
-
-    function checkForUpdates() {
-        ipcRenderer.send('check-for-update');
-    }
 </script>

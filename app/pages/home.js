@@ -33,33 +33,35 @@ storage.get('mods', function(error, data) {
 }
 
 */
-function showModInfo(jsonData, success){
-
+function showModInfo(jsonData, success) {
+    if (debug_mode >= 1) {
+        console.log('Loading mods..');
+    };
     if (success) {
         for (var i = 0; i < jsonData.length; i++) {
             var carItem = document.createElement('div');
-            if(i == 0){
-                carItem.setAttribute('class','carousel-item active');
-            }else{
-                carItem.setAttribute('class','carousel-item');
+            if (i == 0) {
+                carItem.setAttribute('class', 'carousel-item active');
+            } else {
+                carItem.setAttribute('class', 'carousel-item');
             }
 
             var img = document.createElement('img');
-            img.setAttribute('src',jsonData[i].ImageUrl);
-            img.setAttribute('alt',jsonData[i].Id);
-            img.setAttribute('class','img-responsive center-block');
-            img.setAttribute('style','-webkit-user-drag: none;');
+            img.setAttribute('src', jsonData[i].ImageUrl);
+            img.setAttribute('alt', jsonData[i].Id);
+            img.setAttribute('class', 'img-responsive center-block');
+            img.setAttribute('style', '-webkit-user-drag: none;');
 
 
             var infoDiv = document.createElement('div');
-            infoDiv.setAttribute('class','carousel-caption');
+            infoDiv.setAttribute('class', 'carousel-caption');
 
             var infoDivHeading = document.createElement('h1');
             var node = document.createTextNode(jsonData[i].Name);
             infoDivHeading.appendChild(node);
 
             var infoDivPar = document.createElement('p');
-            infoDivPar.setAttribute('class',"style='text-size:18'");
+            infoDivPar.setAttribute('class', "style='text-size:18'");
 
             var infoDivBold = document.createElement('b');
 
@@ -71,27 +73,27 @@ function showModInfo(jsonData, success){
             infoDivBold.appendChild(node);
 
             var infoDivButton = document.createElement('button');
-            infoDivButton.setAttribute('id','btn_mod_' + jsonData[i].Id);
-            infoDivButton.setAttribute('class','btn btn-success');
+            infoDivButton.setAttribute('id', 'btn_mod_' + jsonData[i].Id);
+            infoDivButton.setAttribute('class', 'btn btn-success');
 
-            if($.inArray(jsonData[i].Id,updateMods) > -1){
+            if ($.inArray(jsonData[i].Id, updateMods) > -1) {
                 node = document.createTextNode("Update");
-                infoDivButton.setAttribute('onClick','modClick(' + jsonData[i].Id + ')');
-            }else if($.inArray(jsonData[i].Id,installedMods) < 0){
+                infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ')');
+            } else if ($.inArray(jsonData[i].Id, installedMods) < 0) {
                 node = document.createTextNode("Installieren");
-                infoDivButton.setAttribute('onClick','modClick(' + jsonData[i].Id + ')');
-            }else{
+                infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ')');
+            } else {
                 node = document.createTextNode("Spielen");
-                infoDivButton.setAttribute('onClick','modClickPlay(' + jsonData[i].Id + ')');
+                infoDivButton.setAttribute('onClick', 'modClickPlay(' + jsonData[i].Id + ')');
             }
 
             infoDivButton.appendChild(node);
 
             var fullCheckButton = document.createElement('button');
-            fullCheckButton.setAttribute('id','btn_full_' + jsonData[i].Id);
-            fullCheckButton.setAttribute('class','btn btn-warning');
+            fullCheckButton.setAttribute('id', 'btn_full_' + jsonData[i].Id);
+            fullCheckButton.setAttribute('class', 'btn btn-warning');
             node = document.createTextNode("Prüfen");
-            fullCheckButton.setAttribute('onClick','fullCheckClick(' + jsonData[i].Id + ')');
+            fullCheckButton.setAttribute('onClick', 'fullCheckClick(' + jsonData[i].Id + ')');
             fullCheckButton.appendChild(node);
 
             infoDivPar.appendChild(infoDivBold);
@@ -100,11 +102,11 @@ function showModInfo(jsonData, success){
             infoDiv.appendChild(infoDivButton);
             infoDiv.appendChild(fullCheckButton);
 
-            if($.inArray(jsonData[i].Id,updateMods) > -1){
+            if ($.inArray(jsonData[i].Id, updateMods) > -1) {
                 fullCheckButton.disabled = false;
-            }else if($.inArray(jsonData[i].Id,installedMods) < 0){
+            } else if ($.inArray(jsonData[i].Id, installedMods) < 0) {
                 fullCheckButton.disabled = true;
-            }else{
+            } else {
                 fullCheckButton.disabled = false;
             }
 
@@ -114,30 +116,38 @@ function showModInfo(jsonData, success){
             var container = document.getElementById("crs_modList");
             container.appendChild(carItem);
         };
-        if(jsonData.length == 1){
+        if (jsonData.length == 1) {
             document.getElementById("car_left").style.visibility = 'hidden';
             document.getElementById("car_right").style.visibility = 'hidden';
         }
     } else {
-        if(debug_mode >= 1){console.log('Error requesting Mod List: ' + jsonData);};
+        if (debug_mode >= 1) {
+            console.log('Error requesting Mod List: ' + jsonData);
+        };
     }
 }
 
-function modClickPlay(id){
-  loadpage('server.html');
+function modClickPlay(id) {
+    loadpage('server.html');
 }
 
-function fullCheckClick(id){
+function fullCheckClick(id) {
+    if (debug_mode >= 1) {
+        console.log('Fullcheck started, mod ID: ' + id);
+    };
     $('#btn_cancel_progress').delay(500).fadeIn('slow');
     var args = {
         message: 'start-fullcheck',
-        modId : id
+        modId: id
     };
-    notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet','ic_description_white_36dp_2x.png');
+    notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet', 'ic_description_white_36dp_2x.png');
     ipcRenderer.send('message-to-download', args);
 }
 
-function modClick(id){
+function modClick(id) {
+    if (debug_mode >= 1) {
+        console.log('Downlaod started, mod ID: ' + id);
+    };
     $('#btn_cancel_progress').delay(500).fadeIn('slow');
     var args = {
         type: 1,
@@ -145,5 +155,5 @@ function modClick(id){
         modId: id
     }
     ipcRenderer.send('message-to-download', args);
-    notifyWin('RealLifeRPG Launcher', 'Download gestartet','ic_file_download_white_36dp_2x.png');
+    notifyWin('RealLifeRPG Launcher', 'Download gestartet', 'ic_file_download_white_36dp_2x.png');
 }
