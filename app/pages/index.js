@@ -254,6 +254,13 @@ function callDownloadStop() {
 function showHashDialog(arg) {
     var dialog = $('#dialog_downloadComplete').data('dialog');
     curModId = arg.modId;
+    
+    if(curModId == 0){
+        $("#content").load("home");
+        enterPage = WinJS.UI.Animation.enterPage(anim, null);
+        curentPage = file.replace('.html', '');
+    }
+
     dialog.open();
 }
 
