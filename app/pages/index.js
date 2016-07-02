@@ -22,8 +22,6 @@ checkDebug();
 searchUpdates();
 checkVersion();
 
-require('devtron').install();
-
 //wait for finished starup loop
 function waitForStartup() {
 
