@@ -125,7 +125,7 @@ function createWindow() {
         icon: 'icon/workericon.ico',
         width: 1000,
         height: 550,
-        //show: false
+        show: false
     });
     webWin.loadURL(`file://${__dirname}/pages/web.html`);
     webWin.webContents.openDevTools({
@@ -136,7 +136,7 @@ function createWindow() {
         icon: 'icon/workericon.ico',
         width: 1000,
         height: 550,
-        //show: false
+        show: false
     });
     downWin.loadURL(`file://${__dirname}/pages/download.html`);
     downWin.webContents.openDevTools({

@@ -48,6 +48,8 @@ function showModInfo(jsonData, success){
             img.setAttribute('src',jsonData[i].ImageUrl);
             img.setAttribute('alt',jsonData[i].Id);
             img.setAttribute('class','img-responsive center-block');
+            img.setAttribute('style','-webkit-user-drag: none;');
+
 
             var infoDiv = document.createElement('div');
             infoDiv.setAttribute('class','carousel-caption');

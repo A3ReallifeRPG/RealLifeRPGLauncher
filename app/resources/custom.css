@@ -1,3 +1,14 @@
+*:focus {outline:none !important}
+
+* {
+    user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
 .content,
 #app {
     height: 100%;
@@ -104,11 +115,13 @@
     transition-duration: 0.2s;
     cursor: default;
     border-radius: 100%;
+    outline:0;!important;
 }
 
 .help-button:hover {
     background-color: #ED8E0E;
     color: white;
+    outline:0;!important;
 }
 
 /* Preloader */
