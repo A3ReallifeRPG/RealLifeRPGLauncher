@@ -254,7 +254,7 @@ function callDownloadStop() {
 function showHashDialog(arg) {
     var dialog = $('#dialog_downloadComplete').data('dialog');
     curModId = arg.modId;
-    
+
     if(curModId == 0){
         $("#content").load("home");
         enterPage = WinJS.UI.Animation.enterPage(anim, null);
@@ -548,7 +548,7 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
     $('#btn_update_restart').css({
         'visibility': 'visible'
     });
-    notifyWin('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten', 'ic_done_white_36dp_2x.png');
+    notifyWinRestart('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten', 'ic_done_white_36dp_2x.png');
     if (debug_mode >= 1) {
         console.log(arg);
     };
@@ -642,7 +642,7 @@ function checkVersion() {
             setVersion();
         } else if (data.version != version) {
             extractIconsFromAsar();
-            notifyWinRestart('RealLifeRPG Launcher', 'Launcher geupdated!', 'ic_done_white_36dp_2x.png');
+            notifyWin('RealLifeRPG Launcher', 'Launcher geupdated!', 'ic_done_white_36dp_2x.png');
             setVersion();
         }
     });
@@ -678,12 +678,12 @@ function openUrl(url) {
 function toggleDebug(state) {
     ipcRenderer.send('toggle-devtools');
     if (state) {
-        document.title = "RealLifeRPG Launcher - " + app.app.getVersion() + " - Debug";
+        document.title = "RealLifeRPG Launcher - Beta - " + app.app.getVersion() + " - Debug";
         if (debug_mode >= 1) {
             console.log('Enabling debug mode');
         };
     } else {
-        document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
+        document.title = "RealLifeRPG Launcher - Beta - " + app.app.getVersion();
         if (debug_mode >= 1) {
             console.log('Disabling debug mode');
         };
@@ -694,7 +694,7 @@ function checkDebug() {
     storage.get('settings', function(error, data) {
         var debug = data.debug;
         if (debug) {
-            document.title = "RealLifeRPG Launcher - " + app.app.getVersion() + " - Debug";
+            document.title = "RealLifeRPG Launcher - Beta - " + app.app.getVersion() + " - Debug";
                 console.log('Running in Debug mode');
             debug_mode = 2;
             ipcRenderer.send('open-devtools');
@@ -709,10 +709,10 @@ function setTitle() {
         var debug = data.debug;
         if (debug) {
             debug_mode = 2;
-            document.title = "RealLifeRPG Launcher - " + app.app.getVersion() + " - Debug";
+            document.title = "RealLifeRPG Launcher - Beta - " + app.app.getVersion() + " - Debug";
         } else {
             debug_mode = 0;
-            document.title = "RealLifeRPG Launcher - " + app.app.getVersion();
+            document.title = "RealLifeRPG Launcher - Beta - " + app.app.getVersion();
         }
     });
 }
