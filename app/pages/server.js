@@ -150,7 +150,19 @@ function insertServerTab(serverObj, index) {
 function joinServer(serverIp, serverPort, serverPw, serverParams) {
     //var cp = require("child_process");
     //cp.exec('start "D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe" -nosplash -skipIntro -cpucount=4 -maxmem=12288 -connect=server -port=port "-mod=" -nolauncher -useBE');
-    shell.openItem('D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe -nosplash -skipIntro -connect=' + serverIp + ' -port=' + serverPort + ' -mod="' + serverParams + '" -password=' + serverPw + ' -nolauncher -useBE');
+    //shell.openItem('D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe -nosplash -skipIntro -connect=' + serverIp + ' -port=' + serverPort + ' -mod="' + serverParams + '" -password=' + serverPw + ' -nolauncher -useBE');
+    var params = [];
+    params.push('-nosplash');
+    params.push('-skipIntro');
+    params.push('-connect=' + serverIp);
+    params.push('-port=' + serverPort);
+    params.push('-mod=' + serverParams);
+    //params.push('-password=\"' + serverPw + '\"');
+    params.push('-nolauncher');
+    params.push('-useBE');
+
+    var child_process = require('child_process');
+    child_process.spawn("D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe", params, [])
 }
 
 function setPlayerList(serverId, playerList) {
