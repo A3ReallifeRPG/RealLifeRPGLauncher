@@ -4,6 +4,15 @@ const electron = require('electron');
 
 const app = require('electron').app
 
+const path = require('path')
+
+const shell = require('electron').shell;
+
+const {
+    Menu,
+    Tray
+} = require('electron')
+
 const autoUpdater = require('electron').autoUpdater;
 
 const BrowserWindow = require('electron').BrowserWindow
@@ -185,7 +194,38 @@ function setUpIpcHandlers() {
     });
 }
 
-app.on('ready', createWindow);
+app.on('ready', function() {
+    createWindow();
+
+    wintray = new Tray(app.getAppPath() + '/app/icon/tray.ico');
+
+    var contextMenu = Menu.buildFromTemplate([{
+        label: 'Nach Updates suchen',
+        click: function() {
+            autoUpdater.checkForUpdates();
+        }
+    }, {
+        label: 'RealLifeRPG.de',
+        click: function() {
+            shell.openExternal('https://realliferpg.de/');
+        }
+    }, {
+        label: 'Beenden',
+        click: function() {
+            app.quit();
+        }
+    }]);
+    wintray.setToolTip('RealLifeRPG Launcher')
+    wintray.setContextMenu(contextMenu);
+
+    wintray.addListener("click", function(error) {
+        win.focus();
+    });
+
+    wintray.addListener("double-click", function(error) {
+        win.focus();
+    });
+});
 
 app.on('window-all-closed', () => {
     app.quit();
