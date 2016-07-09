@@ -11,7 +11,7 @@ Permissions beyond the scope of this license may be available at www.realliferpg
 <br>
 Created with ❤ by <span class="fake-link" onclick="openUrl('https://github.com/vabene1111')">vaBene</span> and <span class="fake-link" onclick="openUrl('https://github.com/Kaibu')">Kaibu</span>
 <br>
-<br> Running Node.JS <span id="electron_version"></span>
+<br> Running Electron <span id="electron_version"></span> and Node.JS <span id="node_version"></span>
 <br>
 <br> Using:
 <br><span class="fake-link" onclick="openUrl('https://github.com/twbs/bootstrap/tree/v4-dev')">Bootstrap 4.0.0.alpha3 (MIT)</span>
@@ -21,6 +21,7 @@ Created with ❤ by <span class="fake-link" onclick="openUrl('https://github.com
 <br>
 <img onclick="openUrl('https://creativecommons.org/licenses/by-nc-sa/4.0/')" style="margin-top:20px" src="../img/license.png" />
 <script>
-    document.getElementById("electron_version").innerHTML = process.version;
-    document.getElementById("launcher_version").innerHTML = app.app.getVersion();
+    document.getElementById("electron_version").innerHTML = process.versions.electron;
+    document.getElementById("node_version").innerHTML = process.version;
+    document.getElementById("node_version").innerHTML = app.app.getVersion();
 </script>

@@ -22,17 +22,6 @@
 </div>
 
 <script>
-    $('#downloadtfar').on('click', function() {
-        var args = {
-            type: 1,
-            message: "start-download"
-        }
-        ipcRenderer.send('message-to-download', args);
-        let myNotification = new Notification('Title', {
-            body: 'Lorem Ipsum Dolor Sit Amet'
-        });
-    });
-
     $('#div_header').height($(this).height() * 0.15);
     $('#div_content').height($(this).height() * 0.75);
     $('#div_download').height($(this).height() * 0.10);
