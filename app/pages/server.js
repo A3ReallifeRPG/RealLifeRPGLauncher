@@ -1,4 +1,16 @@
-getServerInfo(getServerCallback);
+
+
+var armaPath = "";
+
+storage.get('settings', function(error, data) {
+    if (data.armapath == "") {
+        var dialog = $('#dialog_noPath').data('dialog');
+        dialog.open();
+    } else {
+        armaPath = data.armapath;
+        getServerInfo(getServerCallback);
+    };
+});
 
 function getServerCallback(jsObj) {
     if (jsObj.length > 0) {
@@ -15,39 +27,6 @@ function getServerCallback(jsObj) {
         $('#serverpreloader').remove();
     }
 }
-
-/*
-<div class="frame" id="mod1">
-    <div class="row">
-        <div class="col-md-4" style="height:100%">
-            <div id="piechart1" style="min-width: 20%; height: 200px;"></div>
-            Aktuelle Spieler: 1337<br>
-            IP: 46.20.46.31:2302<br>
-            <button class="button loading-pulse lighten success" style="margin-top:20px"> Server beitreten</button>
-        </div>
-        <div class="col-md-8">
-            <div id="table-wrapper">
-                <div id="table-scroll">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th><span class="text">Name</span></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Vabene</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<li><a href="#mod1">Server 1</a></li>
-*/
 
 function insertServerTab(serverObj, index) {
     if (serverObj.Slots != 0) {
@@ -146,23 +125,22 @@ function insertServerTab(serverObj, index) {
         ipcRenderer.send('message-to-webwin', args);
     };
 }
-// ('joinServer(' + serverObj.IpAddress + ','+serverObj.Port+','+serverObj.ServerPassword+','+serverObj.StartParameters+')'));
+
 function joinServer(serverIp, serverPort, serverPw, serverParams) {
-    //var cp = require("child_process");
-    //cp.exec('start "D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe" -nosplash -skipIntro -cpucount=4 -maxmem=12288 -connect=server -port=port "-mod=" -nolauncher -useBE');
-    //shell.openItem('D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe -nosplash -skipIntro -connect=' + serverIp + ' -port=' + serverPort + ' -mod="' + serverParams + '" -password=' + serverPw + ' -nolauncher -useBE');
+
     var params = [];
+
+    params.push('-noLauncher');
+    params.push('-useBE');
     params.push('-nosplash');
     params.push('-skipIntro');
     params.push('-connect=' + serverIp);
-    params.push('-port=' + serverPort);
+    params.push('-port=' + (serverPort - 1));
     params.push('-mod=' + serverParams);
-    //params.push('-password=\"' + serverPw + '\"');
-    params.push('-nolauncher');
-    params.push('-useBE');
+    params.push('-password=' + serverPw);
 
     var child_process = require('child_process');
-    child_process.spawn("D:\\SteamLibrary\\SteamApps\\common\\Arma 3\\arma3.exe", params, [])
+    child_process.spawn((armaPath + "\\arma3launcher.exe"), params, [])
 }
 
 function setPlayerList(serverId, playerList) {
