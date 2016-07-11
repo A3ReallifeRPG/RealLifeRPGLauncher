@@ -9,8 +9,7 @@ const path = require('path')
 const shell = require('electron').shell;
 
 const {
-    Menu,
-    Tray
+    Menu
 } = require('electron')
 
 const autoUpdater = require('electron').autoUpdater;
@@ -196,7 +195,7 @@ function setUpIpcHandlers() {
 
 app.on('ready', function() {
     createWindow();
-
+    /*
     wintray = new Tray(app.getAppPath() + '/app/icon/tray.ico');
 
     var contextMenu = Menu.buildFromTemplate([{
@@ -225,6 +224,7 @@ app.on('ready', function() {
     wintray.addListener("double-click", function(error) {
         win.focus();
     });
+    */
 });
 
 app.on('window-all-closed', () => {
