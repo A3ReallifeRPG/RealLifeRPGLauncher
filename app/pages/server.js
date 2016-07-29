@@ -120,7 +120,7 @@ function insertServerTab(serverObj, index) {
 
         var args = {
             message: 'get-server-player',
-            serverId: defaultServer
+            serverId: serverObj.Id
         };
         ipcRenderer.send('message-to-webwin', args);
     };
