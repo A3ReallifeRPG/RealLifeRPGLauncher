@@ -144,7 +144,8 @@ function getHashListCallback(jsObj) {
         var args = {
             type: 1,
             message: "ask-hash",
-            modId: currentModId
+            modId: currentModId,
+            modUrl: downloadServerUrl
         };
         ipcRenderer.send('message-to-render', args);
     };

@@ -205,7 +205,8 @@ function hashDialogConfirm() {
     notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet', 'ic_description_white_36dp_2x.png');
     var args = {
         message: 'start-fullcheck',
-        modId: curModId
+        modId: curModId,
+        modUrl: curModUrl
     };
     ipcRenderer.send('message-to-download', args);
     var dwnCompleteDialog = $('#dialog_downloadComplete').data('dialog');
@@ -261,6 +262,7 @@ function callDownloadStop() {
 function showHashDialog(arg) {
     var dialog = $('#dialog_downloadComplete').data('dialog');
     curModId = arg.modId;
+    curModUrl = arg.modUrl;
 
     if(curModId == 0){
         $("#content").load("home");
