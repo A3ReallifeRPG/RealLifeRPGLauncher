@@ -61,6 +61,9 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             });
             break;
         case 'start-fullcheck':
+            if(isDownloading){
+                break;
+            };
             if (debug_mode >= 2) {
                 console.log('fullCheck start');
             };
@@ -77,6 +80,9 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             });
             break;
         case 'start-quickcheck':
+            if(isDownloading){
+                break;
+            };
             if (debug_mode >= 2) {
                 console.log('quickCheck start');
             };
@@ -124,8 +130,8 @@ function notfCallback(json, success) {
 function getHashListCallback(jsObj) {
     cancelDownload = false;
     downloadList = jsObj;
-    deleteFiles(downloadList);
     calcDownloadStats();
+    deleteFiles(downloadList);
     preDownloadCheck();
     if (downloadList.length > 0) {
         download(downloadList[0]);
@@ -210,6 +216,8 @@ function preDownloadCheck() {
         fileObj = downloadList[i];
         if (!quickCheck(fileObj)) {
             checkList.push(fileObj);
+        }else{
+            currentDownloadSize = currentDownloadSize + fileObj.Size;
         };
     }
     downloadList = checkList;
@@ -325,8 +333,6 @@ function quickCheck(fileObj) {
         if (stats['size'] != fileObj.Size) {
             return false;
         }
-
-        currentDownloadSize = currentDownloadSize + fileObj.Size;
         return true;
     } catch (e) {
         return false;

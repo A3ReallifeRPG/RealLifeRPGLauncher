@@ -304,11 +304,12 @@ function updateDwnProgress(arg) {
     };
     ipcRenderer.send('winprogress-change', args);
     document.title = "RealLifeRPG Launcher - " + totalProgress + "%";
-    curDownSize = (arg.obj.currentDownloadSize / 1073741824).toFixed(3);
-    maxDownSize = (arg.obj.totalFileSize / 1073741824).toFixed(3);
+    curDownSize = parseFloat((arg.obj.currentDownloadSize / 1073741824).toFixed(3));
+    maxDownSize = parseFloat((arg.obj.totalFileSize / 1073741824).toFixed(3));
+
     if (curDownSize > maxDownSize) {
         curDownSize = maxDownSize;
-    }
+    };
 
     var fName = arg.obj.fileObj.FileName;
     fName.replace('.pbo', '');
