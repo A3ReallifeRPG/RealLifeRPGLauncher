@@ -132,6 +132,13 @@ function quickCheckResult(arg) {
 
         var dialog = $('#dialog_updateInfo').data('dialog');
         dialog.open();
+    }else if (arg.obj.resultType == 3) {
+        var index = checkListMods.indexOf(arg.obj.modId);
+        checkListMods.splice(index, 1);
+
+        waitForStartup();
+
+        resetProgress();
     }
 }
 

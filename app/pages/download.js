@@ -157,7 +157,19 @@ function getHashFullCheckCallback(jsObj) {
     fullCheck();
 }
 
-function getHashQuickCheckCallback(jsObj) {
+function getHashQuickCheckCallback(jsObj,success) {
+    if(!success){
+        var args = {
+            message: "quick-check-result",
+            obj: {
+                resultType: 3, //1 = success, 2 = update
+                modId: currentModId
+            }
+        };
+        ipcRenderer.send('message-to-render', args);
+        return;
+    };
+
     cancelDownload = false;
     downloadList = jsObj;
     calcDownloadStats();

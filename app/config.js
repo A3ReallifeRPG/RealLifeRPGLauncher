@@ -3,16 +3,16 @@
 
 */
 
-var infoServerURL = "http://panel.realliferpg.de/";
+var infoServerURL = "https://husky.realliferpg.de/api/";
 
-var server_ListPath = "Server/ServerList";
-var server_PlayerListPath = "/Server/PlayerList/"; // url/<server id>
+var server_ListPath = "servers/";
+var server_PlayerListPath = "server/players/"; // url/<server id>
 
-var mod_ModList = "/ArmaMod/GetMods";
-var mod_FileList = "VersionUpdate/CurrentFileList/"; // url/<mod id>
+var mod_ModList = "mods/";
+var mod_FileList = "mod/hashlist/"; // url/<mod id>
 var mod_Changelog = "/News/GetNews/"; // url/<mod id>
 
-var launcher_Notification = "/LauncherSettings/GetSettings";
+var launcher_Notification = "";
 
 var task_force_installer = "https://realliferpg.de/TFARReallifeRPG.ts3_plugin";
 

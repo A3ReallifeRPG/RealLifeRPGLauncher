@@ -78,7 +78,12 @@ function getModInfo(callBackFnc) {
             callBackFnc(this.status,false);
         }
     }
-    xhr.send();
+    try{
+        xhr.send();
+    }catch (err) {
+
+    }
+
 }
 
 /*
@@ -95,8 +100,12 @@ function getModHashList(modId,callBackFnc) {
             callBackFnc(jsObj);
         }
         if (this.readyState == 4 && this.status == 404) {
-            document.write('Error 404 in function: getModHashList');
+            callBackFnc(jsObj,false);
+        }else if (this.readyState == 4 && this.status == 410){
+            callBackFnc(jsObj,false);
         }
     }
+
     xhr.send();
+
 }
