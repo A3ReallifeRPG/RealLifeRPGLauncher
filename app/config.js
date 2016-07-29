@@ -10,9 +10,8 @@ var server_PlayerListPath = "server/players/"; // url/<server id>
 
 var mod_ModList = "mods/";
 var mod_FileList = "mod/hashlist/"; // url/<mod id>
-var mod_Changelog = "/News/GetNews/"; // url/<mod id>
 
-var launcher_Notification = "";
+var launcher_Notification = "notification";
 
 var task_force_installer = "https://realliferpg.de/TFARReallifeRPG.ts3_plugin";
 

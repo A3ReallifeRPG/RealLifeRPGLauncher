@@ -2,7 +2,17 @@
     "name": "RealLifeRPG",
     "version": "1.2.1",
     "description": "RealLifeRPG Launcher",
+    "homepage": "https://www.realliferpg.de",
     "main": "main.js",
+    "license": "CC-BY-NC-SA-4.0",
+    "readme": "../../README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher.git"
+    },
+    "bugs": {
+        "url": "https://github.com/A3ReallifeRPG/ReallifeRPG5.0/issues"
+    },
     "scripts": {
         "start": "electron ."
     },
@@ -10,8 +20,16 @@
         "type": "git",
         "url": "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher"
     },
-    "license": "CC-BY-NC-ND-4.0",
     "author": "RealLifeRPG",
+    "contributers": [{
+        "name": "vabene1111",
+        "email": "vabene1234@googlemail.com",
+        "url": "https://github.com/vabene1111"
+    } {
+        "name": "Kaibu",
+        "email": "green4ever999@web.de",
+        "url": "https://github.com/Kaibu"
+    }],
     "dependencies": {
         "dwn": "0.0.2",
         "electron-json-storage": "2.0.0",

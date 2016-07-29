@@ -78,6 +78,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                     ipcRenderer.send('message-to-render', args);
                 } else {
                     armaPath = data.armapath;
+                    downloadServerUrl = arg.modUrl;
                     getModHashList(arg.modId, getHashFullCheckCallback);
                 };
             });
@@ -158,6 +159,7 @@ function getHashFullCheckCallback(jsObj) {
 }
 
 function getHashQuickCheckCallback(jsObj,success) {
+
     if(!success){
         var args = {
             message: "quick-check-result",
@@ -243,6 +245,7 @@ function download(fileObj) {
     isDownloading = true;
 
     if (cancelDownload) {
+        isDownloading = false;
         var args = {
             progType: 2,
             message: "update-progress",

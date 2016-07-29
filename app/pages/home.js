@@ -93,7 +93,7 @@ function showModInfo(jsonData, success) {
             fullCheckButton.setAttribute('id', 'btn_full_' + jsonData[i].Id);
             fullCheckButton.setAttribute('class', 'button warning');
             node = document.createTextNode("Prüfen");
-            fullCheckButton.setAttribute('onClick', 'fullCheckClick(' + jsonData[i].Id + ')');
+            fullCheckButton.setAttribute('onClick', 'fullCheckClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
             fullCheckButton.appendChild(node);
 
             infoDivPar.appendChild(infoDivBold);
@@ -131,14 +131,15 @@ function modClickPlay(id) {
     loadpage('server.html');
 }
 
-function fullCheckClick(id) {
+function fullCheckClick(id,url) {
     if (debug_mode >= 1) {
         console.log('Fullcheck started, mod ID: ' + id);
     };
     $('#btn_cancel_progress').delay(500).fadeIn('slow');
     var args = {
         message: 'start-fullcheck',
-        modId: id
+        modId: id,
+        modUrl: url
     };
     notifyWin('RealLifeRPG Launcher', 'Komplette Überprüfung gestartet', 'ic_description_white_36dp_2x.png');
     ipcRenderer.send('message-to-download', args);

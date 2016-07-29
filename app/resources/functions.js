@@ -97,7 +97,7 @@ function getModHashList(modId,callBackFnc) {
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var jsObj = JSON.parse(this.responseText);
-            callBackFnc(jsObj);
+            callBackFnc(jsObj,true);
         }
         if (this.readyState == 4 && this.status == 404) {
             callBackFnc(jsObj,false);
