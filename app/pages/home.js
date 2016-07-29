@@ -78,10 +78,10 @@ function showModInfo(jsonData, success) {
 
             if ($.inArray(jsonData[i].Id, updateMods) > -1) {
                 node = document.createTextNode("Update");
-                infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ')');
+                infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
             } else if ($.inArray(jsonData[i].Id, installedMods) < 0) {
                 node = document.createTextNode("Installieren");
-                infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ')');
+                infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
             } else {
                 node = document.createTextNode("Spielen");
                 infoDivButton.setAttribute('onClick', 'modClickPlay(' + jsonData[i].Id + ')');
@@ -144,7 +144,7 @@ function fullCheckClick(id) {
     ipcRenderer.send('message-to-download', args);
 }
 
-function modClick(id) {
+function modClick(id,url) {
     if (debug_mode >= 1) {
         console.log('Downlaod started, mod ID: ' + id);
     };
@@ -152,7 +152,8 @@ function modClick(id) {
     var args = {
         type: 1,
         message: "start-download",
-        modId: id
+        modId: id,
+        modUrl: url
     }
     ipcRenderer.send('message-to-download', args);
     notifyWin('RealLifeRPG Launcher', 'Download gestartet', 'ic_file_download_white_36dp_2x.png');

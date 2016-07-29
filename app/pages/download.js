@@ -15,6 +15,8 @@ var delList = [];
 var downloadListTotalSize = 0;
 var checkList = [];
 var errorList = [];
+var downloadServerUrl = "";
+
 
 var curFileObj = null;
 var curHashObj = null;
@@ -41,6 +43,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                     ipcRenderer.send('message-to-render', args);
                 } else {
                     armaPath = data.armapath;
+                    downloadServerUrl = arg.modUrl;
                     getModHashList(arg.modId, getHashListCallback);
 
                     storage.get('settings', function(error, data) {
@@ -272,7 +275,7 @@ function download(fileObj) {
         }, 300000);
     };
 
-    var stream = dwn._download('http://213.202.212.13/download/' + fileObj.RelativPath); //TODO hardcoded IP
+    var stream = dwn._download(downloadServerUrl + fileObj.RelativPath);
 
     var str = progress({
         length: fileObj.Size,
