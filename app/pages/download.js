@@ -140,6 +140,7 @@ function getHashListCallback(jsObj) {
     if (downloadList.length > 0) {
         download(downloadList[0]);
     } else {
+
         isDownloading = false;
         var args = {
             type: 1,
@@ -338,7 +339,8 @@ function downloadNext() {
         var args = {
             type: 1,
             message: "ask-hash",
-            modId: currentModId
+            modId: currentModId,
+            modUrl: downloadServerUrl
         };
         ipcRenderer.send('message-to-render', args);
     }
