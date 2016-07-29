@@ -135,7 +135,7 @@ function joinServer(serverIp, serverPort, serverPw, serverParams) {
     params.push('-nosplash');
     params.push('-skipIntro');
     params.push('-connect=' + serverIp);
-    params.push('-port=' + (serverPort - 1));
+    params.push('-port=' + serverPort );
     params.push('-mod=' + serverParams);
     params.push('-password=' + serverPw);
 
