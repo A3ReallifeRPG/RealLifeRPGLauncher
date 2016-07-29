@@ -34,11 +34,11 @@
             "remoteReleases": "http://89.163.140.216:8000/"
         }
     },
-    "contributers": [{
+    "contributors": [{
         "name": "vabene1111",
         "email": "vabene1234@googlemail.com",
         "url": "https://github.com/vabene1111"
-    } {
+    }, {
         "name": "Kaibu",
         "email": "green4ever999@web.de",
         "url": "https://github.com/Kaibu"
