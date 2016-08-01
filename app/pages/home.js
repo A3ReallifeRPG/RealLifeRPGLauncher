@@ -51,7 +51,7 @@ function showModInfo(jsonData, success) {
             img.setAttribute('alt', jsonData[i].Id);
             img.setAttribute('class', 'img-responsive center-block');
             img.setAttribute('style', '-webkit-user-drag: none;');
-
+            img.setAttribute('height', '300px');
 
             var infoDiv = document.createElement('div');
             infoDiv.setAttribute('class', 'carousel-caption');
@@ -76,10 +76,10 @@ function showModInfo(jsonData, success) {
             infoDivButton.setAttribute('id', 'btn_mod_' + jsonData[i].Id);
             infoDivButton.setAttribute('class', 'button success');
 
-            if ($.inArray(jsonData[i].Id, updateMods) > -1) {
+            if ($.inArray(jsonData[i].Id, updateMods) > -1 && jsonData[i].HasGameFiles) {
                 node = document.createTextNode("Update");
                 infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
-            } else if ($.inArray(jsonData[i].Id, installedMods) < 0) {
+            } else if ($.inArray(jsonData[i].Id, installedMods) < 0 && jsonData[i].HasGameFiles) {
                 node = document.createTextNode("Installieren");
                 infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
             } else {
@@ -89,6 +89,7 @@ function showModInfo(jsonData, success) {
 
             infoDivButton.appendChild(node);
 
+
             var fullCheckButton = document.createElement('button');
             fullCheckButton.setAttribute('id', 'btn_full_' + jsonData[i].Id);
             fullCheckButton.setAttribute('class', 'button warning');
@@ -96,11 +97,15 @@ function showModInfo(jsonData, success) {
             fullCheckButton.setAttribute('onClick', 'fullCheckClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
             fullCheckButton.appendChild(node);
 
+
             infoDivPar.appendChild(infoDivBold);
             infoDiv.appendChild(infoDivHeading);
             infoDiv.appendChild(infoDivPar);
             infoDiv.appendChild(infoDivButton);
-            infoDiv.appendChild(fullCheckButton);
+            
+            if (jsonData[i].HasGameFiles) {
+                infoDiv.appendChild(fullCheckButton);
+            };
 
             if ($.inArray(jsonData[i].Id, updateMods) > -1) {
                 fullCheckButton.disabled = false;
@@ -131,7 +136,7 @@ function modClickPlay(id) {
     loadpage('server.html');
 }
 
-function fullCheckClick(id,url) {
+function fullCheckClick(id, url) {
     if (debug_mode >= 1) {
         console.log('Fullcheck started, mod ID: ' + id);
     };
@@ -145,7 +150,7 @@ function fullCheckClick(id,url) {
     ipcRenderer.send('message-to-download', args);
 }
 
-function modClick(id,url) {
+function modClick(id, url) {
     if (debug_mode >= 1) {
         console.log('Downlaod started, mod ID: ' + id);
     };

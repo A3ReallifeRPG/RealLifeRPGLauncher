@@ -31,7 +31,7 @@ function getServerCallback(jsObj) {
 }
 
 function insertServerTab(serverObj, index,isArma) {
-    if (true) {
+    if (serverObj.online != 0) {
         //build server info
         var wrapper = document.createElement('div');
         wrapper.setAttribute('class', 'frame');
@@ -135,7 +135,7 @@ function insertServerTab(serverObj, index,isArma) {
 }
 
 function joinSteamServer(serverIp, serverPort, serverPw) {
-    shell.openExternal('steam://connect/' + serverIp + ':' + serverPort );
+    shell.openExternal('steam://connect/' + serverIp + ':' + serverPort + '/' + ServerPassword);
 }
 
 function joinArmaServer(serverIp, serverPort, serverPw, serverParams) {
