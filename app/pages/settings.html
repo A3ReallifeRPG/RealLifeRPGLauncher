@@ -1,7 +1,7 @@
 <h2 class="win-h2">Settings</h2>
 <br/>
 <br/>
-<div class="container">
+<div class="container pre-scrollable" >
     <div class="row">
         <h3 class="win-h3">Arma Pfad</h3>
         <br/>
@@ -119,6 +119,12 @@
             </table>
         </div>
     </div>
+    <div class="row">
+        <h3 class="win-h3">Zusätzliche Startparameter</h3>
+        <br/>
+        <input type="text" id="additional_params" class="form-control" >
+    </div>
+    <br/>
     <div class="row">
         <h3 class="win-h3">Launcher Einstellungen</h3>
         <br>
@@ -275,6 +281,12 @@
         saveallsettings();
     });
 
+    $("#additional_params").on('change keydown paste input', function() {
+        add_params = $("#additional_params").val();
+        saveallsettings();
+    });
+
+
     function saveallsettings() {
         storage.set('settings', {
             armapath: path,
@@ -286,6 +298,7 @@
             cpu: cpu,
             vram: vram,
             thread: thread,
+            add_params: add_params,
             toast: toast,
             sounds: sounds,
             debug: debug,
@@ -315,6 +328,7 @@
             cpu: '',
             vram: '',
             thread: '',
+            add_params: '',
             toast: toast,
             sounds: sounds,
             debug: debug,
@@ -347,6 +361,7 @@
             cpu: cpu,
             vram: vram,
             thread: thread,
+            add_params: add_params,
             toast: true,
             sounds: true,
             debug: false,
@@ -380,6 +395,7 @@
             cpu = data.cpu;
             vram = data.vram;
             thread = data.thread;
+            add_params = data.add_params;
             toast = data.toast;
             sounds = data.sounds;
             debug = data.debug;
@@ -402,6 +418,7 @@
         $("#cpuinput").val(cpu);
         $("#vraminput").val(vram);
         $("#threadinput").val(thread);
+        $("#additional_params").val(add_params);
     }
 
     WinJS.Utilities.markSupportedForProcessing(toggleWifi);

@@ -1,5 +1,3 @@
-
-
 var armaPath = "";
 
 storage.get('settings', function(error, data) {
@@ -16,7 +14,11 @@ function getServerCallback(jsObj) {
     if (jsObj.length > 0) {
         defaultServer = jsObj[0].Id;
         for (var i = 0; i < jsObj.length; i++) {
-            insertServerTab(jsObj[i], i);
+            if(jsObj[i].appId == 107410){
+                insertServerTab(jsObj[i], i,true);
+            }else{
+                insertServerTab(jsObj[i], i,false);
+            };
         };
         $(function() {
             $("#tabcontroller").tabcontrol();
@@ -28,8 +30,8 @@ function getServerCallback(jsObj) {
     }
 }
 
-function insertServerTab(serverObj, index) {
-    if (serverObj.Slots != 0) {
+function insertServerTab(serverObj, index,isArma) {
+    if (true) {
         //build server info
         var wrapper = document.createElement('div');
         wrapper.setAttribute('class', 'frame');
@@ -55,7 +57,12 @@ function insertServerTab(serverObj, index) {
         btnJoin.setAttribute('class', 'button loading-pulse lighten success');
         btnJoin.setAttribute('style', 'margin-top:20px');
         btnJoin.setAttribute('id', ('btn_start_' + serverObj.Id));
-        btnJoin.setAttribute('onclick', 'joinServer("' + serverObj.IpAddress + '","' + serverObj.Port + '","' + serverObj.ServerPassword + '","' + serverObj.StartParameters + '")');
+        if(isArma){
+            btnJoin.setAttribute('onclick', 'joinArmaServer("' + serverObj.IpAddress + '","' + serverObj.Port + '","' + serverObj.ServerPassword + '","' + serverObj.StartParameters + '")');
+        }else{
+            btnJoin.setAttribute('onclick', 'joinSteamServer("' + serverObj.IpAddress + '","' + serverObj.Port + '","' + serverObj.ServerPassword + '")');
+        }
+
         var txtBtnJoin = document.createTextNode(" Server beitreten");
         btnJoin.appendChild(txtBtnJoin);
 
@@ -107,7 +114,7 @@ function insertServerTab(serverObj, index) {
         wrapper.appendChild(row);
         //attach to host
         document.getElementById('server_tabs').appendChild(wrapper);
-        var txtTab = document.createTextNode("Server " + (index + 1));
+        var txtTab = document.createTextNode(serverObj.Servername);
         var li = document.createElement('li');
         var liA = document.createElement('a');
         liA.setAttribute('href', ('#server_' + serverObj.Id));
@@ -115,8 +122,9 @@ function insertServerTab(serverObj, index) {
         li.appendChild(liA);
 
         document.getElementById('server_tabHost').appendChild(li);
-
-        loadHighCharts(("char_server_" + serverObj.Id), parseInt(serverObj.Civilians), parseInt(serverObj.Cops), parseInt(serverObj.Medics), parseInt(serverObj.Adac));
+        if(isArma){
+            loadHighCharts(("char_server_" + serverObj.Id), parseInt(serverObj.Civilians), parseInt(serverObj.Cops), parseInt(serverObj.Medics), parseInt(serverObj.Adac));
+        }
 
         var args = {
             message: 'get-server-player',
@@ -126,21 +134,67 @@ function insertServerTab(serverObj, index) {
     };
 }
 
-function joinServer(serverIp, serverPort, serverPw, serverParams) {
+function joinSteamServer(serverIp, serverPort, serverPw) {
+    shell.openExternal('steam://connect/' + serverIp + ':' + serverPort );
+}
 
-    var params = [];
+function joinArmaServer(serverIp, serverPort, serverPw, serverParams) {
 
-    params.push('-noLauncher');
-    params.push('-useBE');
-    params.push('-nosplash');
-    params.push('-skipIntro');
-    params.push('-connect=' + serverIp);
-    params.push('-port=' + serverPort );
-    params.push('-mod=' + serverParams);
-    params.push('-password=' + serverPw);
+    storage.get('settings', function(error, data) {
+        var params = [];
 
-    var child_process = require('child_process');
-    child_process.spawn((armaPath + "\\arma3launcher.exe"), params, [])
+        path = data.armapath;
+        splash = data.splash;
+        intro = data.intro;
+        ht = data.ht;
+        windowed = data.windowed;
+        mem = data.mem;
+        cpu = data.cpu;
+        vram = data.vram;
+        thread = data.thread;
+        add_params = data.add_params;
+
+        params.push('-noLauncher');
+        params.push('-useBE');
+        params.push('-connect=' + serverIp);
+        params.push('-port=' + serverPort);
+        params.push('-mod=' + serverParams);
+        params.push('-password=' + serverPw);
+
+        if (splash == true) {
+            params.push('-nosplash');
+        };
+        if (intro == true) {
+            params.push('-skipIntro');
+        };
+        if (ht == true) {
+            params.push('-enableHT');
+        };
+        if (windowed == true) {
+            params.push('-window');
+        };
+
+        if (mem != null && mem != "") {
+            params.push('-maxMem=' + mem);
+        };
+        if (vram != null && vram != "") {
+            params.push('-maxVRAM=' + vram);
+        };
+        if (cpu != null && cpu != "") {
+            params.push('-cpuCount=' + cpu);
+        };
+        if (thread != null && thread != "") {
+            params.push('-exThreads=' + thread);
+        };
+        if (add_params != null && add_params != "") {
+            params.push(add_params);
+        };
+
+
+        var child_process = require('child_process');
+        child_process.spawn((armaPath + "\\arma3launcher.exe"), params, [])
+    });
+
 }
 
 function setPlayerList(serverId, playerList) {
