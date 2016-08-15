@@ -2,7 +2,7 @@
 <script src="../resources/functions.js"></script>
 <h2 class="win-h2">About</h2>
 <br>
-<span style="font-size:17px">RealLifeRPG Launcher Version <span id="launcher_version"></span></span>
+<span style="font-size:17px">RealLifeRPG Launcher Version <span class="fake-link" onclick="openUrl('https://github.com/A3ReallifeRPG/RealLifeRPGLauncher')"><span id="launcher_version"></span></span></span>
 <br>
 <br>
 <span style="font-size:17px">
@@ -23,5 +23,5 @@ Created with ❤ by <span class="fake-link" onclick="openUrl('https://github.com
 <script>
     document.getElementById("electron_version").innerHTML = process.versions.electron;
     document.getElementById("node_version").innerHTML = process.version;
-    document.getElementById("node_version").innerHTML = app.app.getVersion();
+    document.getElementById("launcher_version").innerHTML = app.app.getVersion();
 </script>

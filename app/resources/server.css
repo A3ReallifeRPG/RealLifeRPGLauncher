@@ -19,3 +19,12 @@
     height: 20px;
     width: 35%;
 }
+
+
+.tabcontrol .tabs li a {
+    color: #FFFFFF !important;
+}
+
+.tabcontrol .tabs li a:hover {
+    background-color: #1ba1e2 !important;
+}

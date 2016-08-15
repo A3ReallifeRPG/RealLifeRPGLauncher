@@ -91,12 +91,7 @@ function insertServerTab(serverObj, index,isArma) {
         var tblHead = document.createElement('thead');
         var tblHeadRow = document.createElement('tr');
         var tblHeadRowH = document.createElement('th');
-        var tblHeadRowHSpan = document.createElement('span');
-        var txtTblHead = document.createTextNode("Name");
 
-        tblHeadRowHSpan.appendChild(txtTblHead);
-        tblHeadRowH.appendChild(tblHeadRowHSpan);;
-        tblHeadRow.appendChild(tblHeadRowH);
         tblHead.appendChild(tblHeadRow);
 
         var tblBody = document.createElement('tbody');

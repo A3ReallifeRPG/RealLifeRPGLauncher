@@ -31,16 +31,11 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
 })
 
 function queryPlayerInfocallback(jsObj,sId){
-    array = [];
-    for(i = 0; i < jsObj.Playernames.length; i++){
-        array.push(jsObj.Playernames[i]);
-    }
-
     var args = {
         message: "player-list-callback",
         obj: {
             serverId: sId,
-            playerArray: array
+            playerArray: jsObj
         }
     };
     ipcRenderer.send('message-to-render', args);
