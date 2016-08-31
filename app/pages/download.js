@@ -46,7 +46,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                     downloadServerUrl = arg.modUrl;
                     getModHashList(arg.modId, getHashListCallback);
 
-                    storage.get('settings', function(error, data) {
+                    storage.get('mods', function(error, data) {
                         if (jQuery.isEmptyObject(data.installedMods)) {
                             installedMods = [];
                         } else {
