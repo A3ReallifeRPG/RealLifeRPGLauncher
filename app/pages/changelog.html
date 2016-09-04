@@ -23,6 +23,11 @@
                 readLogs = data.readLogs;
             }
 
+            readLogs = filterReadLogs(readLogs);
+            storage.set('changelog', {
+                readLogs: readLogs
+            }, function(error) {});
+
             $("#changelog").load("https://service.realliferpg.de/include/changelog?gameid=1", function() {
                 for (i = 0; i < readLogs.length; i++) {
                     $("#" + readLogs[i]).find(".heading").prop('style', 'color:#000000;font-size:18px');
@@ -35,11 +40,12 @@
     function markRead(frame) {
         var id = frame.attr('id');
         $("#" + id).find(".heading").prop('style', 'color:#000000;font-size:18px');
-        readLogs.push(id);
-        storage.set('changelog', {
-            readLogs: readLogs
-        }, function(error) {});
-
+        if(!inArray(id,readLogs)){
+            readLogs.push(id);
+            storage.set('changelog', {
+                readLogs: readLogs
+            }, function(error) {});
+        }
     }
 
     function readAll(){
@@ -51,6 +57,16 @@
                 readLogs: readLogs
             }, function(error) {});
         });
+    }
+
+    function filterReadLogs(logs){
+        tmp = [];
+        for(i = 0; i < logs.length; i++){
+            if(!inArray(logs[i],tmp)){
+                tmp.push(logs[i]);
+            }
+        }
+        return tmp;
     }
 
 </script>

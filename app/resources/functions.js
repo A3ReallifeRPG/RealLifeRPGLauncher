@@ -109,3 +109,16 @@ function getModHashList(modId,callBackFnc) {
     xhr.send();
 
 }
+
+/*
+    Check if valu in array
+*/
+function inArray(val, array){
+    x = 0;
+    for(x = 0; x < array.length; x++){
+        if(array[x] == val){
+            return true;
+        }
+    }
+    return false;
+}

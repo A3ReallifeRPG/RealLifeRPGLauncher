@@ -52,13 +52,16 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                         } else {
                             installedMods = data.installedMods;
                         }
-                        if (!(arg.modId in installedMods)) {
+
+                        installedMods = filterInstalledMods(installedMods); //TODO this sucks
+
+                        if (!inArray(arg.modId,installedMods)) {
                             installedMods.push(arg.modId);
-                            storage.set('mods', {
-                                installedMods: installedMods
-                            }, function(error) {});
                         }
 
+                        storage.set('mods', {
+                            installedMods: installedMods
+                        }, function(error) {});
                     });
                 };
             });
@@ -120,6 +123,16 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             break;
     }
 })
+
+function filterInstalledMods(mods){
+    tmp = [];
+    for(i = 0; i < mods.length; i++){
+        if(!inArray(mods[i],tmp)){
+            tmp.push(mods[i]);
+        }
+    }
+    return tmp;
+}
 
 function notfCallback(json, success) {
 
