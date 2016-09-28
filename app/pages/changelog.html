@@ -28,7 +28,7 @@
                 readLogs: readLogs
             }, function(error) {});
 
-            $("#changelog").load("https://service.realliferpg.de/include/changelog?gameid=1", function() {
+            $("#changelog").load("https://husky.realliferpg.de/files/changelog", function() {
                 for (i = 0; i < readLogs.length; i++) {
                     $("#" + readLogs[i]).find(".heading").prop('style', 'color:#000000;font-size:18px');
                 };
