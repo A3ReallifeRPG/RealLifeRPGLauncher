@@ -31,7 +31,7 @@
         "win": {
             "title": "RealLifeRPG Launcher",
             "iconUrl": "https://upload.realliferpg.de/icon.ico",
-            "remoteReleases": "http://89.163.140.216:8000/"
+            "remoteReleases": "http://89.163.140.216:8000/files/"
         }
     },
     "contributors": [{
