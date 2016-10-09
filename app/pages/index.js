@@ -13,29 +13,21 @@ const {
     ipcRenderer
 } = require('electron');
 
+var anim = document.getElementById("content");
+
 var updateMods = [];
 var curModId = 0;
 var checkListMods = [];
 curentPage = "";
 
 checkDebug();
-searchUpdates();
 checkVersion();
 
-//wait for finished starup loop
-function waitForStartup() {
-
-    if (checkListMods.length > 0) {
-        return;
-    }
-
-    var args = {
-        message: "search-notf"
-    };
-    ipcRenderer.send('message-to-download', args);
-
-    loadpage('home.html');
+//check for mod updates
+var args = {
+    message: "check-mod-updates"
 }
+ipcRenderer.send('message-to-webwin', args);
 
 //show Notification if activated TODO move to extra thread
 function showNotf(arg) {
@@ -53,7 +45,6 @@ function showNotf(arg) {
     }
 }
 
-
 //setup event handler for IPC
 ipcRenderer.on('render-receiver', (event, arg) => {
     switch (arg.message) {
@@ -68,9 +59,6 @@ ipcRenderer.on('render-receiver', (event, arg) => {
             break;
         case 'ask-hash':
             showHashDialog(arg);
-            break;
-        case 'quick-check-result':
-            quickCheckResult(arg);
             break;
         case 'full-check-result':
             fullCheckResult(arg);
@@ -99,74 +87,6 @@ ipcRenderer.on('render-receiver', (event, arg) => {
             break;
     }
 })
-
-//show quick check success (maybe later more status types)
-function quickCheckResult(arg) {
-    if (arg.obj.resultType == 1) {
-
-        var pb1 = $("#pb1").data('progress');
-        pb1.set(100)
-        var pb2 = $("#pb2").data('progress');
-        pb2.set(100);
-
-        var index = checkListMods.indexOf(arg.obj.modId);
-        checkListMods.splice(index, 1);
-
-        waitForStartup();
-
-        resetProgress();
-        document.getElementById('pb1text').innerHTML = "Schnelle Überprüfung beendet";
-        document.getElementById('pb2text').innerHTML = "Wahrscheinlich sind alle Dateien Korrekt";
-    } else if (arg.obj.resultType == 2) {
-
-        var lbl = document.getElementById('lbl_updateModInfo');
-
-        updateMods.push(arg.obj.modId);
-
-        var index = checkListMods.indexOf(arg.obj.modId);
-        checkListMods.splice(index, 1);
-
-        waitForStartup();
-
-        lbl.innerHTML = lbl.innerHTML + arg.obj.modId + " ";
-
-        var dialog = $('#dialog_updateInfo').data('dialog');
-        dialog.open();
-    }else if (arg.obj.resultType == 3) {
-        var index = checkListMods.indexOf(arg.obj.modId);
-        checkListMods.splice(index, 1);
-
-        waitForStartup();
-
-        resetProgress();
-    }
-}
-
-//check for updates
-function searchUpdates() {
-    if (debug_mode >= 1) {
-        console.log('Searching for installed mods...');
-    };
-    var installedMods;
-
-    storage.get('mods', function(error, data) {
-        if (jQuery.isEmptyObject(data.installedMods)) {
-            installedMods = [];
-        } else {
-            installedMods = data.installedMods;
-        }
-        checkListMods = installedMods;
-
-        waitForStartup();
-        for (i = 0; i < installedMods.length; i++) {
-            var args = {
-                message: 'start-quickcheck',
-                modId: installedMods[i]
-            };
-            ipcRenderer.send('message-to-download', args);
-        }
-    });
-}
 
 //show quick check success (maybe later more status types)
 function fullCheckResult(arg) {

@@ -184,7 +184,7 @@
         new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
     });
 
-    var anim = document.getElementById("content");
+
     $(".nav-element").click(function() {
         if (curentPage != $(this).attr("data-navigate")) {
             loadpage($(this).attr("data-navigate") + ".html");
@@ -193,6 +193,7 @@
 
     // First launch
     $(document).ready(function() {
+        loadpage('home.html');
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
                 if (debug_mode >= 1) {

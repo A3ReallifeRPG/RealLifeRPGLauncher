@@ -179,7 +179,7 @@ function getHashQuickCheckCallback(jsObj,success) {
         var args = {
             message: "quick-check-result",
             obj: {
-                resultType: 3, //1 = success, 2 = update
+                resultType: 3, //1 = success, 2 = update, 3 = request fail
                 modId: currentModId
             }
         };
@@ -195,7 +195,7 @@ function getHashQuickCheckCallback(jsObj,success) {
         var args = {
             message: "quick-check-result",
             obj: {
-                resultType: 2, //1 = success, 2 = update
+                resultType: 2, //1 = success, 2 = update, 3 = request fail
                 modId: currentModId
             }
         };
@@ -204,7 +204,7 @@ function getHashQuickCheckCallback(jsObj,success) {
         var args = {
             message: "quick-check-result",
             obj: {
-                resultType: 1 //1 = success, 2 = update
+                resultType: 1 //1 = success, 2 = update, 3 = request fail
             }
         };
         ipcRenderer.send('message-to-render', args);

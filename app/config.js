@@ -10,6 +10,7 @@ var server_PlayerListPath = "server/players/"; // url/<server id>
 
 var mod_ModList = "mods/";
 var mod_FileList = "mod/hashlist/"; // url/<mod id>
+var mod_Dirs = "";
 
 var launcher_Notification = "notification";
 

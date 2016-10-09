@@ -8,6 +8,9 @@ const {
     ipcRenderer
 } = require('electron');
 
+var modDirArray;
+var modUpdateArray = [];
+
 ipcRenderer.on('webwin-receiver', (event, arg) => {
     switch (arg.message) {
         case 'download-tfar':
@@ -15,6 +18,18 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
                 console.log('TFAR-download start');
             };
             downloadTFAR();
+            break;
+        case 'check-mod-updates':
+            if (debug_mode >= 2) {
+                console.log('Mod Update Check started');
+            };
+            checkMods();
+            break;
+        case 'quick-check-result':
+            if (debug_mode >= 2) {
+                console.log('Mod Update Check started');
+            };
+            quickCheckResult(arg);
             break;
         case 'get-server-player':
             if (debug_mode >= 2) {
@@ -77,4 +92,35 @@ function downloadTFAR() {
     });
 
     stream.pipe(str).pipe(fs.createWriteStream(dest));
+}
+
+//show quick check success
+function quickCheckResult(arg) {
+    //1 = success, 2 = update, 3 = request fail
+    if(arg.obj.resultType == 2){
+        modUpdateArray.push(arg.obj.modId);
+    }
+
+    checkMods();
+}
+
+//
+function getModsCallback(){
+    modDirArray = [[1,"@RealLifeRPG5.0"],[5,"@RealLifeRPG5.0BETA"]];
+    checkMods();
+}
+
+//
+function checkMods(){
+    if(modDirArray.length > 0){
+        var args = {
+            message: 'start-quickcheck',
+            modId: modDirArray[0]
+        };
+        modDirArray.shift();
+        ipcRenderer.send('message-to-download', args);
+    }else{
+        debugger;
+        // send modUpdateArray to render
+    }
 }
