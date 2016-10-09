@@ -183,7 +183,7 @@ function getHashQuickCheckCallback(jsObj,success) {
                 modId: currentModId
             }
         };
-        ipcRenderer.send('message-to-render', args);
+        ipcRenderer.send('message-to-webwin', args);
         return;
     };
 
@@ -199,7 +199,7 @@ function getHashQuickCheckCallback(jsObj,success) {
                 modId: currentModId
             }
         };
-        ipcRenderer.send('message-to-render', args);
+        ipcRenderer.send('message-to-webwin', args);
     } else {
         var args = {
             message: "quick-check-result",
@@ -207,7 +207,7 @@ function getHashQuickCheckCallback(jsObj,success) {
                 resultType: 1 //1 = success, 2 = update, 3 = request fail
             }
         };
-        ipcRenderer.send('message-to-render', args);
+        ipcRenderer.send('message-to-webwin', args);
     }
 }
 

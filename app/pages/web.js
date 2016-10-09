@@ -9,6 +9,7 @@ const {
 } = require('electron');
 
 var modDirArray;
+var allModsArray;
 var modUpdateArray = [];
 
 ipcRenderer.on('webwin-receiver', (event, arg) => {
@@ -23,6 +24,8 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
             if (debug_mode >= 2) {
                 console.log('Mod Update Check started');
             };
+            modDirArray = arg.dirList;
+            allModsArray = arg.allMods;
             checkMods();
             break;
         case 'quick-check-result':
@@ -100,13 +103,6 @@ function quickCheckResult(arg) {
     if(arg.obj.resultType == 2){
         modUpdateArray.push(arg.obj.modId);
     }
-
-    checkMods();
-}
-
-//
-function getModsCallback(){
-    modDirArray = [[1,"@RealLifeRPG5.0"],[5,"@RealLifeRPG5.0BETA"]];
     checkMods();
 }
 
@@ -115,12 +111,16 @@ function checkMods(){
     if(modDirArray.length > 0){
         var args = {
             message: 'start-quickcheck',
-            modId: modDirArray[0]
+            modId: modDirArray[0][0]
         };
         modDirArray.shift();
         ipcRenderer.send('message-to-download', args);
     }else{
-        debugger;
-        // send modUpdateArray to render
+        var args = {
+            message: "quick-check-updates",
+            modList: modUpdateArray,
+            allMods: allModsArray
+        };
+        ipcRenderer.send('message-to-render', args);
     }
 }

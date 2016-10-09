@@ -23,12 +23,6 @@ curentPage = "";
 checkDebug();
 checkVersion();
 
-//check for mod updates
-var args = {
-    message: "check-mod-updates"
-}
-ipcRenderer.send('message-to-webwin', args);
-
 //show Notification if activated TODO move to extra thread
 function showNotf(arg) {
     if (arg.success) {
@@ -82,11 +76,40 @@ ipcRenderer.on('render-receiver', (event, arg) => {
                 setPlayerList(arg.obj.serverId, arg.obj.playerArray);
             };
             break;
+        case 'quick-check-updates':
+            updateButtons(arg.modList,arg.allMods);
+            break;
         default:
-            console.log('Packet dropped');
+            console.log('Packet dropped: ' + arg.message);
             break;
     }
-})
+});
+
+function updateButtons(modList,allMods){
+    var update_mods_string = "";
+
+    for(i = 0; i < allMods.length;i++){
+        var mod_id = allMods[i][0];
+        if($.inArray(mod_id,modList) != -1){
+            document.getElementById('btn_mod_' + mod_id).innerHTML = "Update";
+            document.getElementById('btn_full_' + mod_id).disabled = false;
+            update_mods_string += " " + allMods[i][1] + ",";
+            document.getElementById('btn_mod_' + mod_id).disabled = false;
+        }else{
+            document.getElementById('btn_mod_' + mod_id).innerHTML = "Spielen";
+            document.getElementById('btn_mod_' + mod_id).setAttribute('onClick', 'modClickPlay(' + mod_id + ')');
+            document.getElementById('btn_full_' + mod_id).disabled = false;
+            document.getElementById('btn_mod_' + mod_id).disabled = false;
+        }
+    }
+
+    update_mods_string = update_mods_string.substring(0, update_mods_string.length - 1);
+    var lbl = document.getElementById('lbl_updateModInfo');
+    lbl.innerHTML = update_mods_string;
+
+    var dialog = $('#dialog_updateInfo').data('dialog');
+    dialog.open();
+}
 
 //show quick check success (maybe later more status types)
 function fullCheckResult(arg) {

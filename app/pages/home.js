@@ -29,7 +29,8 @@ storage.get('mods', function(error, data) {
     "IsActive":true,
     "Description":"RealLife RPG Community Arma 3 Server ",
     "ImageUrl":"http://fs5.directupload.net/images/160418/33uqn5it.png",
-    "HasGameFiles":true
+    "HasGameFiles":true,
+    "Directories": "@RealLifeRPG5.0"
 }
 
 */
@@ -37,6 +38,9 @@ function showModInfo(jsonData, success) {
     if (debug_mode >= 1) {
         console.log('Loading mods..');
     };
+
+    var dirList = [];
+    var modList = [];
     if (success) {
         for (var i = 0; i < jsonData.length; i++) {
             var carItem = document.createElement('div');
@@ -45,6 +49,9 @@ function showModInfo(jsonData, success) {
             } else {
                 carItem.setAttribute('class', 'carousel-item');
             }
+
+            //TODO explode ,
+            dirList.push([jsonData[i].Id,jsonData[i].Directories]);
 
             var img = document.createElement('img');
             img.setAttribute('src', jsonData[i].ImageUrl);
@@ -76,19 +83,17 @@ function showModInfo(jsonData, success) {
             infoDivButton.setAttribute('id', 'btn_mod_' + jsonData[i].Id);
             infoDivButton.setAttribute('class', 'button success');
 
-            if ($.inArray(jsonData[i].Id, updateMods) > -1 && jsonData[i].HasGameFiles) {
-                node = document.createTextNode("Update");
+            if(jsonData[i].HasGameFiles){
+                modList.push([jsonData[i].Id,jsonData[i].Name]);
+                node = document.createTextNode("Prüfe Updates ..");
                 infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
-            } else if ($.inArray(jsonData[i].Id, installedMods) < 0 && jsonData[i].HasGameFiles) {
-                node = document.createTextNode("Installieren");
-                infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
-            } else {
+                infoDivButton.disabled = true;
+            }else{
                 node = document.createTextNode("Spielen");
                 infoDivButton.setAttribute('onClick', 'modClickPlay(' + jsonData[i].Id + ')');
             }
 
             infoDivButton.appendChild(node);
-
 
             var fullCheckButton = document.createElement('button');
             fullCheckButton.setAttribute('id', 'btn_full_' + jsonData[i].Id);
@@ -97,23 +102,18 @@ function showModInfo(jsonData, success) {
             fullCheckButton.setAttribute('onClick', 'fullCheckClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
             fullCheckButton.appendChild(node);
 
+            if(jsonData[i].HasGameFiles){
+                fullCheckButton.disabled = true;
+            }
 
             infoDivPar.appendChild(infoDivBold);
             infoDiv.appendChild(infoDivHeading);
             infoDiv.appendChild(infoDivPar);
             infoDiv.appendChild(infoDivButton);
-            
+
             if (jsonData[i].HasGameFiles) {
                 infoDiv.appendChild(fullCheckButton);
             };
-
-            if ($.inArray(jsonData[i].Id, updateMods) > -1) {
-                fullCheckButton.disabled = false;
-            } else if ($.inArray(jsonData[i].Id, installedMods) < 0) {
-                fullCheckButton.disabled = true;
-            } else {
-                fullCheckButton.disabled = false;
-            }
 
             carItem.appendChild(img);
             carItem.appendChild(infoDiv);
@@ -125,6 +125,15 @@ function showModInfo(jsonData, success) {
             document.getElementById("car_left").style.visibility = 'hidden';
             document.getElementById("car_right").style.visibility = 'hidden';
         }
+
+        //check for mod updates
+        var args = {
+            message: "check-mod-updates",
+            dirList: dirList,
+            allMods: modList
+        }
+        ipcRenderer.send('message-to-webwin', args);
+
     } else {
         if (debug_mode >= 1) {
             console.log('Error requesting Mod List: ' + jsonData);
