@@ -44,25 +44,8 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                 } else {
                     armaPath = data.armapath;
                     downloadServerUrl = arg.modUrl;
+                    currentModId = arg.modId;
                     getModHashList(arg.modId, getHashListCallback);
-
-                    storage.get('mods', function(error, data) {
-                        if (jQuery.isEmptyObject(data.installedMods)) {
-                            installedMods = [];
-                        } else {
-                            installedMods = data.installedMods;
-                        }
-
-                        installedMods = filterInstalledMods(installedMods); //TODO this sucks
-
-                        if (!inArray(arg.modId,installedMods)) {
-                            installedMods.push(arg.modId);
-                        }
-
-                        storage.set('mods', {
-                            installedMods: installedMods
-                        }, function(error) {});
-                    });
                 };
             });
             break;
@@ -102,6 +85,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
                 } else {
                     currentModId = arg.modId;
                     armaPath = data.armapath;
+                    //console.log('starting quickcheck ' + isDownloading);
                     getModHashList(arg.modId, getHashQuickCheckCallback);
                 };
             });
@@ -123,16 +107,6 @@ ipcRenderer.on('download-receiver', (event, arg) => {
             break;
     }
 })
-
-function filterInstalledMods(mods){
-    tmp = [];
-    for(i = 0; i < mods.length; i++){
-        if(!inArray(mods[i],tmp)){
-            tmp.push(mods[i]);
-        }
-    }
-    return tmp;
-}
 
 function notfCallback(json, success) {
 
@@ -174,7 +148,7 @@ function getHashFullCheckCallback(jsObj) {
 }
 
 function getHashQuickCheckCallback(jsObj,success) {
-
+    //console.log('callback ');
     if(!success){
         var args = {
             message: "quick-check-result",
@@ -204,7 +178,8 @@ function getHashQuickCheckCallback(jsObj,success) {
         var args = {
             message: "quick-check-result",
             obj: {
-                resultType: 1 //1 = success, 2 = update, 3 = request fail
+                resultType: 1, //1 = success, 2 = update, 3 = request fail
+                modId: currentModId
             }
         };
         ipcRenderer.send('message-to-webwin', args);

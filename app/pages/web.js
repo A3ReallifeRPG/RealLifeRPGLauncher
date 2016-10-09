@@ -24,8 +24,11 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
             if (debug_mode >= 2) {
                 console.log('Mod Update Check started');
             };
+
             modDirArray = arg.dirList;
             allModsArray = arg.allMods;
+
+            console.log('started array: ' + modDirArray);
             checkMods();
             break;
         case 'quick-check-result':
@@ -99,6 +102,7 @@ function downloadTFAR() {
 
 //show quick check success
 function quickCheckResult(arg) {
+    console.log('Result for ' + arg.obj.modId);
     //1 = success, 2 = update, 3 = request fail
     if(arg.obj.resultType == 2){
         modUpdateArray.push(arg.obj.modId);
@@ -108,7 +112,9 @@ function quickCheckResult(arg) {
 
 //
 function checkMods(){
+
     if(modDirArray.length > 0){
+        console.log('checking mod id: ' + modDirArray[0][0]);
         var args = {
             message: 'start-quickcheck',
             modId: modDirArray[0][0]

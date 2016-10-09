@@ -87,28 +87,31 @@ ipcRenderer.on('render-receiver', (event, arg) => {
 
 function updateButtons(modList,allMods){
     var update_mods_string = "";
-
+    var c = 0;
     for(i = 0; i < allMods.length;i++){
         var mod_id = allMods[i][0];
         if($.inArray(mod_id,modList) != -1){
             document.getElementById('btn_mod_' + mod_id).innerHTML = "Update";
-            document.getElementById('btn_full_' + mod_id).disabled = false;
             update_mods_string += " " + allMods[i][1] + ",";
-            document.getElementById('btn_mod_' + mod_id).disabled = false;
+            c++;
         }else{
             document.getElementById('btn_mod_' + mod_id).innerHTML = "Spielen";
             document.getElementById('btn_mod_' + mod_id).setAttribute('onClick', 'modClickPlay(' + mod_id + ')');
-            document.getElementById('btn_full_' + mod_id).disabled = false;
-            document.getElementById('btn_mod_' + mod_id).disabled = false;
         }
+        if ($('#btn_full_' + mod_id).length > 0) {
+            document.getElementById('btn_full_' + mod_id).disabled = false;
+        }
+        document.getElementById('btn_mod_' + mod_id).disabled = false;
+        document.getElementById('btn_mod_' + mod_id).setAttribute('class', 'button success');
     }
+    if(c > 0){
+        update_mods_string = update_mods_string.substring(0, update_mods_string.length - 1);
+        var lbl = document.getElementById('lbl_updateModInfo');
+        lbl.innerHTML = update_mods_string;
 
-    update_mods_string = update_mods_string.substring(0, update_mods_string.length - 1);
-    var lbl = document.getElementById('lbl_updateModInfo');
-    lbl.innerHTML = update_mods_string;
-
-    var dialog = $('#dialog_updateInfo').data('dialog');
-    dialog.open();
+        var dialog = $('#dialog_updateInfo').data('dialog');
+        dialog.open();
+    }
 }
 
 //show quick check success (maybe later more status types)

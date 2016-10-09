@@ -50,9 +50,6 @@ function showModInfo(jsonData, success) {
                 carItem.setAttribute('class', 'carousel-item');
             }
 
-            //TODO explode ,
-            dirList.push([jsonData[i].Id,jsonData[i].Directories]);
-
             var img = document.createElement('img');
             img.setAttribute('src', jsonData[i].ImageUrl);
             img.setAttribute('alt', jsonData[i].Id);
@@ -81,9 +78,12 @@ function showModInfo(jsonData, success) {
 
             var infoDivButton = document.createElement('button');
             infoDivButton.setAttribute('id', 'btn_mod_' + jsonData[i].Id);
-            infoDivButton.setAttribute('class', 'button success');
+            infoDivButton.setAttribute('class', 'button success loading-cube lighten');
 
             if(jsonData[i].HasGameFiles){
+                //TODO explode ,
+                dirList.push([jsonData[i].Id,jsonData[i].Directories]);
+                
                 modList.push([jsonData[i].Id,jsonData[i].Name]);
                 node = document.createTextNode("Prüfe Updates ..");
                 infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
