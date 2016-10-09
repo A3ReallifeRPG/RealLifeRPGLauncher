@@ -83,12 +83,13 @@ function showModInfo(jsonData, success) {
             if(jsonData[i].HasGameFiles){
                 //TODO explode ,
                 dirList.push([jsonData[i].Id,jsonData[i].Directories]);
-                
+
                 modList.push([jsonData[i].Id,jsonData[i].Name]);
                 node = document.createTextNode("Prüfe Updates ..");
                 infoDivButton.setAttribute('onClick', 'modClick(' + jsonData[i].Id + ',"' + jsonData[i].DownloadUrl + '")');
                 infoDivButton.disabled = true;
             }else{
+                infoDivButton.setAttribute('class', 'button success');
                 node = document.createTextNode("Spielen");
                 infoDivButton.setAttribute('onClick', 'modClickPlay(' + jsonData[i].Id + ')');
             }
