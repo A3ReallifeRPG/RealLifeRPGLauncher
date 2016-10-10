@@ -92,8 +92,10 @@ function updateButtons(modList,allMods){
         var mod_id = allMods[i][0];
         if($.inArray(mod_id,modList) != -1){
             document.getElementById('btn_mod_' + mod_id).innerHTML = "Update";
-            update_mods_string += " " + allMods[i][1] + ",";
-            c++;
+            if(mod_id != 5){ //TODO this sucks, dir scan for installed mods
+                update_mods_string += " " + allMods[i][1] + ",";
+                c++;
+            }
         }else{
             document.getElementById('btn_mod_' + mod_id).innerHTML = "Spielen";
             document.getElementById('btn_mod_' + mod_id).setAttribute('onClick', 'modClickPlay(' + mod_id + ')');
