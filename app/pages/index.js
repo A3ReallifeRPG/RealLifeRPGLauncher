@@ -6,6 +6,8 @@ const storage = require('electron-json-storage');
 const Winreg = require('winreg');
 const notifier = require('node-notifier');
 const winpath = require('path');
+const fs = require('fs');
+const unzip = require('unzip');
 const {
     dialog
 } = require('electron').remote;
@@ -234,10 +236,20 @@ function updateTFARProgress(arg) {
         document.title = "RealLifeRPG Launcher - " + arg.obj.progressObj.percentage.toFixed(1) + "%";
         document.getElementById('pb2text').innerHTML = "TFAR Download " + ((arg.obj.progressObj.speed) / 1048576).toFixed(2) + " MB/s - noch " + arg.obj.progressObj.eta + "s";
     } else if (arg.progType == 2) {
-        notifyWin('RealLifeRPG Launcher', 'TFAR heruntergeladen, wird ausgeführt...', 'ic_done_white_36dp_2x.png');
+        $('#step2').css("visibility","visible");
         setTimeout(function() {
             resetProgress();
-            shell.openItem("TFARReallifeRPG.ts3_plugin");
+            var dpath = winpath.join(__dirname,"../../TFAR/TFARReallifeRPG.ts3_plugin");
+            if(!shell.openItem(dpath)) {
+              $('#step2_status').html("Fehlgeschlagen");
+              $('#step3').css("visibility","visible");
+              var stream = fs.createReadStream(dpath).pipe(unzip.Extract({ path: 'TFAR/Teamspeak3Ordner' }));
+              stream.on('close', function(){
+                fs.unlinkSync(winpath.join(__dirname,"../../TFAR/Teamspeak3Ordner/package.ini"));
+                shell.showItemInFolder(dpath);
+                $('#step4').css("visibility","visible");
+              });
+            };
         }, 500);
     };
 }
