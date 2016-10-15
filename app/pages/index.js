@@ -250,7 +250,6 @@ function updateTFARProgress(arg) {
                 $('#step4').css("visibility","visible");
               });
             };
-            $('#downloadtfar').attr("disabled", false);
         }, 500);
     };
 }
