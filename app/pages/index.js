@@ -239,13 +239,13 @@ function updateTFARProgress(arg) {
         $('#step2').css("visibility","visible");
         setTimeout(function() {
             resetProgress();
-            var dpath = winpath.join(__dirname,"../../TFAR/TFARReallifeRPG.ts3_plugin");
+            var dpath = winpath.join(__dirname,"../../../TFAR/TFARReallifeRPG.ts3_plugin");
             if(!shell.openItem(dpath)) {
               $('#step2_status').html("Fehlgeschlagen");
               $('#step3').css("visibility","visible");
               var stream = fs.createReadStream(dpath).pipe(unzip.Extract({ path: 'TFAR/Teamspeak3Ordner' }));
               stream.on('close', function(){
-                fs.unlinkSync(winpath.join(__dirname,"../../TFAR/Teamspeak3Ordner/package.ini"));
+                fs.unlinkSync(winpath.join(__dirname,"../../../TFAR/Teamspeak3Ordner/package.ini"));
                 shell.showItemInFolder(dpath);
                 $('#step4').css("visibility","visible");
               });
@@ -519,7 +519,6 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
     $('#btn_update_restart').css({
         'visibility': 'visible'
     });
-    notifyWinRestart('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten', 'ic_done_white_36dp_2x.png');
     if (debug_mode >= 1) {
         console.log(arg);
     };
