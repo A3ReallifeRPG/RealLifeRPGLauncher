@@ -1,7 +1,6 @@
 <h2 class="win-h2">Settings</h2>
 <br/>
 <br/>
-<div class="pre-scrollable" style="max-height:400px !important">
   <div class="container">
       <div class="row">
           <h3 class="win-h3">Arma Pfad</h3>
@@ -167,11 +166,11 @@
                       <td style="width:5%">
                       </td>
                       <td>
-                          <h5 class="win-h5">Download Fenster</h5>
+                          <h5 class="win-h5">Twitter Embed</h5>
                       </td>
                       <td>
                           <label class="switch">
-                              <input type="checkbox" id="winswitch">
+                              <input type="checkbox" id="twitterswitch">
                               <span class="check"></span>
                           </label>
                       </td>
@@ -184,7 +183,6 @@
           </div>
       </div>
   </div>
-</div>
 <script>
     $(document).ready(function() {
         timert = true;
@@ -258,8 +256,8 @@
         saveallsettings();
     });
 
-    document.getElementById("winswitch").addEventListener("click", function() {
-        win = $("#winswitch").is(':checked');
+    document.getElementById("twitterswitch").addEventListener("click", function() {
+        twitter = $("#twitterswitch").is(':checked');
         saveallsettings();
     });
 
@@ -304,7 +302,7 @@
             toast: toast,
             sounds: sounds,
             debug: debug,
-            win: win
+            twitter: twitter
         }, function(error) {});
         if (timert) {
             $.Notify({
@@ -334,7 +332,7 @@
             toast: toast,
             sounds: sounds,
             debug: debug,
-            win: win
+            twitter: twitter
         }, function(error) {});
         if (timert) {
             $.Notify({
@@ -367,7 +365,7 @@
             toast: true,
             sounds: true,
             debug: false,
-            win: false
+            twitter: true
         }, function(error) {});
         ipcRenderer.send('close-devtools');
         if (timert) {
@@ -401,7 +399,7 @@
             toast = data.toast;
             sounds = data.sounds;
             debug = data.debug;
-            win = data.win;
+            twitter = data.twitter;
             loadsettingstoui();
         });
     }
@@ -415,7 +413,7 @@
         $('#soundswitch').prop('checked', sounds);
         $('#windowedswitch').prop('checked', windowed);
         $('#debugswitch').prop('checked', debug);
-        $('#winswitch').prop('checked', win);
+        $('#twitterswitch').prop('checked', twitter);
         $("#meminput").val(mem);
         $("#cpuinput").val(cpu);
         $("#vraminput").val(vram);

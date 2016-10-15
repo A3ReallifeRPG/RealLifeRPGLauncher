@@ -129,9 +129,9 @@
 
 
     <!-- Notification Dialog -->
-    <div data-role="dialog" id="dialog_notf" class="padding20 dialog success" data-close-button="true" data-type="success" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
+    <div data-role="dialog,draggable" id="dialog_notf" class="padding20 dialog success" data-close-button="true" data-type="success" style="max-width:60%">
         <h1>Wichtige Information</h1>
-        <p id="dialog_notf_text">
+        <p id="dialog_notf_text" style="font-size:15px;">
 
         </p>
         <span class="dialog-close-button"></span>
@@ -197,13 +197,20 @@
         storage.get('settings', function(error, data) {
             if (jQuery.isEmptyObject(data)) {
                 if (debug_mode >= 1) {
-                    console.log('Runing first launch');
+                    console.log('Running first launch');
                 };
                 checkregkey1();
                 extractIconsFromAsar();
             };
         });
+        checkForNotification();
+    });
+    $(document).on('click', 'a[href^="htt"]', function(event) {
+      event.preventDefault();
+      shell.openExternal(this.href);
     });
 </script>
+<script src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 
 </html>

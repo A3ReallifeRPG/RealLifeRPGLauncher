@@ -163,6 +163,13 @@ function hashDialogConfirm() {
     dwnCompleteDialog.close();
 }
 
+function checkForNotification() {
+  var args = {
+        message: 'search-notf'
+    };
+    ipcRenderer.send('message-to-download', args);
+};
+
 //ask path dialog
 function noArmaPathSettings() {
     if (debug_mode >= 1) {
@@ -519,6 +526,7 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
     $('#btn_update_restart').css({
         'visibility': 'visible'
     });
+    notifyWin('RealLifeRPG Launcher', 'Update heruntergeladen, bitte den Launcher neustarten', 'ic_done_white_36dp_2x.png');
     if (debug_mode >= 1) {
         console.log(arg);
     };
@@ -545,32 +553,6 @@ function notifyWin(title, text, icon) {
                 wait: true
             }, function(err, response) {
                 ipcRenderer.send('focus-window');
-            });
-        }
-    });
-}
-
-function notifyWinRestart(title, text, icon) {
-    storage.get('settings', function(error, data) {
-        if (data.toast == "") {
-            toast = true;
-        } else {
-            toast = data.toast;
-        };
-        if (data.sounds == "") {
-            sounds = true;
-        } else {
-            sounds = data.sounds;
-        };
-        if (toast) {
-            notifier.notify({
-                title: title,
-                message: text,
-                icon: winpath.join(__dirname, '../../extracted/icon/' + icon),
-                sound: sounds,
-                wait: true
-            }, function(err, response) {
-                restartOnUpdate();
             });
         }
     });

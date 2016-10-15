@@ -8,6 +8,9 @@
   -webkit-user-select: none;
   -ms-user-select: none;
 }
+.verticalLine {
+    border-left: thin solid #292f33;
+}
 
 .fake-link {
     color: #0099ff;

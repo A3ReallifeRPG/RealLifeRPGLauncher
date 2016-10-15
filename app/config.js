@@ -3,7 +3,7 @@
 
 */
 
-var infoServerURL = "https://husky.realliferpg.de/api/";
+var infoServerURL = "https://api.realliferpg.de/";
 
 var server_ListPath = "servers/";
 var server_PlayerListPath = "server/players/"; // url/<server id>

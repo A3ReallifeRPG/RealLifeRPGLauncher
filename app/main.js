@@ -8,6 +8,8 @@ const path = require('path')
 
 const shell = require('electron').shell;
 
+const {session} = require('electron')
+
 const {
     Menu
 } = require('electron')
@@ -18,6 +20,10 @@ const BrowserWindow = require('electron').BrowserWindow
 const {
     ipcMain
 } = require('electron');
+
+const filter = {
+  urls: ['https://*.twitter.com/i/*']
+}
 
 // ------------------------------------------- squirrel stuff (for updating) ----------------------------------------------------------------
 
@@ -155,13 +161,14 @@ function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
         icon: 'icon/appicon.ico',
-        width: 1100,
-        height: 600,
-        minWidth: 1100,
-        minHeight: 600,
+        width: 1320,
+        height: 700,
+        minWidth: 1320,
+        minHeight: 700,
         maxWidth: 1920,
         maxHeight: 1080
     });
+
     win.loadURL(`file://${__dirname}/pages/index.html`);
 
     win.on('closed', () => {
@@ -179,6 +186,7 @@ function createWindow() {
     setUpIpcHandlers();
 }
 
+
 function setUpIpcHandlers() {
     ipcMain.on('message-to-download', (event, arg) => {
         downWin.webContents.send('download-receiver', arg);
@@ -195,6 +203,9 @@ function setUpIpcHandlers() {
 
 app.on('ready', function() {
     createWindow();
+    session.defaultSession.webRequest.onBeforeRequest(filter, (callback) => {
+      callback.cancel = true;
+    })
     /*
     wintray = new Tray(app.getAppPath() + '/app/icon/tray.ico');
 
