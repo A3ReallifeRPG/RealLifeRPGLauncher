@@ -2,81 +2,32 @@
 <script src="../resources/functions.js"></script>
 <script src="tfar.js"></script>
 
-
 <h2 class="win-h2">TFAR - Task Force Arma Radio</h2>
 <br/>
 <br/>
 <div class="container">
-
-  <!--
-    <div class="row">
-        <h3 class="win-h3">TFAR Komplettinstallation</h3>
-        <br/>
-        <div class="col-md-8" style="font-size:17px">
-            Installiert TFAR komplett,
-            <br> führe dies aus wenn du TFAR noch nicht installiert hast.
-        </div>
-        <div class="col-md-4">
-            <button class="button loading-pulse lighten success" id="installfull" style="width:35%">Starten</button>
-        </div>
-    </div>
-    <hr>
-    <br>
-  -->
     <div class="row">
         <h3 class="win-h3">Teamspeak Installationsdatei</h3>
         <br/>
         <div class="col-md-8" style="font-size:17px">
             Downloaded eine .ts3_plugin Datei und führt diese aus.
+            <hr>
+            <br>  Teamspeak sollte vor der Installation geschlossen werden.
         </div>
         <div class="col-md-4">
             <button class="button loading-pulse lighten success" id="downloadtfar" style="width:35%">Download</button>
         </div>
     </div>
     <hr>
-    <ul style="font-size:15px">
+    <ul style="font-size:16px">
       <li id="step1" style="visibility:hidden">Die Installationsdatei wird runtergeladen...</li>
       <li id="step2" style="visibility:hidden">Versuche die Installationsdatei zu öffnen... <span id="step2_status"></span></li>
       <li id="step3" style="visibility:hidden">Ordner mit dem Download wird geöffnet...</li>
-      <li id="step4" style="visibility:hidden">Um TFAR manuell zu installieren muss der Inhalt von "Teamspeak3Ordner" in den Ordner deiner Teamspeak3 Installation verschoben werden.</li>
+      <li id="step4" style="visibility:hidden">Um TFAR manuell zu installieren muss der Inhalt des "Teamspeak3Ordner" in den Ordner deiner Teamspeak3 Installation kopiert werden.</li>
     </ul>
-  <!--
-    <hr>
-    <br>
-    <div class="row">
-        <h3 class="win-h3">TFAR Userconfig</h3>
-        <br/>
-        <div class="col-md-8" style="font-size:17px">
-            Legt eine TFAR Einstellungsdatei in deinem Arma3/userconfig Ordner an.
-            <br>
-        </div>
-        <div class="col-md-4">
-            <button class="button loading-pulse lighten success" id="userconfig" style="width:35%">Starten</button>
-        </div>
-    </div>
-    <hr>
-  -->
 </div>
-<!--
-<div data-role="dialog" id="dialog_hppExists" class="padding20 dialog success" data-close-button="true" data-type="warning" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
-    <h1>Die Datei existiert bereits</h1>
-    <p>
-        Die TFAR settings.hpp existiert, ersetzen ?
-    </p>
-    <button class="button success" onclick="writeHPPFile();" style="float:left">Ersetzen</button>
-    <button class="button danger" onclick="var dialog = $('#dialog_hppExists').data('dialog'); dialog.close();" style="float:right">Abbrechen</button>
-</div>
--->
 <script>
     $('#downloadtfar').on('click', function() {
         downloadTFAR();
     });
-    /*
-    $('#installfull').on('click', function() {
-        installFull();
-    });
-    $('#userconfig').on('click', function() {
-        installUserconfigOnly();
-    });
-    */
 </script>
