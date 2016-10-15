@@ -54,7 +54,6 @@
         "progress-stream": "^1.2.0",
         "recursive-readdir": "^2.0.0",
         "shelljs": "^0.7.0",
-        "winreg": "^1.2.1",
-        "unzip": "^0.1.11"
+        "winreg": "^1.2.1"
     }
 }
