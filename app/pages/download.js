@@ -27,8 +27,6 @@ var currentModId = 0;
 var cancelDownload = false;
 var isDownloading = false;
 
-var timert = true;
-
 ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
         case 'start-download':
@@ -186,7 +184,6 @@ function getHashQuickCheckCallback(jsObj,success) {
     }
 }
 
-//D:\SteamLibrary\SteamApps\common\Arma 3\@RealLifeRPG5.0\addons\abramia.pbo.RL_RPG_201605151413.bisign
 function deleteFiles(fileList) {
     var fs = require('fs');
     var rec = require('recursive-readdir');
@@ -263,21 +260,6 @@ function download(fileObj) {
             download(downloadList[0]);
             return;
         });
-    };
-
-    if (timert) {
-        $.ajax({
-            url: "https://service.realliferpg.de/launcher/report.php",
-            type: "POST",
-            data: {
-                'type': 'downloading'
-            },
-            success: function() {}
-        });
-        timert = false;
-        setTimeout(function() {
-            timert = true;
-        }, 300000);
     };
 
     var stream = dwn._download(downloadServerUrl + fileObj.RelativPath);
@@ -402,7 +384,6 @@ function fullCheck() {
         });
 
         file.on('error', function() {
-            //console.log('invalid checksum for: ' + curHashObj.FileName);
             errorList.push(curHashObj);
             downloadList.shift();
             fullCheck();
