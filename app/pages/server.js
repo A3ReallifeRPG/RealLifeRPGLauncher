@@ -263,3 +263,7 @@ function loadHighCharts(chart, civ, cop, med, adac) {
         });
     });
 }
+
+function tab_click(tab) {
+    return true;
+}
