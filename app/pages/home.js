@@ -10,31 +10,6 @@ storage.get('mods', function(error, data) {
     getModInfo(showModInfo);
 });
 
-
-/*
-<div class="carousel-item active" >
-    <img src="https://upload.realliferpg.de/uploads/Keppo_5752b42b0be5b.png" alt="First slide" class="img-responsive center-block">
-    <div class="carousel-caption">
-        <h1>RealLifeRPG 5.0 Mod</h1>
-        <p style="text-size:18"><b>Das ist die RLRPG Mod für die 5.0</b></p>
-        <button class="btn btn-success">Downlaod</button>
-
-      </div>
-</div>
-
-{
-    "Id":18,
-    "ModType":0,
-    "Name":"RealLife RPG 5.0 ",
-    "DownloadUrl":"http://213.202.212.13/download/",
-    "IsActive":true,
-    "Description":"RealLife RPG Community Arma 3 Server ",
-    "ImageUrl":"http://fs5.directupload.net/images/160418/33uqn5it.png",
-    "HasGameFiles":true,
-    "Directories": "@RealLifeRPG5.0"
-}
-
-*/
 function showModInfo(jsonData, success) {
     if (debug_mode >= 1) {
         console.log('Loading mods..');

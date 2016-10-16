@@ -215,6 +215,7 @@ function callDownloadStop() {
     };
     ipcRenderer.send('message-to-download', args);
 }
+
 //show Notification for hash
 function showHashDialog(arg) {
     var dialog = $('#dialog_downloadComplete').data('dialog');
@@ -229,7 +230,6 @@ function showHashDialog(arg) {
 
     dialog.open();
 }
-
 
 function updateTFARProgress(arg) {
     var pb2 = $("#pb2").data('progress');
@@ -262,9 +262,6 @@ function updateTFARProgress(arg) {
     };
 }
 
-
-
-//update status bar
 function updateDwnProgress(arg) {
 
     var totalProgress = ((100 / arg.obj.totalFileSize) * arg.obj.currentDownloadSize).toFixed(4);
@@ -329,7 +326,7 @@ function updateHashProgress(arg) {
     var fName = arg.obj.curObj.FileName;
     fName.replace('.pbo', '');
 
-    if (fName.length > 24) {
+    if (fName.length > 35) {
         fName = fName.substr(0, 24);
         fName = fName + "...";
     }
@@ -341,12 +338,14 @@ function updateHashProgress(arg) {
     }
 }
 
+//switches pages
 function loadpage(file) {
     $("#content").load(file);
     enterPage = WinJS.UI.Animation.enterPage(anim, null);
     curentPage = file.replace('.html', '');
 }
 
+//checks the first regkey
 function checkregkey1() {
     var fs = require('fs');
 
@@ -395,6 +394,7 @@ function checkregkey1() {
     });
 };
 
+//checks the second regkey
 function checkregkey2() {
     var fs = require('fs');
 
@@ -443,6 +443,7 @@ function checkregkey2() {
     });
 }
 
+//checks the third regkey
 function checkregkey3() {
     var fs = require('fs');
 
@@ -501,6 +502,8 @@ function checkregkey3() {
     });
 }
 
+
+//resets all progress
 function resetProgress() {
     if (debug_mode >= 1) {
         console.log('Resetting progress');
@@ -519,6 +522,7 @@ function resetProgress() {
     pb2.set(100);
 }
 
+//IPC receiver for launcher update
 ipcRenderer.on('update-downloaded', (event, arg) => {
     if (debug_mode >= 1) {
         console.log('Launcher update downloaded');
@@ -532,6 +536,7 @@ ipcRenderer.on('update-downloaded', (event, arg) => {
     };
 });
 
+//windows toast notifcations
 function notifyWin(title, text, icon) {
     storage.get('settings', function(error, data) {
         if (data.toast == "") {
@@ -558,6 +563,7 @@ function notifyWin(title, text, icon) {
     });
 }
 
+//extracts icons from .asar file for use in toast notifications
 function extractIconsFromAsar() {
     if (debug_mode >= 1) {
         console.log('Extracting icons from asar');
@@ -577,6 +583,7 @@ function extractIconsFromAsar() {
     });
 }
 
+//restarts and updates the launcher
 function restartOnUpdate() {
     if (debug_mode >= 1) {
         console.log('Restarting');
@@ -584,6 +591,7 @@ function restartOnUpdate() {
     ipcRenderer.send('restartOnUpdate');
 }
 
+//checks if the launcher is on a new version
 function checkVersion() {
     if (debug_mode >= 1) {
         console.log('Checking version');
@@ -600,6 +608,7 @@ function checkVersion() {
     });
 }
 
+//saves the current version
 function setVersion() {
     var version = app.app.getVersion();
     storage.set('version', {
@@ -607,6 +616,7 @@ function setVersion() {
     }, function(error) {});
 }
 
+//reset download progress
 function progressCancelled() {
     if (debug_mode >= 1) {
         console.log('Progress cancelled');
@@ -620,6 +630,7 @@ function progressCancelled() {
     });
 }
 
+//reset download progress
 function openUrl(url) {
     if (debug_mode >= 1) {
         console.log('Opening url: ' + url);
@@ -627,6 +638,7 @@ function openUrl(url) {
     shell.openExternal(url);
 }
 
+//toggles debug mode
 function toggleDebug(state) {
     ipcRenderer.send('toggle-devtools');
     if (state) {
@@ -642,6 +654,7 @@ function toggleDebug(state) {
     }
 }
 
+//checks if the launcher is running de
 function checkDebug() {
     storage.get('settings', function(error, data) {
         var debug = data.debug;
@@ -656,6 +669,7 @@ function checkDebug() {
     });
 }
 
+//resets the launcher title
 function setTitle() {
     storage.get('settings', function(error, data) {
         var debug = data.debug;

@@ -1,3 +1,4 @@
+//sends IPC to downWin to download TFAR Installation file
 function downloadTFAR() {
   $('#downloadtfar').attr("disabled", true);
   $('#step1').css("visibility","visible");

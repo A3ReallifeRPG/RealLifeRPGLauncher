@@ -126,8 +126,6 @@
     </div>
     </div>
 
-
-
     <!-- Notification Dialog -->
     <div data-role="dialog,draggable" id="dialog_notf" class="padding20 dialog success" data-close-button="true" data-type="success" style="max-width:60%">
         <h1>Wichtige Information</h1>
@@ -136,6 +134,7 @@
         </p>
         <span class="dialog-close-button"></span>
     </div>
+
     <!-- Arma Path Dialog -->
     <div data-role="dialog" id="dialog_defaultpath" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
         <h1>Arma Pfad gefunden</h1>
@@ -144,6 +143,7 @@
         <button class="button success" onclick="armaPathisCorrect();" style="float:left">Richtig</button>
         <button class="button danger" onclick="armaPathisFalse();" style="float:right">Falsch</button>
     </div>
+
     <!-- Download Complete Hash Dialog -->
     <div data-role="dialog" id="dialog_downloadComplete" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
         <h1>Download abgeschlossen</h1>
@@ -176,8 +176,8 @@
         <span class="dialog-close-button"></span>
     </div>
 </body>
-
 <script>
+
     // winjs splitview
     WinJS.UI.processAll().done(function() {
         var splitView = document.querySelector(".splitView").winControl;
@@ -211,6 +211,4 @@
     });
 </script>
 <script src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
 </html>

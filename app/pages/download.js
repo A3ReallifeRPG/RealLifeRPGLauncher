@@ -27,6 +27,7 @@ var currentModId = 0;
 var cancelDownload = false;
 var isDownloading = false;
 
+//IPC receiver
 ipcRenderer.on('download-receiver', (event, arg) => {
     switch (arg.message) {
         case 'start-download':
@@ -106,6 +107,7 @@ ipcRenderer.on('download-receiver', (event, arg) => {
     }
 })
 
+//callback for launcher motification
 function notfCallback(json, success) {
 
     var args = {
@@ -146,7 +148,6 @@ function getHashFullCheckCallback(jsObj) {
 }
 
 function getHashQuickCheckCallback(jsObj,success) {
-    //console.log('callback ');
     if(!success){
         var args = {
             message: "quick-check-result",

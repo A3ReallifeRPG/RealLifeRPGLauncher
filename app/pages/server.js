@@ -263,9 +263,3 @@ function loadHighCharts(chart, civ, cop, med, adac) {
         });
     });
 }
-
-function tab_click(tab) {
-
-    //loadHighCharts("char_server_31",58, 8, 5, 4);
-    return true;
-}
