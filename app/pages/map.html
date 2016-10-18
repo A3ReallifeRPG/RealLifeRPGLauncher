@@ -1,8 +1,10 @@
 <link rel="stylesheet" href="../resources/leaflet/leaflet.css"/>
 <script src="../resources/leaflet/leaflet.js"></script>
 <link rel="stylesheet" href="../resources/leaflet/leatflet_custom.css"/>
+<script src="map.js"></script>
 <div style="width: 100%; height: 100%" id="map"></div>
 <script>
+
     var img1 = L.tileLayer('https://static.realliferpg.de/img/map/img1/{z}/{x}/{y}.png', {
         minZoom: 1,
         maxZoom: 6,
@@ -26,32 +28,21 @@
         popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
     });
 
+    var gasMarker = L.icon({
+        iconUrl: '../icon/gas.png',
+
+        iconSize: [32,37], // size of the icon
+        iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
+        popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+    });
+
     var map = L.map('map', {
         layers: [img1]
     }).setView([0, 0], 1);
 
-    map.on('click', function(e){
-        addMarker(e);
-    });
-
-    function addMarker(e){
-      var newMarker = new L.marker(e.latlng,{
-        icon: redMarker
-      }).addTo(map);
-      var popup = newMarker.bindPopup("<div class=\"input-control text\"><input type=\"text\"></div>",{
-        autoClose: false
-      }).openPopup();
-
-    }
-
-    var baseLayers = {
-        "Straßen": img1,
-        "Satellit": img2
-    };
-
-    L.control.layers(baseLayers).addTo(map);
-
     var southWest = map.unproject([0, 16384], map.getMaxZoom());
     var northEast = map.unproject([16384, 0], map.getMaxZoom());
     map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+
+    refreshFuelstations();
 </script>
