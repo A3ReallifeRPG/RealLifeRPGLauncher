@@ -37,6 +37,7 @@
         "highcharts": "4.2.5",
         "mkpath": "1.0.0",
         "node-notifier": "4.6.0",
+        "node-zstandard": "^1.2.4",
         "progress-stream": "1.2.0",
         "recursive-readdir": "2.0.0",
         "shelljs": "0.7.0",

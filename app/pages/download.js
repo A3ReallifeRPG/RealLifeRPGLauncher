@@ -3,6 +3,7 @@ var dwn = require('dwn');
 var progress = require('progress-stream');
 var fs = require('fs');
 var mkpath = require('mkpath');
+var zstd = require ('node-zstandard');
 window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
 
 const {
@@ -250,17 +251,19 @@ function download(fileObj) {
 
     var dest = armaPath + fileObj.RelativPath;
     curFileObj = fileObj;
+
     try {
         stats = fs.lstatSync(dest.replace(fileObj.FileName, ''));
-        if (stats.isDirectory()) {};
+        if (stats.isDirectory()) {}else{};
     } catch (e) {
         mkpath(dest.replace(fileObj.FileName, ''), function() {
             if (debug_mode >= 2) {
                 console.log('Directory created');
             };
-            download(downloadList[0]);
+            setTimeout(download(downloadList[0]),1000);
             return;
         });
+        return;
     };
 
     var stream = dwn._download(downloadServerUrl + fileObj.RelativPath);
@@ -288,8 +291,26 @@ function download(fileObj) {
 
     stream.on('end', function() {
         currentDownloadSize = currentDownloadSize + curFileObj.Size;
-        downloadNext();
+
+        if(dest.search('.zst') > 0){
+            downloadNext();
+
+            zstd.decompress(dest,(dest.replace('.zst','')), (err, result) => {
+              if (err){
+                  throw err;
+              }
+              fs.unlinkSync(dest);
+              console.log (result);
+              downloadNext();
+          });
+        }else{
+            downloadNext();
+        }
     });
+
+    if(fileObj.RelativPath.substr(fileObj.RelativPath.length - 4) == '.pbo'){
+        dest = dest + '.zst';
+    }
 
     stream.pipe(str).pipe(fs.createWriteStream(dest));
 }
