@@ -43,6 +43,12 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
             };
             getServerClients(arg.serverId,queryPlayerInfocallback);
             break;
+        case 'get-fuelstations':
+            if (debug_mode >= 2) {
+                console.log('Query for Fuelstations started');
+            };
+            getFuelstations(fuelstationCallback);
+            break;
         default:
             if (debug_mode >= 2) {
                 console.log('Packet dropped');
@@ -69,7 +75,7 @@ function downloadTFAR() {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     };
-    
+
     var dest = 'TFAR/TFARReallifeRPG.ts3_plugin';
 
     var stream = dwn._download(task_force_installer);
@@ -113,6 +119,16 @@ function quickCheckResult(arg) {
         modUpdateArray.push(arg.obj.modId);
     }
     checkMods();
+}
+
+function fuelstationCallback(json, success) {
+
+    var args = {
+        message: "update-fuelstations",
+        jsonObj: json,
+        success: success
+    };
+    ipcRenderer.send('message-to-render', args);
 }
 
 //

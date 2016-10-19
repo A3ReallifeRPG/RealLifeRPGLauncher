@@ -81,6 +81,12 @@ ipcRenderer.on('render-receiver', (event, arg) => {
         case 'quick-check-updates':
             updateButtons(arg.modList,arg.allMods);
             break;
+        case 'update-fuelstations':
+            fuelData = arg.jsonObj;
+            if(curentPage == "map") {
+              addFuels();
+            };
+            break;
         default:
             console.log('Packet dropped: ' + arg.message);
             break;

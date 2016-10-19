@@ -19,6 +19,23 @@ function getLauncherNotification(callBackFnc) {
     xhr.send();
 }
 
+function getFuelstations(callBackFnc) {
+    var searchUrl = infoServerURL + fuelstation_Path;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", searchUrl, true);
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var jsObj = JSON.parse(this.responseText);
+
+            callBackFnc(jsObj,true);
+        }else if (this.readyState == 4 && !(this.status == 200)){
+            callBackFnc(this.status,false);
+        }
+    }
+    xhr.send();
+}
+
 /*
     Query Panel for Server Information
 */

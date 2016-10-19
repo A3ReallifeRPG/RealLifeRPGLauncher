@@ -1,0 +1,10 @@
+#app .contenttext {
+    margin-left: 0px;
+    margin-top: 0px;
+}
+.leaflet-container {
+    background: #C7E6FC;
+}
+.input-control text {
+  color: black;
+}
