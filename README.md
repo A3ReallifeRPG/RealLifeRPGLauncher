@@ -6,7 +6,7 @@
 
 Willkommen im Repository des RealLifeRPG Launchers.
 
-Unser Launcher ist OpenSource, ihr könnt euch die gesammte Source herrunterladen/bearbeiten.  
+Unser Launcher ist OpenSource, ihr könnt euch die gesammte Source herunterladen/bearbeiten.  
 
 Gerne könnt ihr auch zur Weiterentwicklung beitragen, mehr Infos dazu findet ihr weiter unten.
 
