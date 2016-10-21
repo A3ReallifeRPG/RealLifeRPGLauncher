@@ -32,6 +32,9 @@
             "title": "RealLifeRPG Launcher",
             "iconUrl": "https://upload.realliferpg.de/icon.ico",
             "remoteReleases": "http://89.163.140.216:8000/files/"
+        },
+        "squirrelWindows": {
+            "loadingGif": "build/install-spinner.gif"
         }
     },
     "contributors": [{

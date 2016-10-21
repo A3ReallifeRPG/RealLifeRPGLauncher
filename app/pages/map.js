@@ -12,8 +12,8 @@ function addFuels() {
 function addFuelMarker(object){
   var name = "marker" + object.Id;
   var arr = object.Pos.replace("[", "").replace("]", "").split(",");
-  var fuel = object.Fuel;
-  var percentage = Math.round((fuel / 30000) * 100);
+  var percentage = Math.round((object.Fuel / 30000) * 100);
+  percentage
   var ArmaX = arr[0];
   var ArmaY = 10240 - arr[1]
   var m = {
@@ -22,23 +22,63 @@ function addFuelMarker(object){
   };
 
   if(object.ServerId == 1) {
-    server1.push(
-      L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
-          icon: gasMarker
-      }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\"></div>",{
-        autoClose: false,
-        minWidth: 150
-      })
-    );
+    if(percentage > 70) {
+      server1.push(
+        L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
+            icon: gasMarker_green
+        }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\" data-color=\"bg-green\"></div>",{
+          autoClose: false,
+          minWidth: 150
+        })
+      );
+    } else if(percentage > 30) {
+      server1.push(
+        L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
+            icon: gasMarker_orange
+        }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\" data-color=\"bg-orange\"></div>",{
+          autoClose: false,
+          minWidth: 150
+        })
+      );
+    } else {
+      server1.push(
+        L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
+            icon: gasMarker_red
+        }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\" data-color=\"bg-red\"></div>",{
+          autoClose: false,
+          minWidth: 150
+        })
+      );
+    }
   } else if(object.ServerId == 2) {
-    server2.push(
-      L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
-          icon: gasMarker
-      }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\"></div>",{
-        autoClose: false,
-        minWidth: 150
-      })
-    );
+    if(percentage > 70) {
+      server2.push(
+        L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
+            icon: gasMarker_green
+        }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\" data-color=\"bg-green\"></div>",{
+          autoClose: false,
+          minWidth: 150
+        })
+      );
+    } else if(percentage > 30) {
+      server2.push(
+        L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
+            icon: gasMarker_orange
+        }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\" data-color=\"bg-orange\"></div>",{
+          autoClose: false,
+          minWidth: 150
+        })
+      );
+    } else {
+      server2.push(
+        L.marker(map.unproject([m.x, m.y], map.getMaxZoom()), {
+            icon: gasMarker_red
+        }).bindPopup("<div class=\"progress small\" data-value=\"" + percentage + "\" data-role=\"progress\" data-color=\"bg-red\"></div>",{
+          autoClose: false,
+          minWidth: 150
+        })
+      );
+    }
   };
 };
 
