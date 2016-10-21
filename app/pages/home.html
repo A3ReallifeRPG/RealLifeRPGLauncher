@@ -1,7 +1,7 @@
 <script src="home.js"></script>
 <div>
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-8" id="mod_div">
       <div id="div_header">
           <h2 class="win-h2">RealLifeRPG Mods</h2>
           <br>
@@ -22,7 +22,7 @@
           </a>
       </div>
     </div>
-    <div class="col-md-4 verticalLine">
+    <div class="col-md-4 verticalLine" id="twitter_div">
       <div style="width:98%">
         <a class="twitter-timeline" id="twitter-widget" data-width="500" data-height="441" data-theme="dark" href="https://twitter.com/A3ReallifeRPG"></a>
       </div>
@@ -46,7 +46,11 @@
         $( window ).resize(function() {
           $('.twitter-timeline-rendered').css('height',  (parseInt($(document).height()) - 100) + "px" );
         });
-      };
+      } else {
+        $("#mod_div").removeClass("col-md-8");
+
+        $("#twitter_div").remove();
+      }
     });
     $('#div_header').height($(this).height() * 0.15);
     $('#div_content').height($(this).height() * 0.75);
