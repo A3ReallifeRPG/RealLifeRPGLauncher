@@ -1,8 +1,8 @@
-![Banner](https://upload.realliferpg.de/yHuB2)
+![Banner](https://upload.realliferpg.de/uploads/5f7f29e9eea0741d9827e924b042f656_58077a8a1e9c9.png)
 
 # RealLifeRPGLauncher
 
-![alt tag](https://travis-ci.org/A3ReallifeRPG/RealLifeRPGLauncher.svg?branch=master)
+![alt tag](https://travis-ci.org/A3ReallifeRPG/RealLifeRPGLauncher.svg?branch=master) [![GitHub release](https://img.shields.io/github/release/A3ReallifeRPG/RealLifeRPGLauncher.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases/latest) [![Github All Releases](https://img.shields.io/github/downloads/A3ReallifeRPG/RealLifeRPGLauncher/total.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases)  [![Github All Releases](https://img.shields.io/badge/Download-58,9_MB-green.svg)](https://deploy.realliferpg.de/)
 
 Willkommen im Repository des RealLifeRPG Launchers.
 
