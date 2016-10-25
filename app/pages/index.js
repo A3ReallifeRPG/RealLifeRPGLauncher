@@ -196,7 +196,8 @@ function armaPathisFalse() {
     storage.set('settings', {
         armapath: '',
         toast: true,
-        sounds: true
+        sounds: true,
+        spaceholder1: true
     }, function(error) {});
 }
 
@@ -382,7 +383,8 @@ function checkregkey1() {
                     storage.set('settings', {
                         armapath: path,
                         toast: true,
-                        sounds: true
+                        sounds: true,
+                        spaceholder1: true
                     }, function(error) {});
                 } else {
                     if (debug_mode >= 1) {
@@ -431,7 +433,8 @@ function checkregkey2() {
                     storage.set('settings', {
                         armapath: path,
                         toast: true,
-                        sounds: true
+                        sounds: true,
+                        spaceholder1: true
                     }, function(error) {});
                 } else {
                     if (debug_mode >= 1) {
@@ -480,7 +483,8 @@ function checkregkey3() {
                     storage.set('settings', {
                         armapath: path,
                         toast: true,
-                        sounds: true
+                        sounds: true,
+                        spaceholder1: true
                     }, function(error) {});
                 } else {
                     if (debug_mode >= 1) {
@@ -489,7 +493,8 @@ function checkregkey3() {
                     storage.set('settings', {
                         armapath: '',
                         toast: true,
-                        sounds: true
+                        sounds: true,
+                        spaceholder1: true
                     }, function(error) {});
                     loadpage('settings.html');
                 };
@@ -501,7 +506,8 @@ function checkregkey3() {
             storage.set('settings', {
                 armapath: '',
                 toast: true,
-                sounds: true
+                sounds: true,
+                spaceholder1: true
             }, function(error) {});
             loadpage('settings.html');
         }

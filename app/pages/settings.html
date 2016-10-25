@@ -166,11 +166,11 @@
                       <td style="width:5%">
                       </td>
                       <td>
-                          <h5 class="win-h5">Twitter Embed</h5>
+                          <h5 class="win-h5">Soon</h5>
                       </td>
                       <td>
                           <label class="switch">
-                              <input type="checkbox" id="twitterswitch">
+                              <input type="checkbox" id="spaceholder1switch">
                               <span class="check"></span>
                           </label>
                       </td>
@@ -256,8 +256,8 @@
         saveallsettings();
     });
 
-    document.getElementById("twitterswitch").addEventListener("click", function() {
-        twitter = $("#twitterswitch").is(':checked');
+    document.getElementById("spaceholder1switch").addEventListener("click", function() {
+        spaceholder1 = $("#spaceholder1switch").is(':checked');
         saveallsettings();
     });
 
@@ -302,7 +302,7 @@
             toast: toast,
             sounds: sounds,
             debug: debug,
-            twitter: twitter
+            spaceholder1: spaceholder1
         }, function(error) {});
         if (timert) {
             $.Notify({
@@ -329,10 +329,10 @@
             vram: '',
             thread: '',
             add_params: '',
-            toast: toast,
-            sounds: sounds,
-            debug: debug,
-            twitter: twitter
+            toast: true,
+            sounds: true,
+            debug: false,
+            spaceholder1: true
         }, function(error) {});
         if (timert) {
             $.Notify({
@@ -365,7 +365,7 @@
             toast: true,
             sounds: true,
             debug: false,
-            twitter: true
+            spaceholder1: true
         }, function(error) {});
         ipcRenderer.send('close-devtools');
         if (timert) {
@@ -399,7 +399,7 @@
             toast = data.toast;
             sounds = data.sounds;
             debug = data.debug;
-            twitter = data.twitter;
+            spaceholder1 = data.spaceholder1;
             loadsettingstoui();
         });
     }
@@ -413,7 +413,7 @@
         $('#soundswitch').prop('checked', sounds);
         $('#windowedswitch').prop('checked', windowed);
         $('#debugswitch').prop('checked', debug);
-        $('#twitterswitch').prop('checked', twitter);
+        $('#spaceholder1switch').prop('checked', spaceholder1);
         $("#meminput").val(mem);
         $("#cpuinput").val(cpu);
         $("#vraminput").val(vram);

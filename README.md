@@ -1,6 +1,6 @@
-![Banner](https://upload.realliferpg.de/yHuB2) 
+![Banner](https://upload.realliferpg.de/yHuB2)
 
-# RealLifeRPGLauncher 
+# RealLifeRPGLauncher
 
 ![alt tag](https://travis-ci.org/A3ReallifeRPG/RealLifeRPGLauncher.svg?branch=master)
 
@@ -12,7 +12,7 @@ Gerne könnt ihr auch zur Weiterentwicklung beitragen, mehr Infos dazu findet ih
 
 ## Über RealLifeRPG
 
-RealLifeRPG ist eine Arma3 Gaming Community. 
+RealLifeRPG ist eine Arma3 Gaming Community.
 
 Wir bringen euch seit 2014 Arma3 Modded Roleplay, mit vielen neuen Jobs, Fahrzeugen, Flugzeugen und auf Isla Abramia.
 
@@ -41,11 +41,10 @@ Vielen Dank auch an alle Entwickler der verschiedenen Bibilotheken, eine genaue 
 
 Du willst deinen Teil zur Entwicklung des Launchers beitragen ?  
 
-Dann Fork dir dieses Repository und ertelle einen Pull Request mit deinen Änderungen.
+Dann Fork dir dieses Repository und erstelle einen Pull Request mit deinen Änderungen.
 
 #LICENSE
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">RealLifeRPG Launcher</span> von vabene1111 & Kaibu ist lizenziert unter einer [Creative Commons Namensnennung - Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 4.0 International Lizenz](http://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 
 RealLifeRPG Launcher</span> by vabene1111 & Kaibu is licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/)
-
