@@ -23,7 +23,7 @@
     },
     "devDependencies": {
         "electron": "1.4.4",
-        "electron-prebuilt": "1.3.8"
+        "electron-builder": "7.14.2"
     },
     "build": {
         "appId": "realliferpg.de",
