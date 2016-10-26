@@ -19,7 +19,8 @@
         "postinstall": "install-app-deps",
         "pack": "build --target dir",
         "dist": "build",
-        "install": "npm install --prefix ./app"
+        "install": "npm install --prefix ./app",
+        "test": "electron ."
     },
     "devDependencies": {
         "electron": "1.4.4",
