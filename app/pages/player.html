@@ -1,8 +1,57 @@
 <script src="player.js"></script>
-<div class="row" id="install">
-  <div class="input-group">
-  <input type="text" class="form-control" placeholder="Hier den Code einfügen">
-</div>
+<div class="container">
+  <div class="row" id="secret_div">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-success" type="button" id="delete_secret_button"><span class="mif-not"></span></button>
+      </span>
+      <input type="text" class="form-control" placeholder="Hier den Code einfügen" id="secret_input">
+      <span class="input-group-btn">
+        <button class="btn btn-success" type="button" id="secret_button"><span class="mif-search"></span></button>
+      </span>
+    </div>
+    <hr>
+  </div>
+  <div class="row" id="install">
+    <ul style="font-size:16px" style="text-align: left;">
+      <li>Öffne diesen <a href="https://player.realliferpg.de">Link</a> und füge den Code den du erhätst oben ein.</li>
+    </ul>
+  </div>
+  <div class="row" id="player_content" style="visibility: hidden;">
+    <div class="col-md-4">
+      <span style="font-size:17px" id="player_data_name"></span>
+    </div>
+  </div>
 </div>
 <script>
+$('#secret_button').on('click', function() {
+    var secret = $('#secret_input').val();
+    if(secret.match(md5regex)) {
+      getPlayerData(secret);
+      savePlayerSecret(secret);
+    };
+});
+$('#delete_secret_button').on('click', function() {
+   $('#secret_input').val("");
+   savePlayerSecret("");
+});
+$('#secret_button').keypress(function (e) {
+  if (e.which == 13) {
+    var secret = $('#secret_input').val();
+    if(secret.match(md5regex)) {
+      getPlayerData(secret);
+      savePlayerSecret(secret);
+    };
+    return false;
+  }
+});
+$(document).ready(function() {
+  storage.get('player', function(error, data) {
+     secret = data.secret;
+     if(typeof secret !== 'undefined' && secret.match(md5regex)) {
+       $('#secret_input').val(secret);
+       getPlayerData(secret);
+     };
+  });
+});
 </script>

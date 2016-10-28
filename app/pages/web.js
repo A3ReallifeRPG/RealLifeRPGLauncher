@@ -47,7 +47,13 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
             if (debug_mode >= 2) {
                 console.log('Query for Fuelstations started');
             };
-            getFuelstations(fuelstationCallback);
+            getFuelstationsXHR(fuelstationCallback);
+            break;
+        case 'get-player-data':
+            if (debug_mode >= 2) {
+                console.log('Query for Player Data started');
+            };
+            getPlayerDataXHR(arg.secret, playerDataCallback);
             break;
         default:
             if (debug_mode >= 2) {
@@ -122,7 +128,6 @@ function quickCheckResult(arg) {
 }
 
 function fuelstationCallback(json, success) {
-
     var args = {
         message: "update-fuelstations",
         jsonObj: json,
@@ -131,7 +136,15 @@ function fuelstationCallback(json, success) {
     ipcRenderer.send('message-to-render', args);
 }
 
-//
+function playerDataCallback(json, success) {
+    var args = {
+        message: "update-player-data",
+        jsonObj: json,
+        success: success
+    };
+    ipcRenderer.send('message-to-render', args);
+}
+
 function checkMods(){
 
     if(modDirArray.length > 0){

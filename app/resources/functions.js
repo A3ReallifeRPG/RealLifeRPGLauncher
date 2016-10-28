@@ -19,7 +19,7 @@ function getLauncherNotification(callBackFnc) {
     xhr.send();
 }
 
-function getFuelstations(callBackFnc) {
+function getFuelstationsXHR(callBackFnc) {
     var searchUrl = infoServerURL + fuelstation_Path;
 
     var xhr = new XMLHttpRequest();
@@ -27,7 +27,22 @@ function getFuelstations(callBackFnc) {
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var jsObj = JSON.parse(this.responseText);
+            callBackFnc(jsObj,true);
+        }else if (this.readyState == 4 && !(this.status == 200)){
+            callBackFnc(this.status,false);
+        }
+    }
+    xhr.send();
+}
 
+function getPlayerDataXHR(secret, callBackFnc) {
+    var searchUrl = playerInfoURL + secret;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", searchUrl, true);
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var jsObj = JSON.parse(this.responseText);
             callBackFnc(jsObj,true);
         }else if (this.readyState == 4 && !(this.status == 200)){
             callBackFnc(this.status,false);
@@ -139,3 +154,11 @@ function inArray(val, array){
     }
     return false;
 }
+
+var delayFunction = (function(){
+  var timer = 0;
+  return function(callback, ms){
+    clearTimeout (timer);
+    timer = setTimeout(callback, ms);
+  };
+})();

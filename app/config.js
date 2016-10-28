@@ -4,17 +4,17 @@
 */
 
 var infoServerURL = "https://api.realliferpg.de/";
-
 var server_ListPath = "servers/";
-var server_PlayerListPath = "server/players/"; // url/<server id>
-
+var server_PlayerListPath = "server/players/";
 var mod_ModList = "mods/";
-var mod_FileList = "mod/hashlist/"; // url/<mod id>
+var mod_FileList = "mod/hashlist/";
 var mod_Dirs = "";
-
 var fuelstation_Path = "fuelstations";
-
 var launcher_Notification = "notification";
+
+var playerInfoURL = "https://player.realliferpg.de/";
+
+var md5regex = /^[a-f0-9]{32}$/i;
 
 var task_force_installer = "http://static.realliferpg.de/arma/ReallifeRPGTFAR.ts3_plugin";
 

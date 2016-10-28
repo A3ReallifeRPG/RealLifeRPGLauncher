@@ -87,6 +87,11 @@ ipcRenderer.on('render-receiver', (event, arg) => {
               addFuels();
             };
             break;
+        case 'update-player-data':
+            if(curentPage == "player") {
+              renderPlayerData(arg.jsonObj[0]);
+            };
+            break;
         default:
             console.log('Packet dropped: ' + arg.message);
             break;

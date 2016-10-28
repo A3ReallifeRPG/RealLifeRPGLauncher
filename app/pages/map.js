@@ -98,8 +98,7 @@ function addLayers() {
 
 function refreshFuelstations() {
   var args = {
-          message: 'get-fuelstations',
-          obj: {}
+          message: 'get-fuelstations'
       };
   ipcRenderer.send('message-to-webwin', args);
 };
