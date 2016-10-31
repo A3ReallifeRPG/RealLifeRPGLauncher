@@ -1,5 +1,7 @@
 var installedMods = [];
 
+getNewsWorker();
+
 storage.get('mods', function(error, data) {
     if (jQuery.isEmptyObject(data.installedMods)) {
         installedMods = [];

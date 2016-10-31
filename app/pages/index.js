@@ -188,7 +188,14 @@ function getNews() {
         message: 'get-news'
   };
   ipcRenderer.send('message-to-webwin', args);
-  setTimeout("ipcRenderer.send('message-to-webwin', args)",60000);
+  setTimeout("getNewsWorker()",60000);
+};
+
+function getNewsWorker() {
+  var args = {
+        message: 'get-news'
+  };
+  ipcRenderer.send('message-to-webwin', args);
 };
 
 //ask path dialog
