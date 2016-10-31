@@ -55,6 +55,12 @@ ipcRenderer.on('webwin-receiver', (event, arg) => {
             };
             getPlayerDataXHR(arg.secret, playerDataCallback);
             break;
+        case 'get-news':
+            if (debug_mode >= 2) {
+                console.log('Query for News started');
+            };
+            getNewsXHR(newsCallback);
+            break;
         default:
             if (debug_mode >= 2) {
                 console.log('Packet dropped');
@@ -130,6 +136,15 @@ function quickCheckResult(arg) {
 function fuelstationCallback(json, success) {
     var args = {
         message: "update-fuelstations",
+        jsonObj: json,
+        success: success
+    };
+    ipcRenderer.send('message-to-render', args);
+}
+
+function newsCallback(json, success) {
+    var args = {
+        message: "update-news",
         jsonObj: json,
         success: success
     };

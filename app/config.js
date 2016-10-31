@@ -11,6 +11,7 @@ var mod_FileList = "mod/hashlist/";
 var mod_Dirs = "";
 var fuelstation_Path = "fuelstations";
 var launcher_Notification = "notification";
+var news_Path = "news";
 
 var playerInfoURL = "https://player.realliferpg.de/";
 
