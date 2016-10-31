@@ -15,6 +15,7 @@ var mod_Dirs = "";
 var fuelstation_Path = "fuelstations";
 
 var launcher_Notification = "notification";
+var news_Path = "news";
 
 var task_force_installer = "http://static.realliferpg.de/arma/ReallifeRPGTFAR.ts3_plugin";
 

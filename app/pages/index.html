@@ -137,7 +137,7 @@
     </div>
 
     <!-- Arma Path Dialog -->
-    <div data-role="dialog" id="dialog_defaultpath" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
+    <div data-role="dialog,draggable" id="dialog_defaultpath" class="padding20 dialog warning" data-type="warning" style="max-width:60%">
         <h1>Arma Pfad gefunden</h1>
         <p id="armapathtext">
         </p>
@@ -146,7 +146,7 @@
     </div>
 
     <!-- Download Complete Hash Dialog -->
-    <div data-role="dialog" id="dialog_downloadComplete" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
+    <div data-role="dialog,draggable" id="dialog_downloadComplete" class="padding20 dialog warning" data-type="warning" style="max-width:60%">
         <h1>Download abgeschlossen</h1>
         <p>
             Der Download ist abgeschlossen.
@@ -159,7 +159,7 @@
     </div>
 
     <!-- No Path Dialog -->
-    <div data-role="dialog" id="dialog_noPath" class="padding20 dialog success" data-close-button="true" data-type="warning" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
+    <div data-role="dialog,draggable" id="dialog_noPath" class="padding20 dialog success" data-close-button="true" data-type="warning" style="max-width:60%">
         <h1>Arma Pfad nicht gefunden</h1>
         <p>
             Die Aktion kann nicht ausgeführt werden, da kein Arma Pfad gefunden wurde.
@@ -168,7 +168,7 @@
     </div>
 
     <!-- Update Dialog -->
-    <div data-role="dialog" id="dialog_updateInfo" class="padding20 dialog success" data-close-button="true" data-type="warning" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
+    <div data-role="dialog,draggable" id="dialog_updateInfo" class="padding20 dialog success" data-close-button="true" data-type="warning" style="max-width:60%">
         <h1>Update verfügbar</h1>
         <p>
             Für folgende Mod(s) ist ein Update verfügbar:
@@ -204,6 +204,7 @@
                 extractIconsFromAsar();
             };
         });
+        getNews();
         checkForNotification();
     });
     $(document).on('click', 'a[href^="htt"]', function(event) {

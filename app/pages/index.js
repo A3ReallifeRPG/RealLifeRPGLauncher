@@ -87,6 +87,13 @@ ipcRenderer.on('render-receiver', (event, arg) => {
               addFuels();
             };
             break;
+        case 'update-news':
+            if(curentPage == "home") {
+              $('#news1').html(arg.jsonObj[0].Content);
+              $('#news2').html(arg.jsonObj[1].Content);
+              $('#news3').html(arg.jsonObj[2].Content);
+            };
+            break;
         default:
             console.log('Packet dropped: ' + arg.message);
             break;
@@ -174,6 +181,14 @@ function checkForNotification() {
         message: 'search-notf'
     };
     ipcRenderer.send('message-to-download', args);
+};
+
+function getNews() {
+  var args = {
+        message: 'get-news'
+  };
+  ipcRenderer.send('message-to-webwin', args);
+  setTimeout("ipcRenderer.send('message-to-webwin', args)",60000);
 };
 
 //ask path dialog
@@ -380,7 +395,7 @@ function checkregkey1() {
                     $('#armapathtext').html(path);
                     pathdialog.open();
                     path = path + "\\";
-                    storage.set('settings', {
+                    storage .set('settings', {
                         armapath: path,
                         toast: true,
                         sounds: true,
@@ -562,15 +577,16 @@ function notifyWin(title, text, icon) {
             sounds = data.sounds;
         };
         if (toast) {
-            notifier.notify({
-                title: title,
-                message: text,
-                icon: winpath.join(__dirname, '../../extracted/icon/' + icon),
-                sound: sounds,
-                wait: true
-            }, function(err, response) {
-                ipcRenderer.send('focus-window');
+            var notification = new Notification(title, {
+              body: text,
+              icon: winpath.join(__dirname, '../../extracted/icon/' + icon),
+              badge: winpath.join(__dirname, '../../extracted/icon/' + icon),
+              sound: sounds,
+              wait: true
             });
+            notification.onclick = () => {
+              ipcRenderer.send('focus-window');
+            }
         }
     });
 }
