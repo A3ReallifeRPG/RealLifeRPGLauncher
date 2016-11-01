@@ -31,7 +31,7 @@
         "win": {
             "title": "RealLifeRPG Launcher",
             "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
-            "remoteReleases": "https://static.realliferpg.de/remoteReleases/"
+            "remoteReleases": "http://server3.realliferpg.de:8000/files/"
         },
         "squirrelWindows": {
             "loadingGif": "build/install-spinner.gif",
