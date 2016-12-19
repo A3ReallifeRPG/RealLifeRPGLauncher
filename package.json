@@ -1,64 +1,70 @@
 {
-    "name": "RealLifeRPG",
-    "version": "1.5.0",
-    "description": "RealLifeRPG Launcher",
-    "homepage": "https://www.realliferpg.de",
-    "author":"RealLifeRPG",
-    "main": "./app/main.js",
-    "license" : "CC-BY-NC-SA-4.0",
-    "readme" : "README.md",
-    "repository" :{
-        "type" : "git",
-        "url" : "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher.git"
+  "name": "RealLifeRPG",
+  "version": "1.5.0",
+  "description": "RealLifeRPG Launcher",
+  "homepage": "https://www.realliferpg.de",
+  "author": "RealLifeRPG",
+  "main": "./app/main.js",
+  "license": "CC-BY-NC-SA-4.0",
+  "readme": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher.git"
+  },
+  "bugs": {
+    "url": "https://github.com/A3ReallifeRPG/ReallifeRPG5.0/issues"
+  },
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "install-app-deps",
+    "pack": "build --target dir",
+    "dist": "build",
+    "install": "npm install --prefix ./app"
+  },
+  "devDependencies": {
+    "electron": "1.4.4",
+    "electron-builder": "7.14.2"
+  },
+  "build": {
+    "appId": "realliferpg.de",
+    "app-category-type": "launcher.application",
+    "win": {
+      "title": "RealLifeRPG Launcher",
+      "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
+      "remoteReleases": "http://server3.realliferpg.de:8000/files/"
     },
-    "bugs": {
-        "url": "https://github.com/A3ReallifeRPG/ReallifeRPG5.0/issues"
-    },
-    "scripts": {
-        "start": "electron .",
-        "postinstall": "install-app-deps",
-        "pack": "build --target dir",
-        "dist": "build",
-        "install": "npm install --prefix ./app"
-    },
-    "devDependencies": {
-        "electron": "1.4.4",
-        "electron-builder": "7.14.2"
-    },
-    "build": {
-        "appId": "realliferpg.de",
-        "app-category-type": "launcher.application",
-        "win": {
-            "title": "RealLifeRPG Launcher",
-            "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
-            "remoteReleases": "http://server3.realliferpg.de:8000/files/"
-        },
-        "squirrelWindows": {
-            "loadingGif": "build/install-spinner.gif",
-            "setupIcon": "build/icon.ico"
-        }
-    },
-    "contributors": [{
-        "name": "vabene1111",
-        "email": "vabene1234@googlemail.com",
-        "url": "https://github.com/vabene1111"
-    }, {
-        "name": "Kaibu",
-        "email": "green4ever999@web.de",
-        "url": "https://github.com/Kaibu"
-    }],
-    "dependencies": {
-        "devtron": "^1.2.1",
-        "dwn": "^0.0.2",
-        "electron-json-storage": "^2.0.2",
-        "electron-squirrel-startup": "^1.0.0",
-        "highcharts": "^5.0.0",
-        "mkpath": "^1.0.0",
-        "node-notifier": "^4.6.1",
-        "progress-stream": "^1.2.0",
-        "recursive-readdir": "^2.0.0",
-        "shelljs": "^0.7.0",
-        "winreg": "^1.2.1",
-        "unzip": "^0.1.11"
+    "squirrelWindows": {
+      "loadingGif": "build/install-spinner.gif",
+      "setupIcon": "build/icon.ico"
     }
+  },
+  "contributors": [
+    {
+      "name": "vabene1111",
+      "email": "vabene1234@googlemail.com",
+      "url": "https://github.com/vabene1111"
+    },
+    {
+      "name": "Kaibu",
+      "email": "green4ever999@web.de",
+      "url": "https://github.com/Kaibu"
+    }
+  ],
+  "dependencies": {
+    "angular": "^1.6.0",
+    "bootstrap": "^3.3.7",
+    "devtron": "^1.2.1",
+    "dwn": "^0.0.2",
+    "electron-json-storage": "^2.0.2",
+    "electron-squirrel-startup": "^1.0.0",
+    "highcharts": "^5.0.0",
+    "mkpath": "^1.0.0",
+    "node-notifier": "^4.6.1",
+    "progress-stream": "^1.2.0",
+    "recursive-readdir": "^2.0.0",
+    "shelljs": "^0.7.0",
+    "tether": "^1.4.0",
+    "unzip": "^0.1.11",
+    "winreg": "^1.2.1"
+  }
 }

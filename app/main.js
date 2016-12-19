@@ -169,7 +169,7 @@ function createWindow() {
         maxHeight: 1080
     });
 
-    win.loadURL(`file://${__dirname}/pages/index.html`);
+    win.loadURL(`file://${__dirname}/index.html`);
 
     win.on('closed', () => {
         app.quit();

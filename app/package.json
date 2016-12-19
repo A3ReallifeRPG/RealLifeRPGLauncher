@@ -31,6 +31,9 @@
         "url": "https://github.com/Kaibu"
     }],
     "dependencies": {
+        "angular": "^1.6.0",
+        "bootstrap": "^3.3.7",
+        "tether": "^1.4.0",
         "dwn": "0.0.2",
         "electron-json-storage": "2.0.2",
         "electron-squirrel-startup": "1.0.0",

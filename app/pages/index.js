@@ -15,8 +15,6 @@ const {
     ipcRenderer
 } = require('electron');
 
-var anim = document.getElementById("content");
-
 var updateMods = [];
 var curModId = 0;
 var checkListMods = [];
@@ -25,21 +23,23 @@ curentPage = "";
 checkDebug();
 checkVersion();
 
-//show Notification if activated TODO move to extra thread
+
+
+/* show Notification if activated TODO move to extra thread
 function showNotf(arg) {
     if (arg.success) {
         document.getElementById('dialog_notf_text').innerHTML = arg.jsonObj.Notification;
         if (arg.jsonObj.UseNotification) {
             var dialog = $('#dialog_notf').data('dialog');
             dialog.open();
-            notifyWin('RealLifeRPG Launcher', 'Wichtige Informationen', 'ic_error_outline_white_36dp_2x.png');
+            notifyWin('RealLifeRPG Launcher', 'Wichtige Informationen', 'ic_error_outline_white_36dp_2x.png')
         }
     } else {
         if (debug_mode >= 1) {
-            console.log('Error requesting Notification: ' + arg.jsonObj);
-        };
+            console.log('Error requesting Notification: ' + arg.jsonObj)
+        }
     }
-}
+*/
 
 //setup event handler for IPC
 ipcRenderer.on('render-receiver', (event, arg) => {
