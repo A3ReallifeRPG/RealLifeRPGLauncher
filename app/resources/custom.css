@@ -1,159 +1,259 @@
-*:focus {outline:none !important}
+*:focus {
+    outline: none !important
+}
 
 * {
     user-drag: none;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-drag: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
-.verticalLine {
-    border-left: thin solid #292f33;
-}
-
-.fake-link {
-    color: #0099ff;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.content,
-#app {
-    height: 100%;
-}
-
-    #app .win-splitviewpanetoggle {
-        float: left;
-    }
-
-    /* SplitView pane content style*/
-    #app .header {
-        white-space: nowrap;
-    }
-
-    #app .title {
-        font-size: 25px;
-        left: 50px;
-        margin-top: 6px;
-        vertical-align: middle;
-        display: inline-block;
-    }
-
-    #app .nav-commands {
-        margin-top: 20px;
-    }
-
-.win-navbarcommand-button {
-    background-color: transparent;
-}
-
-#app .win-splitview-pane-hidden .win-navbarcommand-button {
-    width: 46px;
-}
-
-#app .win-splitview-pane-hidden .win-navbarcommand-label {
-    /* Workaround: Make sure pane doesn't scroll if ContentDialog restores focus to
-       NavBarCommand's label
-    */
-    visibility: hidden;
-}
-
-/*SplitView content style*/
-#app .win-splitview-content {
-    background-color: rgb(54,53,51);
-}
-
-#app .contenttext {
-    margin-left: 20px;
-    margin-top: 6px;
-}
-
-/* Template for the items in the ListViews in this sample */
-.smallListIconTextItem
-{
-    width: 100%;
-    height: 70px;
-    padding: 5px;
-    overflow: hidden;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-}
-
-    .smallListIconTextItem img.smallListIconTextItem-Image
-    {
-        width: 60px;
-        height: 60px;
-        margin: 5px;
-        margin-right:20px;
-    }
-
-    .smallListIconTextItem .smallListIconTextItem-Detail
-    {
-        margin: 5px;
-    }
-
-/* CSS applied to the ListViews in this sample */
-.listView
-{
-    height: 100%;
-}
-
-/* Override the background color for even/odd win-containers */
-.listView .win-container.win-container-odd {
-    background-color: #777;
-}
-
-.listView .win-container.win-container-even {
-    background-color: #444;
-}
-
-.help-button {
-    background-color: #777;
-    border: none;
-    color: white;
-    width:100px;
-    height: 100px;
-    padding: 16px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    transition-duration: 0.2s;
-    cursor: default;
-    border-radius: 100%;
-    outline:0;!important;
-}
-
-.help-button:hover {
-    background-color: #ED8E0E;
-    color: white;
-    outline:0;!important;
-}
-
-/* Preloader */
 
 #preloader {
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    background-color:#fff; /* change if the mask should have another color then white */
-    z-index:99; /* makes sure it stays on top */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff; /* change if the mask should have another color then white */
+    z-index: 99; /* makes sure it stays on top */
 }
 
 #status {
-    width:200px;
-    height:200px;
-    position:absolute;
-    left:50%; /* centers the loading animation horizontally one the screen */
-    top:50%; /* centers the loading animation vertically one the screen */
-    margin:-100px 0 0 -100px; /* is width and height divided by two */
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    left: 50%; /* centers the loading animation horizontally one the screen */
+    top: 50%; /* centers the loading animation vertically one the screen */
+    margin: -100px 0 0 -100px; /* is width and height divided by two */
 }
 
-#content{
-  height: calc(100% - 55px);
+#content {
+    height: calc(100% - 55px);
+}
+
+.carousel {
+    position: relative;
+}
+
+.carousel-inner {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.carousel-inner > .carousel-item {
+    position: relative;
+    display: none;
+    -webkit-transition: .6s ease-in-out left;
+    -o-transition: .6s ease-in-out left;
+    transition: .6s ease-in-out left;
+}
+
+.carousel-inner > .carousel-item > img,
+.carousel-inner > .carousel-item > a > img {
+    line-height: 1;
+}
+
+@media all and (transform-3d), (-webkit-transform-3d) {
+    .carousel-inner > .carousel-item {
+        -webkit-transition: -webkit-transform .6s ease-in-out;
+        transition: -webkit-transform .6s ease-in-out;
+        -o-transition: -o-transform .6s ease-in-out;
+        transition: transform .6s ease-in-out;
+        transition: transform .6s ease-in-out, -webkit-transform .6s ease-in-out, -o-transform .6s ease-in-out;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-perspective: 1000px;
+        perspective: 1000px;
+    }
+    .carousel-inner > .carousel-item.next, .carousel-inner > .carousel-item.active.right {
+        left: 0;
+        -webkit-transform: translate3d(100%, 0, 0);
+        transform: translate3d(100%, 0, 0);
+    }
+    .carousel-inner > .carousel-item.prev, .carousel-inner > .carousel-item.active.left {
+        left: 0;
+        -webkit-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
+    .carousel-inner > .carousel-item.next.left, .carousel-inner > .carousel-item.prev.right, .carousel-inner > .carousel-item.active {
+        left: 0;
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.carousel-inner > .active,
+.carousel-inner > .next,
+.carousel-inner > .prev {
+    display: block;
+}
+
+.carousel-inner > .active {
+    left: 0;
+}
+
+.carousel-inner > .next,
+.carousel-inner > .prev {
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.carousel-inner > .next {
+    left: 100%;
+}
+
+.carousel-inner > .prev {
+    left: -100%;
+}
+
+.carousel-inner > .next.left,
+.carousel-inner > .prev.right {
+    left: 0;
+}
+
+.carousel-inner > .active.left {
+    left: -100%;
+}
+
+.carousel-inner > .active.right {
+    left: 100%;
+}
+
+.carousel-control {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2%;
+    font-size: 20px;
+    color: #fff;
+    text-align: center;
+    opacity: 1 !important;
+    height: 100%;
+    background-image: none !important;
+}
+
+.carousel-control.right {
+    right: 0;
+    left: auto;
+}
+
+.carousel-control:focus, .carousel-control:hover {
+    color: #fff;
+    text-decoration: none;
+    outline: 0;
+}
+
+.carousel-control .icon-prev,
+.carousel-control .icon-next {
+    position: absolute;
+    top: 50%;
+    z-index: 5;
+    display: inline-block;
+    width: 10px;
+    height: 20px;
+    margin-top: -10px;
+    font-family: serif;
+    line-height: 1;
+    color: #222222;
+}
+
+.carousel-control .icon-prev {
+    left: 60%;
+    margin-left: -10px;
+}
+
+.carousel-control .icon-next {
+    right: 60%;
+    margin-right: -10px;
+}
+
+.carousel-control .icon-prev::before {
+    content: "\2039";
+}
+
+.carousel-control .icon-next::before {
+    content: "\203a";
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    z-index: 15;
+    width: 60%;
+    padding-left: 0;
+    margin-left: -30%;
+    text-align: center;
+    list-style: none;
+}
+
+.carousel-indicators li {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 1px;
+    text-indent: -999px;
+    cursor: pointer;
+    background-color: transparent;
+    border: 1px solid #fff;
+    border-radius: 10px;
+}
+
+.carousel-indicators .active {
+    width: 12px;
+    height: 12px;
+    margin: 0;
+    background-color: #fff;
+}
+
+.carousel-caption {
+    position: absolute;
+    right: 15%;
+    bottom: 20px;
+    left: 15%;
+    z-index: 10;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.carousel-caption .btn {
+    text-shadow: none;
+}
+
+@media (min-width: 576px) {
+    .carousel-control .icon-prev,
+    .carousel-control .icon-next {
+        width: 30px;
+        height: 30px;
+        margin-top: -15px;
+        font-size: 30px;
+    }
+    .carousel-control .icon-prev {
+        margin-left: -15px;
+    }
+    .carousel-control .icon-next {
+        margin-right: -15px;
+    }
+    .carousel-caption {
+        right: 20%;
+        left: 20%;
+        padding-bottom: 30px;
+    }
+    .carousel-indicators {
+        bottom: 20px;
+    }
+}
+
+html,
+body {
+    height: 100%;
 }

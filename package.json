@@ -52,7 +52,7 @@
   ],
   "dependencies": {
     "angular": "^1.6.0",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^4.0.0-alpha.5",
     "devtron": "^1.2.1",
     "dwn": "^0.0.2",
     "electron-json-storage": "^2.0.2",
@@ -63,6 +63,7 @@
     "progress-stream": "^1.2.0",
     "recursive-readdir": "^2.0.0",
     "shelljs": "^0.7.0",
+    "simplebar": "^2.0.1",
     "tether": "^1.4.0",
     "unzip": "^0.1.11",
     "winreg": "^1.2.1"
