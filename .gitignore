@@ -3,3 +3,4 @@
 app/node_modules/*
 Thumbs.db
 /TFAR/*
+.idea
