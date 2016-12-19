@@ -21,6 +21,12 @@ App.controller('navbarController', ['$scope', function ($scope) {
 }]);
 
 App.controller('modController', ['$scope', function ($scope) {
+
+    $scope.downloading = false;
+
+    $scope.progress = 0;
+    $scope.fileProgress = 0;
+    $scope.fileName = 0;
     $scope.mods = [
         {
             "Id": 1,
