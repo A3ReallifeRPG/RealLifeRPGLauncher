@@ -1,3 +1,5 @@
+const {ipcRenderer} = require('electron');
+
 var App = angular.module('App', []);
 
 App.controller('navbarController', ['$scope', function ($scope) {
@@ -27,6 +29,9 @@ App.controller('modController', ['$scope', function ($scope) {
     $scope.progress = 0;
     $scope.fileProgress = 0;
     $scope.fileName = 0;
+
+    $scope.chart = null;
+
     $scope.mods = [
         {
             "Id": 1,
@@ -62,4 +67,30 @@ App.controller('modController', ['$scope', function ($scope) {
             "Directories": ""
         }
     ];
+
+    $scope.initDownload = function (mod) {
+        var args = {
+            type: "start-mod-dwn",
+            mod: mod,
+            target : "E:\\Steam\\steamapps\\common\\Arma 3\\"
+        };
+        ipcRenderer.send('to-dwn', args);
+    };
+
+    $scope.initGraph = function () {
+        $scope.chart = new SmoothieChart({
+            millisPerPixel: 27,
+            grid: {fillStyle: '#ffffff', strokeStyle: 'transparent', borderVisible: false},
+            labels: {fillStyle: '#000000', disabled: true}
+        }),
+            canvas = document.getElementById('smoothie-chart');
+
+        var random = new TimeSeries();
+        setInterval(function () {
+            random.append(new Date().getTime(), Math.random() * 10000);
+        }, 500);
+
+        chart.addTimeSeries(random, {lineWidth: 2, strokeStyle: '#2780e3'});
+        chart.streamTo(canvas, 500);
+    };
 }]);

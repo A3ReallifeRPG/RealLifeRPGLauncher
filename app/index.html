@@ -27,6 +27,9 @@
     <link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css">
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
+    <!-- smoothiecharts -->
+    <script src="node_modules/smoothie/smoothie.js"></script>
+
     <!-- custom css/js -->
     <link rel="stylesheet" href="resources/custom.css">
 
@@ -91,11 +94,17 @@
                                             <h4>{{mod.Name}}</h4>
                                             <hr>
                                             <div class="btn-group btn-group-sm">
-                                                <button class="btn btn-success">Download</button>
+                                                <button class="btn btn-success" ng-click="initDownload(mod)">Download</button>
                                                 <button class="btn btn-warning">Prüfen</button>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <h3>Download</h3>
+                                <canvas id="smoothie-chart" width="1170" height="70"></canvas>
+                                <hr>
+                                <div class="progress progress-striped active">
+                                    <div class="progress-bar" style="width: 45%"></div>
                                 </div>
                             </div>
                         </div>

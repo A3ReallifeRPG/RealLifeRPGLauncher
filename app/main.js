@@ -139,8 +139,7 @@ function createWindow() {
     webWin = new BrowserWindow({
         icon: 'icon/workericon.ico',
         width: 1000,
-        height: 550,
-        show: false
+        height: 550
     });
     webWin.loadURL(`file://${__dirname}/pages/web.html`);
     webWin.webContents.openDevTools({
@@ -150,10 +149,9 @@ function createWindow() {
     downWin = new BrowserWindow({
         icon: 'icon/workericon.ico',
         width: 1000,
-        height: 550,
-        show: false
+        height: 550
     });
-    downWin.loadURL(`file://${__dirname}/pages/download.html`);
+    downWin.loadURL(`file://${__dirname}/app/dwn.html`);
     downWin.webContents.openDevTools({
         detach: false
     });
@@ -188,8 +186,8 @@ function createWindow() {
 
 
 function setUpIpcHandlers() {
-    ipcMain.on('message-to-download', (event, arg) => {
-        downWin.webContents.send('download-receiver', arg);
+    ipcMain.on('to-dwn', (event, arg) => {
+        downWin.webContents.send('to-dwn', arg);
     });
 
     ipcMain.on('message-to-webwin', (event, arg) => {
