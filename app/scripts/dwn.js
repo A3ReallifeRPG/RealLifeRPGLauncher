@@ -8,10 +8,28 @@ const {
     ipcRenderer
 } = require('electron');
 
-ipcRenderer.on('to-dwn', (event, arg) => {
-    switch (arg.type) {
-        case "start-mod-dwn" :
-            alert("kappa");
+ipcRenderer.on('to-dwn', (event, args) => {
+    switch (args.type) {
+        case "start-mod-dwn":
+            getHashlist(args.mod.Id);
+            break;
+        case "hashlist-callback":
+            dwnMod(args);
             break;
     }
 })
+
+function dwnMod(args) {
+    console.log(args);
+    //var hashlist = args.
+};
+
+function getHashlist(id) {
+    var args = {
+        type: "get-url",
+        callback: "hashlist-callback",
+        url: APIBaseURL + APIModHashlistURL + id,
+        callBackTarget: "to-dwn"
+    };
+    ipcRenderer.send('to-web', args);
+}

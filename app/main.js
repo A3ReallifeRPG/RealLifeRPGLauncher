@@ -141,7 +141,7 @@ function createWindow() {
         width: 1000,
         height: 550
     });
-    webWin.loadURL(`file://${__dirname}/pages/web.html`);
+    webWin.loadURL(`file://${__dirname}/app/web.html`);
     webWin.webContents.openDevTools({
         detach: false
     });
@@ -190,12 +190,12 @@ function setUpIpcHandlers() {
         downWin.webContents.send('to-dwn', arg);
     });
 
-    ipcMain.on('message-to-webwin', (event, arg) => {
-        webWin.webContents.send('webwin-receiver', arg);
+    ipcMain.on('to-web', (event, arg) => {
+        webWin.webContents.send('to-web', arg);
     });
 
-    ipcMain.on('message-to-render', (event, arg) => {
-        win.webContents.send('render-receiver', arg);
+    ipcMain.on('to-app', (event, arg) => {
+        win.webContents.send('to-app', arg);
     });
 }
 
