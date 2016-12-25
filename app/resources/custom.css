@@ -69,16 +69,19 @@
         -webkit-perspective: 1000px;
         perspective: 1000px;
     }
+
     .carousel-inner > .carousel-item.next, .carousel-inner > .carousel-item.active.right {
         left: 0;
         -webkit-transform: translate3d(100%, 0, 0);
         transform: translate3d(100%, 0, 0);
     }
+
     .carousel-inner > .carousel-item.prev, .carousel-inner > .carousel-item.active.left {
         left: 0;
         -webkit-transform: translate3d(-100%, 0, 0);
         transform: translate3d(-100%, 0, 0);
     }
+
     .carousel-inner > .carousel-item.next.left, .carousel-inner > .carousel-item.prev.right, .carousel-inner > .carousel-item.active {
         left: 0;
         -webkit-transform: translate3d(0, 0, 0);
@@ -237,17 +240,21 @@
         margin-top: -15px;
         font-size: 30px;
     }
+
     .carousel-control .icon-prev {
         margin-left: -15px;
     }
+
     .carousel-control .icon-next {
         margin-right: -15px;
     }
+
     .carousel-caption {
         right: 20%;
         left: 20%;
         padding-bottom: 30px;
     }
+
     .carousel-indicators {
         bottom: 20px;
     }
@@ -256,4 +263,29 @@
 html,
 body {
     height: 100%;
+}
+
+.nav, .pagination, .carousel, .panel-title a {
+    cursor: pointer;
+}
+
+.label-civ {
+    background-color: #8B008B;
+}
+
+.label-cop {
+    background-color: #0000CD;
+}
+
+.label-medic {
+    background-color: #228B22;
+}
+
+.label-adac {
+    background-color: #C00100;
+}
+
+.label-large {
+    font-size: 14px;
+    line-height: 2;
 }

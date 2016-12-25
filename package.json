@@ -23,7 +23,8 @@
   },
   "devDependencies": {
     "electron": "1.4.4",
-    "electron-builder": "7.14.2"
+    "electron-builder": "7.14.2",
+    "devtron": "^1.4.0"
   },
   "build": {
     "appId": "realliferpg.de",
@@ -52,8 +53,9 @@
   ],
   "dependencies": {
     "angular": "^1.6.0",
+    "angular-ui-bootstrap": "^2.3.1",
     "bootstrap": "^4.0.0-alpha.5",
-    "devtron": "^1.2.1",
+    "chart.js": "^2.4.0",
     "dwn": "^0.0.2",
     "electron-json-storage": "^2.0.2",
     "electron-squirrel-startup": "^1.0.0",

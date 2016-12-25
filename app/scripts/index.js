@@ -20,9 +20,23 @@ App.controller('navbarController', ['$scope', function ($scope) {
         "slide", function () {
             $("#carousel-main").carousel($scope.slide);
         }, true);
+
+    $scope.refresh = function () {
+        getMods();
+        getServers();
+    };
 }]);
 
 App.controller('modController', ['$scope', function ($scope) {
+    ipcRenderer.on('to-app', (event, args) => {
+        switch (args.type) {
+        case "mod-callback":
+            $scope.mods = args.data.data;
+            $scope.loading = false;
+            $scope.$apply();
+            break;
+    }
+});
 
     $scope.downloading = false;
 
@@ -32,41 +46,10 @@ App.controller('modController', ['$scope', function ($scope) {
 
     $scope.chart = null;
 
-    $scope.mods = [
-        {
-            "Id": 1,
-            "Name": "RealLife RPG 5.0",
-            "appId": 107410,
-            "DownloadUrl": "http://dl1.realliferpg.de/download/",
-            "IsActive": true,
-            "Description": "RealLife RPG Community Arma 3 Server",
-            "ImageUrl": "https://static.realliferpg.de/img/launcher/rlrpg5winter-600300.jpg",
-            "HasGameFiles": true,
-            "Directories": "@RealLifeRPG5.0"
-        },
-        {
-            "Id": 5,
-            "Name": "RealLifeRPG 5.0 BETA",
-            "appId": 107410,
-            "DownloadUrl": "http://213.202.212.13/download/",
-            "IsActive": true,
-            "Description": "BETA (inkompatibel mit normalem Server)",
-            "ImageUrl": "https://static.realliferpg.de/img/launcher/rlrpg5-600300.jpg",
-            "HasGameFiles": true,
-            "Directories": "@RealLifeRPG5.0BETA"
-        },
-        {
-            "Id": 6,
-            "Name": "RealLifeRPG CSGO",
-            "appId": 730,
-            "DownloadUrl": "",
-            "IsActive": true,
-            "Description": "Counterstrike Global Offensive",
-            "ImageUrl": "https://static.realliferpg.de/img/launcher/rlrpg5-600300.jpg",
-            "HasGameFiles": false,
-            "Directories": ""
-        }
-    ];
+    $scope.init = function () {
+        $scope.loading = true;
+        getMods();
+    };
 
     $scope.initDownload = function (mod) {
         var args = {
@@ -94,3 +77,84 @@ App.controller('modController', ['$scope', function ($scope) {
         chart.streamTo(canvas, 500);
     };
 }]);
+
+App.controller('serverController', ['$scope', function ($scope) {
+    ipcRenderer.on('to-app', (event, args) => {
+        switch (args.type) {
+        case "servers-callback":
+            $scope.servers = args.data.data;
+            $scope.loading = false;
+            $scope.$apply();
+            for(var i = 0; i < $scope.servers.length; i++) {
+                $scope.redrawChart($scope.servers[i]);
+            }
+            break;
+        }
+    });
+
+    $scope.redrawChart = function (server) {
+        console.log(server);
+        var data = {
+            labels: [
+                "Zivilisten",
+                "Polizisten",
+                "Medics",
+                "ADAC"
+            ],
+            datasets: [
+                {
+                    data: [server.Civilians, server.Cops, server.Medics, server.Adac],
+                    backgroundColor: [
+                        "#8B008B",
+                        "#0000CD",
+                        "#228B22",
+                        "#C00100"
+                    ]
+                }]
+        };
+
+        var xhx = $("#serverChart" + server.Id);
+        var serverChart1 = new Chart(xhx, {
+            type: 'pie',
+            data: data,
+            options: {
+                responsive: false,
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+    };
+
+    $scope.init = function () {
+        $scope.loading = true;
+        getServers();
+    };
+
+    $scope.showTab = function (tabindex) {
+        $('.serverTab').removeClass('active');
+        $('.serverPane').removeClass('active');
+        $('#serverTab' + tabindex).addClass('active')
+        $('#serverPane' + tabindex).addClass('active');
+    };
+}]);
+
+function getMods() {
+    var args = {
+        type: "get-url",
+        callback: "mod-callback",
+        url: APIBaseURL + APIModsURL,
+        callBackTarget: "to-app"
+    };
+    ipcRenderer.send('to-web', args);
+}
+
+function getServers() {
+    var args = {
+        type: "get-url",
+        callback: "servers-callback",
+        url: APIBaseURL + APIServersURL,
+        callBackTarget: "to-app"
+    };
+    ipcRenderer.send('to-web', args);
+}

@@ -30,30 +30,15 @@
     <!-- smoothiecharts -->
     <script src="node_modules/smoothie/smoothie.js"></script>
 
+    <!-- chartjs -->
+    <script src="node_modules/chart.js/dist/Chart.min.js"></script>
+
     <!-- custom css/js -->
     <link rel="stylesheet" href="resources/custom.css">
 
     <script type="text/javascript" src="scripts/index.js"></script>
 </head>
 <body>
-<!-- preloader -->
-<script type="text/javascript">
-    $(window).load(function () { // makes sure the whole site is loaded
-        $('#status').delay(200).fadeOut('slow');
-        $('#preloader').delay(500).fadeOut('slow'); // will fade out the white DIV that covers the website.
-        $('body').delay(340).css({
-            'overflow': 'visible'
-        });
-    })
-</script>
-
-<div id="preloader">
-    <div id="status" style="text-align: center;">
-        <img src="img/icon.png">
-        <h4 style="color:#000000;font-size:24px">ReallifeRPG Launcher</h4>
-    </div>
-</div>
-
 <div id="app" style="height: 100%">
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
@@ -74,18 +59,28 @@
                         <a href="" ng-click="switchSlide(tab)"><span class="{{tab.icon}}"></span></a>
                     </li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span></a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
     <div id="content" style="height: 100%">
         <div id="carousel-main" class="carousel slide" data-ride="carousel" style="height: 100%" data-interval="false">
+            <br>
+            <br>
             <div class="carousel-inner" role="listbox">
                 <div class="carousel-item active">
                     <div id="mods">
                         <div class="container">
-                            <h3>ReallifeRPG Mods</h3>
-                            <hr>
-                            <div class="row" ng-controller="modController">
+                            <div class="row" ng-controller="modController" data-ng-init="init()">
+                                <h3>ReallifeRPG Mods</h3>
+                                <hr>
+                                <div style="text-align: center" ng-show="loading">
+                                    <img src="resources/loading/cube.svg"/>
+                                </div>
                                 <div class="col-md-4" ng-repeat="mod in mods">
                                     <div class="panel panel-primary">
                                         <div class="panel-body" style="text-align: center">
@@ -100,7 +95,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h3>Download</h3>
                                 <canvas id="smoothie-chart" width="1170" height="70"></canvas>
                                 <hr>
                                 <div class="progress progress-striped active">
@@ -111,21 +105,37 @@
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <div id="mods">
+                    <div id="servers">
                         <div class="container">
-                            <h3>ReallifeRPG Mods2</h3>
-                            <hr>
-                            <div class="row" ng-controller="modController">
-                                <div class="col-md-4" ng-repeat="mod in mods">
-                                    <div class="panel panel-primary">
-                                        <div class="panel-body" style="text-align: center">
-                                            <img src="{{mod.ImageUrl}}" width="320px">
-                                            <hr>
-                                            <h4>{{mod.Name}}</h4>
-                                            <hr>
-                                            <div class="btn-group btn-group-sm">
-                                                <button class="btn btn-success">Download</button>
-                                                <button class="btn btn-warning">Prüfen</button>
+                            <div class="row" ng-controller="serverController" data-ng-init="init()">
+                                <h3>ReallifeRPG Server</h3>
+                                <hr>
+                                <div style="text-align: center" ng-show="loading">
+                                    <img src="resources/loading/cube.svg"/>
+                                </div>
+                                <ul class="nav nav-tabs">
+                                    <li class="serverTab" id="serverTab{{server.Id}}" ng-repeat="server in servers">
+                                        <a ng-click="showTab(server.Id)">{{server.Servername}} <span class="label label-success">{{server.Playercount}}/{{server.Slots}}</span></a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="serverPane{{server.Id}}" class="tab-pane fade in serverPane" ng-repeat="server in servers">
+                                        <br>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <canvas id="serverChart{{server.Id}}" width="350" height="350"></canvas>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <span class="label label-large label-civ">Zivilisten: {{server.Civilians}}</span>
+                                                <hr>
+                                                <span class="label label-large label-cop">Polizisten: {{server.Cops}}</span>
+                                                <hr>
+                                                <span class="label label-large label-medic">Medics: {{server.Medics}}</span>
+                                                <hr>
+                                                <span class="label label-large label-adac">Adac: {{server.Adac}}</span>
+                                            </div>
+                                            <div class="col-md-3">
                                             </div>
                                         </div>
                                     </div>

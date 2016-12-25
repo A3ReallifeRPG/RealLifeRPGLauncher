@@ -24,9 +24,8 @@ function getUrl(args) {
 }
 
 function getUrlCallback(args, err, data, resp) {
-    var type = args.callback;
     var content = {
-        "type": type,
+        "type": args.callback,
         "args": args,
         "err": err,
         "data": data,
