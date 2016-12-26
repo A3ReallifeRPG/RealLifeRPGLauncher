@@ -1,6 +1,4 @@
-*:focus {
-    outline: none !important
-}
+*:focus {outline:none !important}
 
 * {
     user-drag: none;
@@ -9,29 +7,6 @@
     -webkit-user-drag: none;
     -webkit-user-select: none;
     -ms-user-select: none;
-}
-
-#preloader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #fff; /* change if the mask should have another color then white */
-    z-index: 99; /* makes sure it stays on top */
-}
-
-#status {
-    width: 200px;
-    height: 200px;
-    position: absolute;
-    left: 50%; /* centers the loading animation horizontally one the screen */
-    top: 50%; /* centers the loading animation vertically one the screen */
-    margin: -100px 0 0 -100px; /* is width and height divided by two */
-}
-
-#content {
-    height: calc(100% - 55px);
 }
 
 .carousel {
@@ -288,4 +263,16 @@ body {
 .label-large {
     font-size: 14px;
     line-height: 2;
+}
+
+.margin-none {
+    margin: 0;
+}
+
+.list-group-unbordered > .list-group-item {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    padding-left: 0;
+    padding-right: 0;
 }

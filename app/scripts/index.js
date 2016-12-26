@@ -36,7 +36,7 @@ App.controller('modController', ['$scope', function ($scope) {
             $scope.$apply();
             break;
     }
-});
+    });
 
     $scope.downloading = false;
 
@@ -44,11 +44,12 @@ App.controller('modController', ['$scope', function ($scope) {
     $scope.fileProgress = 0;
     $scope.fileName = 0;
 
-    $scope.chart = null;
+
 
     $scope.init = function () {
         $scope.loading = true;
         getMods();
+        $scope.initGraph();
     };
 
     $scope.initDownload = function (mod) {
@@ -73,8 +74,8 @@ App.controller('modController', ['$scope', function ($scope) {
             random.append(new Date().getTime(), Math.random() * 10000);
         }, 500);
 
-        chart.addTimeSeries(random, {lineWidth: 2, strokeStyle: '#2780e3'});
-        chart.streamTo(canvas, 500);
+        $scope.chart.addTimeSeries(random, {lineWidth: 2, strokeStyle: '#2780e3'});
+        $scope.chart.streamTo(canvas, 500);
     };
 }]);
 
@@ -87,6 +88,7 @@ App.controller('serverController', ['$scope', function ($scope) {
             $scope.$apply();
             for(var i = 0; i < $scope.servers.length; i++) {
                 $scope.redrawChart($scope.servers[i]);
+                $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar();
             }
             break;
         }
@@ -96,10 +98,10 @@ App.controller('serverController', ['$scope', function ($scope) {
         console.log(server);
         var data = {
             labels: [
-                "Zivilisten",
-                "Polizisten",
-                "Medics",
-                "ADAC"
+                " Zivilisten",
+                " Polizisten",
+                " Medics",
+                " ADAC"
             ],
             datasets: [
                 {
@@ -134,7 +136,7 @@ App.controller('serverController', ['$scope', function ($scope) {
     $scope.showTab = function (tabindex) {
         $('.serverTab').removeClass('active');
         $('.serverPane').removeClass('active');
-        $('#serverTab' + tabindex).addClass('active')
+        $('#serverTab' + tabindex).addClass('active');
         $('#serverPane' + tabindex).addClass('active');
     };
 }]);
