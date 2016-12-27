@@ -1,4 +1,6 @@
-*:focus {outline:none !important}
+*:focus {
+    outline: none !important
+}
 
 * {
     user-drag: none;
@@ -275,4 +277,16 @@ body {
     border-radius: 0;
     padding-left: 0;
     padding-right: 0;
+}
+
+span.htop:before {
+    display: block;
+    content: " ";
+    margin-top: -10px;
+    height: 10px;
+    visibility: hidden;
+}
+
+.page {
+    height: 500px;
 }

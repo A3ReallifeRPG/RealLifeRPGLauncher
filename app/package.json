@@ -43,6 +43,8 @@
     "perfect-scrollbar": "^0.6.15",
     "progress-stream": "1.2.0",
     "recursive-readdir": "2.0.0",
+    "request": "^2.79.0",
+    "request-progress": "^3.0.0",
     "shelljs": "0.7.0",
     "smoothie": "^1.27.0",
     "tether": "^1.4.0",

@@ -7,9 +7,11 @@ App.controller('navbarController', ['$scope', function ($scope) {
 
     $scope.tabs = [
         {
-            icon: 'glyphicon glyphicon-home', target: 'home', slide: 0
+            icon: 'glyphicon glyphicon-home', slide: 0
         }, {
-            icon: 'glyphicon glyphicon-tasks', target: 'servers', slide: 1
+            icon: 'glyphicon glyphicon-tasks',  slide: 1
+        }, {
+            icon: 'glyphicon glyphicon-list-alt', slide: 2
         }];
 
     $scope.switchSlide = function (tab) {
@@ -28,6 +30,7 @@ App.controller('navbarController', ['$scope', function ($scope) {
 }]);
 
 App.controller('modController', ['$scope', function ($scope) {
+
     ipcRenderer.on('to-app', (event, args) => {
         switch (args.type) {
         case "mod-callback":
@@ -35,7 +38,12 @@ App.controller('modController', ['$scope', function ($scope) {
             $scope.loading = false;
             $scope.$apply();
             break;
-    }
+        case "update-dl-progress":
+            console.log(args);
+            $scope.graphTimeline.append(new Date().getTime(),args.state.speed);
+            $scope.fileSpeed = Math.round((args.state.speed / 1000000) * 100) / 100;
+            $scope.$apply();
+        }
     });
 
     $scope.downloading = false;
@@ -43,8 +51,7 @@ App.controller('modController', ['$scope', function ($scope) {
     $scope.progress = 0;
     $scope.fileProgress = 0;
     $scope.fileName = 0;
-
-
+    $scope.fileSpeed = 0;
 
     $scope.init = function () {
         $scope.loading = true;
@@ -66,15 +73,12 @@ App.controller('modController', ['$scope', function ($scope) {
             millisPerPixel: 27,
             grid: {fillStyle: '#ffffff', strokeStyle: 'transparent', borderVisible: false},
             labels: {fillStyle: '#000000', disabled: true}
-        }),
-            canvas = document.getElementById('smoothie-chart');
+        });
 
-        var random = new TimeSeries();
-        setInterval(function () {
-            random.append(new Date().getTime(), Math.random() * 10000);
-        }, 500);
+        canvas = document.getElementById('smoothie-chart');
 
-        $scope.chart.addTimeSeries(random, {lineWidth: 2, strokeStyle: '#2780e3'});
+        $scope.graphTimeline = new TimeSeries();
+        $scope.chart.addTimeSeries($scope.graphTimeline, {lineWidth: 2, strokeStyle: '#2780e3'});
         $scope.chart.streamTo(canvas, 500);
     };
 }]);
@@ -82,17 +86,17 @@ App.controller('modController', ['$scope', function ($scope) {
 App.controller('serverController', ['$scope', function ($scope) {
     ipcRenderer.on('to-app', (event, args) => {
         switch (args.type) {
-        case "servers-callback":
-            $scope.servers = args.data.data;
-            $scope.loading = false;
-            $scope.$apply();
-            for(var i = 0; i < $scope.servers.length; i++) {
-                $scope.redrawChart($scope.servers[i]);
-                $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar();
-            }
-            break;
+    case "servers-callback":
+        $scope.servers = args.data.data;
+        $scope.loading = false;
+        $scope.$apply();
+        for (var i = 0; i < $scope.servers.length; i++) {
+            $scope.redrawChart($scope.servers[i]);
+            $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar();
         }
-    });
+        break;
+    }
+});
 
     $scope.redrawChart = function (server) {
         console.log(server);
@@ -141,11 +145,41 @@ App.controller('serverController', ['$scope', function ($scope) {
     };
 }]);
 
+App.controller('changelogController', ['$scope', function ($scope) {
+    ipcRenderer.on('to-app', (event, args) => {
+        switch (args.type) {
+        case "changelog-callback":
+            console.log(args);
+        $scope.changelogs = args.data.data;
+        $scope.loading = false;
+        $scope.$apply();
+        $('#changelogScroll').perfectScrollbar({wheelSpeed: 0.5});
+        console.log($scope.changelogs);
+        break;
+    }
+});
+
+    $scope.init = function () {
+        $scope.loading = true;
+        getChangelog();
+    };
+}]);
+
 function getMods() {
     var args = {
         type: "get-url",
         callback: "mod-callback",
         url: APIBaseURL + APIModsURL,
+        callBackTarget: "to-app"
+    };
+    ipcRenderer.send('to-web', args);
+}
+
+function getChangelog() {
+    var args = {
+        type: "get-url",
+        callback: "changelog-callback",
+        url: APIBaseURL + APIChangelogURL,
         callBackTarget: "to-app"
     };
     ipcRenderer.send('to-web', args);
