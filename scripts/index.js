@@ -1,8 +1,10 @@
 const {ipcRenderer} = require('electron');
 
-var App = angular.module('App', []);
+var App = angular.module('App', []).run(function($rootScope) {
+    $rootScope.downloading = false;
+});
 
-App.controller('navbarController', ['$scope', function ($scope) {
+App.controller('navbarController', ['$scope','$rootScope', function ($scope,$rootScope) {
     $scope.slide = 0;
 
     $scope.tabs = [
@@ -29,7 +31,7 @@ App.controller('navbarController', ['$scope', function ($scope) {
     };
 }]);
 
-App.controller('modController', ['$scope', function ($scope) {
+App.controller('modController', ['$scope','$rootScope', function ($scope,$rootScope) {
 
     ipcRenderer.on('to-app', (event, args) => {
         switch (args.type) {
@@ -38,15 +40,27 @@ App.controller('modController', ['$scope', function ($scope) {
             $scope.loading = false;
             $scope.$apply();
             break;
-        case "update-dl-progress":
-            console.log(args);
+        case "update-dl-progress-server":
+            $rootScope.downloading = true;
+            $scope.dlType = "Server - Verbunden";
             $scope.graphTimeline.append(new Date().getTime(),args.state.speed);
             $scope.fileSpeed = Math.round((args.state.speed / 1000000) * 100) / 100;
+            $scope.$apply();
+            break;
+        case "update-dl-progress-torrent":
+            $scope.dlType = "Torrent - Verbunden";
+            $rootScope.downloading = true;
+            $scope.graphTimeline.append(new Date().getTime(),args.state.torrentDownloadSpeedState);
+            $rootScope.downSpeed = Math.round((args.state.torrentDownloadSpeedState / 1000000) * 100) / 100;
+            $rootScope.upSpeed = Math.round((args.state.torrentUploadSpeedState / 1000000) * 100) / 100;
+            $scope.fileSpeed = Math.round((args.state.torrentDownloadSpeedState / 1000000) * 100) / 100;
+            $scope.progress = args.state.torrentProgressState.toFixed(2);
             $scope.$apply();
         }
     });
 
-    $scope.downloading = false;
+    $scope.dlType = "Gestoppt";
+    $rootScope.downloading = false;
 
     $scope.progress = 0;
     $scope.fileProgress = 0;
@@ -60,6 +74,7 @@ App.controller('modController', ['$scope', function ($scope) {
     };
 
     $scope.initDownload = function (mod) {
+        $scope.dlType = "Download wird gestarted...";
         var args = {
             type: "start-mod-dwn",
             mod: mod,
@@ -70,8 +85,8 @@ App.controller('modController', ['$scope', function ($scope) {
 
     $scope.initGraph = function () {
         $scope.chart = new SmoothieChart({
-            millisPerPixel: 27,
-            grid: {fillStyle: '#ffffff', strokeStyle: 'transparent', borderVisible: false},
+            millisPerPixel: 20,
+            grid: {fillStyle: '#ffffff', strokeStyle: 'transparent', borderVisible: true},
             labels: {fillStyle: '#000000', disabled: true}
         });
 
@@ -79,7 +94,7 @@ App.controller('modController', ['$scope', function ($scope) {
 
         $scope.graphTimeline = new TimeSeries();
         $scope.chart.addTimeSeries($scope.graphTimeline, {lineWidth: 2, strokeStyle: '#2780e3'});
-        $scope.chart.streamTo(canvas, 500);
+        $scope.chart.streamTo(canvas, 1000);
     };
 }]);
 

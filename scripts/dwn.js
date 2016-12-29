@@ -3,7 +3,7 @@ var request = require('request');
 var progress = require('request-progress');
 var mkpath = require('mkpath');
 var WebTorrent = require('webtorrent');
-var EventEmitter = require('events').EventEmitter;
+require('events').EventEmitter.defaultMaxListeners = 200;
 window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
 const {
     ipcRenderer
@@ -51,33 +51,29 @@ function downloadFileWithCallback(hashlist, index, basepath, dlserver) {
 
     try {
         stats = fs.lstatSync(folder);
-        if (stats.isDirectory() && folder.includes("addons")) {
-            initTorrent(folder);
-        } else {
-            progress(request(dlserver + hashlist[index].RelativPath), {
-
-            }).on('progress', function (state) {
-                updateProgressServer(state,hashlist[index].FileName);
+        if (!(stats.isDirectory() && folder.includes("addons"))) {
+            progress(request(dlserver + hashlist[index].RelativPath), {}).on('progress', function (state) {
+                updateProgressServer(state, hashlist[index].FileName);
             }).on('error', function (err) {
                 console.log(err);
             }).on('end', function () {
-                downloadFileWithCallback(hashlist, index + 1, basepath,dlserver);
+                downloadFileWithCallback(hashlist, index + 1, basepath, dlserver);
             }).pipe(fs.createWriteStream(dest));
+        } else {
+            initTorrent(folder);
         }
     } catch (e) {
         mkpath(folder, function() {
-            if (folder.includes("addons")) {
-                initTorrent(folder);
-            } else {
-                progress(request(dlserver + hashlist[index].RelativPath), {
-
-                }).on('progress', function (state) {
-                    updateProgressServer(state,hashlist[index].FileName);
+            if (!folder.includes("addons")) {
+                progress(request(dlserver + hashlist[index].RelativPath), {}).on('progress', function (state) {
+                    updateProgressServer(state, hashlist[index].FileName);
                 }).on('error', function (err) {
                     console.log(err);
                 }).on('end', function () {
-                    downloadFileWithCallback(hashlist, index + 1, basepath,dlserver);
+                    downloadFileWithCallback(hashlist, index + 1, basepath, dlserver);
                 }).pipe(fs.createWriteStream(dest));
+            } else {
+                initTorrent(folder);
             }
         });
     }
@@ -93,13 +89,11 @@ function initTorrent(folder) {
     client.on('torrent', function (torrent) {
         console.log(torrent);
         window.setInterval(function(){
-            var torrentProgress = client.progress;
             var state = {
                 torrentDownloadSpeedState: client.downloadSpeed,
                 torrentUploadSpeedState: client.uploadSpeed,
-                torrentProgressState: torrentProgress,
-                torrentRationState: client.ratio,
-                torrentState: torrent
+                torrentProgressState:  client.progress,
+                torrentRationState: client.ratio
             };
             updateProgressTorrent(state);
         }, 1000);

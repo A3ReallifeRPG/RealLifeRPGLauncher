@@ -27,6 +27,9 @@
     <link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css">
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
+    <!-- fa icons-->
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+
     <!-- smoothiecharts -->
     <script src="node_modules/smoothie/smoothie.js"></script>
 
@@ -64,6 +67,12 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li ng-show="downloading">
+                        <a><i class="fa fa-download" aria-hidden="true"></i> {{downSpeed}} Mb/s</a>
+                    </li>
+                    <li ng-show="downloading">
+                        <a><i class="fa fa-upload" aria-hidden="true"></i> {{upSpeed}} Mb/s</a>
+                    </li>
                     <li>
                         <a ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span></a>
                     </li>
@@ -107,14 +116,17 @@
                                         <div class="col-lg-4">
                                             <ul class="list-group list-group-unbordered margin-none">
                                                 <li class="list-group-item">
-                                                    <b>Download Speed</b> <a class="pull-right">{{fileSpeed}} Mb/s</a>
+                                                    <b>Status</b> <a class="pull-right">{{dlType}}</a>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <b>Geschwindigkeit</b> <a class="pull-right">{{fileSpeed}} Mb/s</a>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
                                     <hr>
                                     <div class="progress progress-striped active">
-                                        <div class="progress-bar" style="width: 45%"></div>
+                                        <div class="progress-bar" style="width: {{progress*100}}%"></div>
                                     </div>
                                 </div>
                             </div>
