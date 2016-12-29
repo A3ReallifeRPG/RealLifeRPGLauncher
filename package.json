@@ -4,8 +4,8 @@
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
-  "main": "./app/main.js",
-  "license": "CC-BY-NC-SA-4.0",
+  "main": "./main.js",
+  "license": "GPL-3.0",
   "readme": "README.md",
   "repository": {
     "type": "git",
@@ -16,23 +16,22 @@
   },
   "scripts": {
     "start": "electron .",
-    "postinstall": "install-app-deps",
     "pack": "build --target dir",
-    "dist": "build",
-    "install": "npm install --prefix ./app"
+    "dist": "build"
   },
   "devDependencies": {
-    "electron": "1.4.4",
-    "electron-builder": "7.14.2",
+    "electron": "1.4.13",
+    "electron-builder": "10.15.1",
     "devtron": "^1.4.0"
   },
   "build": {
     "appId": "realliferpg.de",
-    "app-category-type": "launcher.application",
+    "mac.category": "launcher.application",
     "win": {
       "title": "RealLifeRPG Launcher",
       "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
-      "remoteReleases": "https://static.realliferpg.de/remoteReleases/"
+      "remoteReleases": "https://static.realliferpg.de/remoteReleases/",
+      "target": "squirrel"
     },
     "squirrelWindows": {
       "loadingGif": "build/install-spinner.gif",
@@ -56,22 +55,21 @@
     "angular-ui-bootstrap": "^2.3.1",
     "bootstrap": "^4.0.0-alpha.5",
     "chart.js": "^2.4.0",
-    "dwn": "^0.0.2",
-    "electron-json-storage": "^2.0.2",
-    "electron-squirrel-startup": "^1.0.0",
+    "dwn": "0.0.2",
+    "electron-json-storage": "2.0.2",
+    "electron-squirrel-startup": "1.0.0",
     "jsonist": "^1.3.0",
-    "mkpath": "^1.0.0",
-    "node-notifier": "^4.6.1",
+    "mkpath": "1.0.0",
+    "node-notifier": "4.6.1",
     "perfect-scrollbar": "^0.6.15",
-    "progress-stream": "^1.2.0",
-    "recursive-readdir": "^2.0.0",
+    "progress-stream": "1.2.0",
+    "recursive-readdir": "2.0.0",
     "request": "^2.79.0",
     "request-progress": "^3.0.0",
-    "shelljs": "^0.7.0",
-    "simplebar": "^2.0.1",
+    "shelljs": "0.7.0",
     "smoothie": "^1.27.0",
     "tether": "^1.4.0",
-    "unzip": "^0.1.11",
-    "winreg": "^1.2.1"
+    "webtorrent": "^0.98.0",
+    "winreg": "1.2.1"
   }
 }
