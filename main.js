@@ -2,28 +2,21 @@ if (require('electron-squirrel-startup')) return;
 
 const electron = require('electron');
 
-const app = require('electron').app
+const app = require('electron').app;
 
-const path = require('path')
+const path = require('path');
 
 const shell = require('electron').shell;
 
-const {session} = require('electron')
+const {session} = require('electron');
 
-const {
-    Menu
-} = require('electron')
+const {Menu} = require('electron');
 
 const autoUpdater = require('electron').autoUpdater;
 
-const BrowserWindow = require('electron').BrowserWindow
-const {
-    ipcMain
-} = require('electron');
+const BrowserWindow = require('electron').BrowserWindow;
+const {ipcMain} = require('electron');
 
-const filter = {
-  urls: ['https://*.twitter.com/i/*']
-}
 
 // ------------------------------------------- squirrel stuff (for updating) ----------------------------------------------------------------
 
@@ -155,7 +148,6 @@ function createWindow() {
     downWin.webContents.openDevTools({
         detach: false
     });
-
     // Create the browser window.
     win = new BrowserWindow({
         icon: 'icon/appicon.ico',
@@ -166,7 +158,9 @@ function createWindow() {
         maxWidth: 1920,
         maxHeight: 1080
     });
-
+    win.webContents.openDevTools({
+        detach: true
+    });
     win.loadURL(`file://${__dirname}/index.html`);
 
     win.on('closed', () => {
@@ -201,9 +195,6 @@ function setUpIpcHandlers() {
 
 app.on('ready', function() {
     createWindow();
-    session.defaultSession.webRequest.onBeforeRequest(filter, (callback) => {
-      callback.cancel = true;
-    })
     /*
     wintray = new Tray(app.getAppPath() + '/app/icon/tray.ico');
 
@@ -266,26 +257,26 @@ ipcMain.on('open-devtools', (event) => {
     win.webContents.openDevTools({
         detach: true
     });
-    webWin.show()
-    downWin.show()
+    webWin.show();
+    downWin.show();
 });
 
 ipcMain.on('close-devtools', (event) => {
     win.webContents.closeDevTools()
-    webWin.hide()
-    downWin.hide()
+    webWin.hide();
+    downWin.hide();
 });
 
 ipcMain.on('toggle-devtools', (event) => {
     if (win.webContents.isDevToolsOpened()) {
-        win.webContents.closeDevTools()
-        webWin.hide()
+        win.webContents.closeDevTools();
+        webWin.hide();
         downWin.hide()
     } else {
         win.webContents.openDevTools({
             detach: true
         });
-        webWin.show()
+        webWin.show();
         downWin.show()
     }
-});
+})

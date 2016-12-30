@@ -1,7 +1,13 @@
 const {ipcRenderer} = require('electron');
+var moment = require('moment');
+var humanizeDuration = require('humanize-duration');
+var vex = require('vex-js');
+vex.registerPlugin(require('vex-dialog'));
+vex.defaultOptions.className = 'vex-theme-plain';
 
 var App = angular.module('App', []).run(function($rootScope) {
     $rootScope.downloading = false;
+    $rootScope.AppLoaded = true;
 });
 
 App.controller('navbarController', ['$scope','$rootScope', function ($scope,$rootScope) {
@@ -32,13 +38,13 @@ App.controller('navbarController', ['$scope','$rootScope', function ($scope,$roo
 }]);
 
 App.controller('modController', ['$scope','$rootScope', function ($scope,$rootScope) {
-
     ipcRenderer.on('to-app', (event, args) => {
         switch (args.type) {
         case "mod-callback":
             $scope.mods = args.data.data;
             $scope.loading = false;
             $scope.$apply();
+            $('#modScroll').perfectScrollbar();
             break;
         case "update-dl-progress-server":
             $rootScope.downloading = true;
@@ -51,21 +57,71 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             $scope.dlType = "Torrent - Verbunden";
             $rootScope.downloading = true;
             $scope.graphTimeline.append(new Date().getTime(),args.state.torrentDownloadSpeedState);
-            $rootScope.downSpeed = Math.round((args.state.torrentDownloadSpeedState / 1000000) * 100) / 100;
-            $rootScope.upSpeed = Math.round((args.state.torrentUploadSpeedState / 1000000) * 100) / 100;
-            $scope.fileSpeed = Math.round((args.state.torrentDownloadSpeedState / 1000000) * 100) / 100;
-            $scope.progress = args.state.torrentProgressState.toFixed(2);
+            $rootScope.downSpeed = (args.state.torrentDownloadSpeedState / 1000000).toFixed(2);
+            $rootScope.upSpeed = (args.state.torrentUploadSpeedState / 1000000).toFixed(2);
+            $scope.fileSpeed = (args.state.torrentDownloadSpeedState / 1000000).toFixed(2);
+            $scope.progress = (args.state.torrentProgressState * 100).toFixed(2);
+            $scope.downloaded = (args.state.torrentDownloadedState / 1000000000).toFixed(2);
+            $scope.torrentSize = (args.state.torrentSizeState / 1000000000).toFixed(2);
+            $scope.eta = humanizeDuration(Math.round(args.state.torrentETAState), { language: 'de' , round: true});
+            $scope.peers = args.state.torrentNumPeersState;
+            $scope.maxConns = args.state.torrentMaxConnsState;
             $scope.$apply();
+            break;
+        case "torrent-init":
+            $scope.dlType = "Torrent - Verbinden...";
+            $rootScope.downloading = false;
+            $scope.$apply();
+            break;
+        case "status-change":
+            $scope.dlType = args.status;
+            $scope.$apply();
+            break;
+        case "update-hash-progress":
+            $scope.dlType = "Überprüfung - Läuft";
+            $scope.progress = (args.state.index/args.state.size * 100).toFixed(2);
+            $scope.$apply();
+            break;
+        case "update-hash-progress-done":
+            $scope.dlType = "Überprüfung - Abgeschlossen";
+            $scope.progress = 100;
+            vex.dialog.alert({
+                message: 'Testing the wireframe theme.',
+                className: 'vex-theme-wireframe' // Overwrites defaultOptions
+            });
+            spawnNotification(args.list.length + " Datein werden erneut heruntergelanden");
+            $scope.$apply();
+            break;
+        case "reset":
+            $scope.dlType = "Gestoppt";
+            $rootScope.downloading = false;
+            $rootScope.downSpeed = 0;
+            $rootScope.upSpeed = 0;
+            $scope.fileSpeed = 0;
+            $scope.progress = 100;
+            $scope.downloaded = 0;
+            $scope.torrentSize = 0;
+            $scope.eta = "-";
+            $scope.peers = 0;
+            $scope.maxConns = 0;
+            $scope.$apply();
+            break;
         }
     });
 
     $scope.dlType = "Gestoppt";
+    $scope.eta = "-";
     $rootScope.downloading = false;
 
+    $scope.maxConns = 0;
+    $scope.peers = 0;
     $scope.progress = 0;
     $scope.fileProgress = 0;
     $scope.fileName = 0;
     $scope.fileSpeed = 0;
+    $scope.downloaded = 0;
+    $scope.size = 0;
+    $scope.torrentSize = 0;
 
     $scope.init = function () {
         $scope.loading = true;
@@ -77,6 +133,16 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         $scope.dlType = "Download wird gestarted...";
         var args = {
             type: "start-mod-dwn",
+            mod: mod,
+            target : "E:\\Steam\\steamapps\\common\\Arma 3\\"
+        };
+        ipcRenderer.send('to-dwn', args);
+    };
+
+    $scope.initHash = function (mod) {
+        $scope.dlType = "Überprüfung wird gestarted...";
+        var args = {
+            type: "start-mod-hash",
             mod: mod,
             target : "E:\\Steam\\steamapps\\common\\Arma 3\\"
         };
@@ -114,7 +180,6 @@ App.controller('serverController', ['$scope', function ($scope) {
 });
 
     $scope.redrawChart = function (server) {
-        console.log(server);
         var data = {
             labels: [
                 " Zivilisten",
@@ -164,12 +229,10 @@ App.controller('changelogController', ['$scope', function ($scope) {
     ipcRenderer.on('to-app', (event, args) => {
         switch (args.type) {
         case "changelog-callback":
-            console.log(args);
         $scope.changelogs = args.data.data;
         $scope.loading = false;
         $scope.$apply();
         $('#changelogScroll').perfectScrollbar({wheelSpeed: 0.5});
-        console.log($scope.changelogs);
         break;
     }
 });

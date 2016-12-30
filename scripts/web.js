@@ -1,12 +1,6 @@
-var dwn = require('dwn');
-var progress = require('progress-stream');
-var fs = require('fs');
 var jsonist = require('jsonist');
-window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
 
-const {
-    ipcRenderer
-} = require('electron');
+const {ipcRenderer} = require('electron');
 
 ipcRenderer.on('to-web', (event, args) => {
     switch (args.type) {
