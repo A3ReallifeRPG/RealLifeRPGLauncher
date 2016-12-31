@@ -116,8 +116,8 @@
                                                             <h4>{{mod.Name}}</h4>
                                                             <hr>
                                                             <div class="btn-group btn-group-sm">
-                                                                <button class="btn btn-success" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0" >{{mod.state[1]}}</button>
-                                                                <button class="btn btn-warning" ng-click="initHash(mod)" ng-disabled="downloading || mod.state[0] == 0">Prüfen</button>
+                                                                <button class="btn btn-success" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
+                                                                <button class="btn btn-warning" ng-show="mod.state[0] !== 0" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
                                                             </div>
                                                         </div>
                                                     </div>

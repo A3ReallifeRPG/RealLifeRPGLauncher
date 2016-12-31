@@ -1,12 +1,32 @@
 const {ipcRenderer} = require('electron');
 var moment = require('moment');
 var humanizeDuration = require('humanize-duration');
+var Datastore = require('nedb');
+var fs = require('fs');
 const {dialog} = require('electron').remote;
+const {app} = require('electron').remote;
 
 var App = angular.module('App', []).run(function($rootScope) {
     $rootScope.downloading = false;
     $rootScope.AppLoaded = true;
-    $rootScope.ArmaPath = "E:\\Steam\\steamapps\\common\\Arma 3\\";
+    $rootScope.ArmaPath = "";
+
+    try {
+        fs.lstatSync(app.getPath('userData') + "\\settings.nedb");
+        $rootScope.NeDB = new Datastore({ filename: app.getPath('userData') + "\\settings.nedb", autoload: true });
+    } catch (e) {
+        $rootScope.NeDB = new Datastore({ filename: app.getPath('userData') + "\\settings.nedb", autoload: true });
+
+        var defaultSettings = {
+            _id: 0
+            , armapath: 5
+        };
+
+        $rootScope.NeDB.insert(defaultSettings, function (err, newDoc) {
+
+        });
+    }
+
 });
 
 App.controller('navbarController', ['$scope','$rootScope', function ($scope,$rootScope) {
@@ -249,6 +269,13 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             ipcRenderer.send('winprogress-change', args);
         }, true);
 
+    $rootScope.$watch(
+        "ArmaPath", function () {
+            if($scope.mods !== undefined) {
+                $scope.checkUpdates();
+            };
+        }, true);
+
     $scope.action = function (mod) {
         console.log(mod);
         switch (mod.state[0]) {
@@ -277,13 +304,17 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
 
     $scope.checkUpdates = function () {
         for(var i = 0; i < $scope.mods.length; i++) {
-            $scope.mods[i].state = [0,"Suche nach Updates..."];
-            var args = {
-                type: "start-mod-quickcheck",
-                mod: $scope.mods[i],
-                path: $rootScope.ArmaPath
-            };
-            ipcRenderer.send('to-dwn', args);
+            if($rootScope.ArmaPath !== ''){
+                $scope.mods[i].state = [0,"Suche nach Updates..."];
+                var args = {
+                    type: "start-mod-quickcheck",
+                    mod: $scope.mods[i],
+                    path: $rootScope.ArmaPath
+                };
+                ipcRenderer.send('to-dwn', args);
+            } else {
+                $scope.mods[i].state = [0,"Kein Pfad gesetzt"];
+            }
         }
         //$scope.setStatus("Suche nach Updates...", "Wir gleichen deine Version der Mods mit der Aktuellen ab.");
     };
@@ -371,8 +402,9 @@ App.controller('changelogController', ['$scope', function ($scope) {
 
 App.controller('settingsController', ['$scope','$rootScope', function ($scope,$rootScope) {
     $scope.init = function () {
-        $scope.loading = true;
-        $scope.loading = false;
+        $rootScope.NeDB.find({ _id: 0 }, function (err, docs) {
+            console.log(docs);
+        });
     };
 
     $scope.chooseArmaPath = function () {
