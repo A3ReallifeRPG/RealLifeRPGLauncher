@@ -24,3 +24,11 @@ function toGB(val) {
 function toMB(val) {
     return (val / 1000000).toFixed(3);
 }
+
+function cutName(name) {
+    if(name.length > 30) {
+        return name.substring(0,30) + "...";
+    } else {
+        return name;
+    }
+}

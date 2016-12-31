@@ -289,68 +289,38 @@
                         </div>
                     </div>
                 </div>
+                <div class="carousel-item">
+                    <div id="settings">
+                        <div class="container" ng-controller="settingsController" data-ng-init="init()">
+                            <h3>Einstellungen</h3>
+                            <hr>
+                            <div class="page">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="pathInput">Arma 3 Pfad</label>
+                                        <div class="input-group">
+                                            <input id="pathInput" class="form-control" type="text" placeholder="Kein Arma Pfad gesetzt" ng-model="ArmaPath" disabled>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-primary" type="button" ng-click="chooseArmaPath()"><span class="glyphicon glyphicon-open-file"></span></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Notification Dialog
-<div data-role="dialog,draggable" id="dialog_notf" class="padding20 dialog success" data-close-button="true" data-type="success" style="max-width:60%">
-    <h1>Wichtige Information</h1>
-    <p id="dialog_notf_text" style="font-size:15px;">
-
-    </p>
-    <span class="dialog-close-button"></span>
-</div>
-
-<!-- Arma Path Dialog
-<div data-role="dialog" id="dialog_defaultpath" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
-    <h1>Arma Pfad gefunden</h1>
-    <p id="armapathtext">
-    </p>
-    <button class="button success" onclick="armaPathisCorrect();" style="float:left">Richtig</button>
-    <button class="button danger" onclick="armaPathisFalse();" style="float:right">Falsch</button>
-</div>
-
-<!-- Download Complete Hash Dialog
-<div data-role="dialog" id="dialog_downloadComplete" class="padding20 dialog warning" data-type="warning" style="width: auto; height: auto; visibility: hidden; left: 289.5px; top: 419px;">
-    <h1>Download abgeschlossen</h1>
-    <p>
-        Der Download ist abgeschlossen.
-        <br/> Wir empfehlen eine komplette überprüfung der Mod Dateien vorzunehmen.
-        <br/> Dies kann einiege Minuten dauern, dadurch ist aber sichergestellt das der Mod korrekt geladen wurde.
-        <br/>
-    </p>
-    <button class="button success" onclick="hashDialogConfirm();" style="float:right">Jetzt Prüfen</button>
-    <button class="button danger" onclick="hashDialogClose();" style="float:left">Nicht Prüfen</button>
-</div>
-
-<!-- No Path Dialog
-<div data-role="dialog" id="dialog_noPath" class="padding20 dialog success" data-close-button="true" data-type="warning" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
-    <h1>Arma Pfad nicht gefunden</h1>
-    <p>
-        Die Aktion kann nicht ausgeführt werden, da kein Arma Pfad gefunden wurde.
-    </p>
-    <button class="button success" onclick="noArmaPathSettings();" style="float:right">Jetzt Einstellen</button>
-</div>
-
-<!-- Update Dialog
-<div data-role="dialog" id="dialog_updateInfo" class="padding20 dialog success" data-close-button="true" data-type="warning" style="width: auto; height: auto; visibility: visible; left: 295.5px; top: 419px;">
-    <h1>Update verfügbar</h1>
-    <p>
-        Für folgende Mod(s) ist ein Update verfügbar:
-        <label id="lbl_updateModInfo"></label>
-    </p>
-    <span class="dialog-close-button"></span>
-</div>
--->
 </body>
 <script>
     $(document).on('click', 'a[href^="htt"]', function (event) {
         if (this.href != "") {
             event.preventDefault();
             shell.openExternal(this.href);
-        };
+        }
     });
 </script>
 </html>

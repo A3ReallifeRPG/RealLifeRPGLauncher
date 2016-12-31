@@ -1,10 +1,12 @@
 const {ipcRenderer} = require('electron');
 var moment = require('moment');
 var humanizeDuration = require('humanize-duration');
+const {dialog} = require('electron').remote;
 
 var App = angular.module('App', []).run(function($rootScope) {
     $rootScope.downloading = false;
     $rootScope.AppLoaded = true;
+    $rootScope.ArmaPath = "E:\\Steam\\steamapps\\common\\Arma 3\\";
 });
 
 App.controller('navbarController', ['$scope','$rootScope', function ($scope,$rootScope) {
@@ -17,6 +19,8 @@ App.controller('navbarController', ['$scope','$rootScope', function ($scope,$roo
             icon: 'glyphicon glyphicon-tasks',  slide: 1
         }, {
             icon: 'glyphicon glyphicon-list-alt', slide: 2
+        }, {
+            icon: 'glyphicon glyphicon-cog', slide: 3
         }];
 
     $scope.switchSlide = function (tab) {
@@ -51,7 +55,7 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         $scope.downloaded = toGB(args.state.totalDownloaded);
         $scope.graphTimeline.append(new Date().getTime(),args.state.speed);
         $scope.speed  = toMB(args.state.speed);
-        $scope.fileName = args.filename;
+        $scope.fileName = cutName(args.fileName);
         $scope.fileProgress = (args.state.percent * 100).toFixed(2);
         $rootScope.downSpeed = $scope.speed;
         $scope.$apply();
@@ -88,6 +92,7 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
     case "update-hash-progress":
         $scope.state = "Überprüfung - Läuft";
         $scope.progress = (args.state.index/args.state.size * 100).toFixed(2);
+        $scope.fileName = cutName(args.fileName);
         $scope.$apply();
         break;
     case "update-hash-progress-done":
@@ -102,10 +107,10 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             alertify.confirm(args.list.length + " Dateien müssen heruntergelanden werden (" + toGB(size) + " GB)", function (e) {
                 if (e) {
                     $scope.reset();
-                    $scope.initListDownload(args.list, true, args.mod, TestPath);
+                    $scope.initListDownload(args.list, true, args.mod, $rootScope.ArmaPath);
                 } else {
                     $scope.reset();
-                    $scope.initListDownload(args.list, false, args.mod, TestPath);
+                    $scope.initListDownload(args.list, false, args.mod, $rootScope.ArmaPath);
                 }
             });
             spawnNotification(args.list.length + " Dateien müssen heruntergelanden werden (" + toGB(size) + " GB)");
@@ -184,7 +189,7 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         var args = {
             type: "start-mod-dwn",
             mod: mod,
-            path : TestPath
+            path : $rootScope.ArmaPath
         };
         ipcRenderer.send('to-dwn', args);
     };
@@ -195,14 +200,13 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         var args = {
             type: "start-mod-hash",
             mod: mod,
-            path : TestPath
+            path : $rootScope.ArmaPath
         };
         ipcRenderer.send('to-dwn', args);
     };
 
     $scope.initListDownload = function(list, torrent, mod, path) {
         $rootScope.downloading = true;
-        console.log($rootScope.downloading);
         $scope.state = "Download wird gestarted...";
         var args = {
             type: "start-list-dwn",
@@ -212,7 +216,7 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             path: path
         };
         ipcRenderer.send('to-dwn', args);
-    }
+    };
 
     $scope.initGraph = function () {
         $scope.chart = new SmoothieChart({
@@ -255,7 +259,7 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
                 $scope.initHash(mod);
                 break;
             case 3:
-                // TODO Play
+                angular.element($('#bs-navbar-collapse')).injector().switchSlide({slide: 1});
                 break;
             default:
                 break;
@@ -277,7 +281,7 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             var args = {
                 type: "start-mod-quickcheck",
                 mod: $scope.mods[i],
-                path: TestPath
+                path: $rootScope.ArmaPath
             };
             ipcRenderer.send('to-dwn', args);
         }
@@ -362,6 +366,30 @@ App.controller('changelogController', ['$scope', function ($scope) {
     $scope.init = function () {
         $scope.loading = true;
         getChangelog();
+    };
+}]);
+
+App.controller('settingsController', ['$scope','$rootScope', function ($scope,$rootScope) {
+    $scope.init = function () {
+        $scope.loading = true;
+        $scope.loading = false;
+    };
+
+    $scope.chooseArmaPath = function () {
+        var options = {
+            filters: [{
+                name: 'Arma3.exe',
+                extensions: ['exe']
+            }],
+            title: "Bitte wähle deine Arma3.exe aus",
+            properties: ['openFile']
+        };
+        path = String(dialog.showOpenDialog(options));
+        if (path !== "undefined" && path.indexOf('\\arma3.exe') > -1) {
+            console.log($rootScope.ArmaPath = path.replace('arma3.exe', ''));
+        } else {
+            $rootScope.ArmaPath = '';
+        }
     };
 }]);
 

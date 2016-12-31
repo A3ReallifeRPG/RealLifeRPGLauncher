@@ -64,7 +64,7 @@ function dwnlist(args) {
 function quickchecklist(args) {
     try {
         fs.lstatSync(path + args.args.mod.Directories);
-        quickCheckRecursive(args.data.data,0,TestPath,args.args.mod);
+        quickCheckRecursive(args.data.data,0,path,args.args.mod);
     } catch (e) {
         console.log(e);
         var args = {
@@ -78,7 +78,7 @@ function quickchecklist(args) {
 
 function hashMod(args) {
     var dllist = [];
-    hashFileRecursive(args.data.data,0,TestPath,dllist,args.args.mod);
+    hashFileRecursive(args.data.data,0,path,dllist,args.args.mod);
 }
 
 function getHashlist(mod, callback) {
@@ -150,7 +150,7 @@ function hashFileRecursive(list, index, basepath, dllist, mod) {
     updateProgressHash({
         index: index,
         size: list.length
-    }, list[index].FileName);
+    }, list[index].FileName,mod);
 
     try {
         fs.lstatSync(folder);
@@ -228,7 +228,7 @@ function updateProgressServer(state,filename) {
     var args = {
         type: "update-dl-progress-server",
         state: state,
-        filename: filename
+        fileName: filename
     };
     ipcRenderer.send('to-app', args);
 }
@@ -262,7 +262,7 @@ function updateProgressHash(state,filename,mod) {
     var args = {
         type: "update-hash-progress",
         state: state,
-        filename: filename,
+        fileName: filename,
         mod: mod
     };
     ipcRenderer.send('to-app', args);
