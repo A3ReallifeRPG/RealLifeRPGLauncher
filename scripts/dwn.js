@@ -4,9 +4,7 @@ var progress = require('request-progress');
 var mkpath = require('mkpath');
 var WebTorrent = require('webtorrent');
 var hasha = require("hasha");
-var jsonfile = require('jsonfile');
 require('events').EventEmitter.defaultMaxListeners = Infinity;
-window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
 const {ipcRenderer} = require('electron');
 
 var index = 0;
