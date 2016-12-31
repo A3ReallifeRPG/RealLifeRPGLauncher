@@ -24,6 +24,6 @@ var filesToExtract = ['ic_description_white_36dp_2x.png','ic_done_all_white_36dp
 
 debug_mode = 0;
 
-var TestPath = "C:\\Users\\User\\Desktop\\LauncherTest\\";
+var TestPath = "E:\\LauncherTest\\";
 
 var TestDlServer = "http://server4.realliferpg.de/download/";

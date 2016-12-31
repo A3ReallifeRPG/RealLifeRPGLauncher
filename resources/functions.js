@@ -15,3 +15,12 @@ function inArray(val, array){
     }
     return false;
 }
+
+
+function toGB(val) {
+    return (val / 1000000000).toFixed(3);
+}
+
+function toMB(val) {
+    return (val / 1000000).toFixed(3);
+}

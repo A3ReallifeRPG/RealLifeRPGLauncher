@@ -4,61 +4,97 @@ var progress = require('request-progress');
 var mkpath = require('mkpath');
 var WebTorrent = require('webtorrent');
 var hasha = require("hasha");
+var jsonfile = require('jsonfile');
 require('events').EventEmitter.defaultMaxListeners = Infinity;
 window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
 const {ipcRenderer} = require('electron');
-const {dialog} = require('electron').remote;
 
 var index = 0;
-var client = new WebTorrent();
+var cancel = false;
+var downloaded = 0;
+
+var path = "";
 
 ipcRenderer.on('to-dwn', (event, args) => {
     switch (args.type) {
     case "start-mod-dwn":
-        getHashlist(args.mod.Id,"hashlist-callback-dwn");
+        cancel = false;
+        path = args.path;
+        getHashlist(args.mod,"hashlist-callback-dwn");
         break;
     case "start-mod-hash":
-        getHashlist(args.mod.Id,"hashlist-callback-hash");
+        cancel = false;
+        path = args.path;
+        getHashlist(args.mod,"hashlist-callback-hash");
+        break;
+    case "start-mod-quickcheck":
+        cancel = false;
+        path = args.path;
+        getHashlist(args.mod,"hashlist-callback-quickcheck");
         break;
     case "hashlist-callback-dwn":
+        cancel = false;
         dwnMod(args);
         break;
     case "hashlist-callback-hash":
+        cancel = false;
         hashMod(args);
+        break;
+    case "start-list-dwn":
+        cancel = false;
+        path = args.path;
+        dwnlist(args);
+        break;
+    case "hashlist-callback-quickcheck":
+        cancel = false;
+        quickchecklist(args);
+        break;
+    case "cancel":
+        cancel = true;
         break;
     }
 })
 
 function dwnMod(args) {
-    downloadList(args.data.data,0,TestPath,TestDlServer);
+    downloadFileRecursive(args.data.data,0,path,args.args.mod.DownloadUrl, true, args.args.mod.Torrent);
+}
+
+function dwnlist(args) {
+    downloadFileRecursive(args.list,0,path,args.mod.DownloadUrl, args.torrent, args.mod.Torrent);
+}
+
+function quickchecklist(args) {
+    try {
+        fs.lstatSync(path + args.args.mod.Directories);
+        quickCheckRecursive(args.data.data,0,TestPath,args.args.mod);
+    } catch (e) {
+        console.log(e);
+        var args = {
+            type: "update-quickcheck",
+            update: 0,
+            mod: args.args.mod
+        };
+        ipcRenderer.send('to-app', args);
+    }
 }
 
 function hashMod(args) {
     var dllist = [];
-    hashList(args.data.data,0,TestPath,dllist);
+    hashFileRecursive(args.data.data,0,TestPath,dllist,args.args.mod);
 }
 
-function getHashlist(id, callback) {
+function getHashlist(mod, callback) {
     var args = {
         type: "get-url",
         callback: callback,
-        url: APIBaseURL + APIModHashlistURL + id,
-        callBackTarget: "to-dwn"
+        url: APIBaseURL + APIModHashlistURL + mod.Id,
+        callBackTarget: "to-dwn",
+        mod: mod
     };
     ipcRenderer.send('to-web', args);
 }
 
-function downloadList(hashlist,startIndex, basepath, dlserver) {
-    if (typeof startIndex === 'undefined') { startIndex = 0; }
-    downloadFileRecursive(hashlist, startIndex, basepath, dlserver, true);
-}
-
-function hashList(hashlist,startIndex, basepath, dllist) {
-    if (typeof startIndex === 'undefined') { startIndex = 0; }
-    hashFileRecursive(hashlist, startIndex, basepath, dllist);
-}
-
-function downloadFileRecursive(list, index, basepath, dlserver, torrent) {
+function downloadFileRecursive(list, index, basepath, dlserver, torrent, torrentURL) {
 
     var dest = basepath + list[index].RelativPath;
     var folder = dest.replace(list[index].FileName, '');
@@ -66,42 +102,49 @@ function downloadFileRecursive(list, index, basepath, dlserver, torrent) {
     try {
         stats = fs.lstatSync(folder);
         if (!(stats.isDirectory() && folder.includes("addons") && torrent)) {
-            progress(request(dlserver + list[index].RelativPath), {}).on('progress', function (state) {
-                updateProgressServer(state, list[index].FileName);
-            }).on('error', function (err) {
-                console.log(err);
-            }).on('end', function () {
-                if(list.length >= index + 1) {
-                    downloadFileRecursive(list, index + 1, basepath, dlserver);
-                } else {
-                    downloadFinished();
-                };
-            }).pipe(fs.createWriteStream(dest));
+            dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL);
         } else {
-            initTorrent(folder);
+            initTorrent(folder, torrentURL);
         }
     } catch (e) {
-        mkpath(folder, function() {
+        mkpath(folder, function () {
             if (!folder.includes("addons") && torrent) {
-                progress(request(dlserver + list[index].RelativPath), {}).on('progress', function (state) {
-                    updateProgressServer(state, list[index].FileName);
-                }).on('error', function (err) {
-                    console.log(err);
-                }).on('end', function () {
-                    if(list.length >= index + 1) {
-                        downloadFileRecursive(list, index + 1, basepath, dlserver);
-                    } else {
-                        downloadFinished();
-                    }
-                }).pipe(fs.createWriteStream(dest));
+                dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL);
             } else {
-                initTorrent(folder);
+                initTorrent(folder, torrentURL);
             }
         });
     }
 }
 
-function hashFileRecursive(list, index, basepath, dllist) {
+function dlFileCallback(list,index,dest,basepath,dlserver,torrent,torrentURL) {
+    changeStatus(true,"Server - Verbunden");
+    var size = 0;
+    for(var i = 0; i < list.length; i++) {
+        size += list[i].Size;
+    }
+    progress(request(dlserver + list[index].RelativPath), {}).on('progress', function (state) {
+        state.totalSize = size;
+        state.totalDownloaded = downloaded;
+        updateProgressServer(state, list[index].FileName);
+    }).on('error', function (err) {
+        console.log(err);
+    }).on('end', function () {
+        downloaded += list[index].Size;
+        if(cancel) {
+            cancel = false;
+            resetStatus();
+        } else {
+            if(list.length > index + 1) {
+                downloadFileRecursive(list, index + 1, basepath, dlserver,torrent, torrentURL);
+            } else {
+                downloadFinished();
+            }
+        }
+    }).pipe(fs.createWriteStream(dest));
+}
+
+function hashFileRecursive(list, index, basepath, dllist, mod) {
 
     var dest = basepath + list[index].RelativPath;
     var folder = dest.replace(list[index].FileName, '');
@@ -112,72 +155,73 @@ function hashFileRecursive(list, index, basepath, dllist) {
     }, list[index].FileName);
 
     try {
-        stats = fs.lstatSync(folder);
+        fs.lstatSync(folder);
+        fs.lstatSync(dest);
         hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
-            if(list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
+            if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
                 dllist.push(list[index]);
             }
-            if(list.length > index + 1) {
-                hashFileRecursive(list,index + 1, basepath,dllist);
+            if (list.length > index + 1) {
+                hashFileRecursive(list, index + 1, basepath, dllist, mod);
             } else {
-                console.log(dllist);
-                finishProgressHash(dllist);
+                finishProgressHash(dllist, mod);
             }
         });
     } catch (e) {
-        console.log(e);
         dllist.push(list[index]);
-        if(list.length > index + 1) {
-            hashFileRecursive(list,index + 1, basepath,dllist);
+        if (list.length > index + 1) {
+            hashFileRecursive(list, index + 1, basepath, dllist, mod);
         } else {
-            finishProgressHash(dllist);
+            finishProgressHash(dllist, mod);
         }
     }
 }
 
 function downloadFinished(){
-    changeStatus("Abgeschlossen");
+    var args = {
+        type: "update-dl-progress-done"
+    };
+    ipcRenderer.send('to-app', args);
 }
 
-function initTorrent(folder) {
-    changeStatus("Torrent - Verbinden...");
+function initTorrent(folder,torrentURL) {
+    var client = new WebTorrent();
+
+    changeStatus(true,"Torrent - Verbinden...","Das Verbinden zum Torrent kann einige Minuten dauern.");
     path = folder.replace('addons', '');
     var opts = {
         path: path
     };
-    client.add(magnet,opts, function (torrent) {
+    client.add(torrentURL,opts, function (torrent) {
         var update = setInterval(function () {
-            var state = {
-                torrentDownloadSpeedState: client.downloadSpeed,
-                torrentUploadSpeedState: client.uploadSpeed,
-                torrentMaxConnsState: client.maxConns,
-                torrentProgressState: torrent.progress,
-                torrentRationState: torrent.ratio,
-                torrentETAState: torrent.timeRemaining,
-                torrentDownloadedState: torrent.downloaded,
-                torrentUploadedState: torrent.uploaded,
-                torrentNumPeersState: torrent.numPeers,
-                torrentSizeState: torrent.length
-            };
-            updateProgressTorrent(state);
-        }, 1000);
-        ipcRenderer.on('to-dwn', (event, args) => {
-            switch (args.type) {
-            case "stop-torrent-dwn":
-                torrent.destroy(function () {
-                    update = null;
-                    changeStatus("Abgebrochen");
+            if(!cancel) {
+                var state = {
+                    torrentDownloadSpeedState: client.downloadSpeed,
+                    torrentUploadSpeedState: client.uploadSpeed,
+                    torrentMaxConnsState: client.maxConns,
+                    torrentProgressState: torrent.progress,
+                    torrentRationState: torrent.ratio,
+                    torrentETAState: torrent.timeRemaining,
+                    torrentDownloadedState: torrent.downloaded,
+                    torrentUploadedState: torrent.uploaded,
+                    torrentNumPeersState: torrent.numPeers,
+                    torrentSizeState: torrent.length
+                };
+                updateProgressTorrent(state);
+            } else {
+                client.destroy(function () {
+                    clearInterval(update);
+                    resetStatus();
                 });
-                break;
             }
-        });
+        }, 1000);
         torrent.on('done', function () {
-            changeStatus("Torrent - Seeding");
+            changeStatus(false,"Abgeschlossen");
         })
     });
 
     client.on('error', function (err) {
-        changeStatus("Torrent - Fehler");
+        changeStatus(false,"Torrent - Fehler");
         console.log(err);
     });
 }
@@ -199,10 +243,12 @@ function updateProgressTorrent(state) {
     ipcRenderer.send('to-app', args);
 }
 
-function changeStatus(status) {
+function changeStatus(downloading,status,hint) {
     var args = {
         type: "status-change",
-        status: status
+        status: status,
+        downloading: downloading,
+        hint: hint
     };
     ipcRenderer.send('to-app', args);
 }
@@ -214,20 +260,77 @@ function resetStatus() {
     ipcRenderer.send('to-app', args);
 }
 
-function updateProgressHash(state,filename) {
+function updateProgressHash(state,filename,mod) {
     var args = {
         type: "update-hash-progress",
         state: state,
-        filename: filename
+        filename: filename,
+        mod: mod
     };
     ipcRenderer.send('to-app', args);
 }
 
-function finishProgressHash(list) {
+function finishProgressHash(list,mod) {
     resetStatus();
     var args = {
         type: "update-hash-progress-done",
-        list: list
+        list: list,
+        mod: mod
     };
     ipcRenderer.send('to-app', args);
+}
+
+function quickCheckRecursive(list, index, basepath, mod) {
+    try {
+        var dest = basepath + list[index].RelativPath;
+        stats = fs.lstatSync(dest);
+        if(dest.includes(".bisign")) {
+            hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
+                if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
+                    var args = {
+                        type: "update-quickcheck",
+                        update: 1,
+                        mod: mod
+                    };
+                    ipcRenderer.send('to-app', args);
+                } else {
+                    if (list.length > index + 1) {
+                        quickCheckRecursive(list, index + 1, basepath, mod)
+                    } else {
+                        var args = {
+                            type: "update-quickcheck",
+                            update: 2,
+                            mod: mod
+                        };
+                        ipcRenderer.send('to-app', args);
+                    }
+                }
+            });
+        } else if (list[index].Size !== stats.size) {
+            var args = {
+                type: "update-quickcheck",
+                update: 1,
+                mod: mod
+            };
+            ipcRenderer.send('to-app', args);
+        } else {
+            if (list.length > index + 1) {
+                quickCheckRecursive(list, index + 1, basepath, mod)
+            } else {
+                var args = {
+                    type: "update-quickcheck",
+                    update: 2,
+                    mod: mod
+                };
+                ipcRenderer.send('to-app', args);
+            }
+        }
+    } catch (e) {
+        var args = {
+            type: "update-quickcheck",
+            update: 1,
+            mod: mod
+        };
+        ipcRenderer.send('to-app', args);
+    }
 }

@@ -30,14 +30,18 @@
     <!-- fa icons-->
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
 
-    <link rel="stylesheet" href="node_modules/vex-js/dist/css/vex.css" />
-    <link rel="stylesheet" href="node_modules/vex-js/dist/css/vex-theme-plain.css" />
-
     <!-- smoothiecharts -->
     <script src="node_modules/smoothie/smoothie.js"></script>
 
     <!-- chartjs -->
     <script src="node_modules/chart.js/dist/Chart.min.js"></script>
+
+    <!-- alertify -->
+    <script src="node_modules/alertify/lib/alertify.min.js"></script>
+    <!-- include the core styles -->
+    <link rel="stylesheet" href="resources/alertify.core.css"/>
+    <!-- include a theme, can be included into the core instead of 2 separate files -->
+    <link rel="stylesheet" href="resources/alertify.cosmo.css"/>
 
     <!-- perfect-scrollbar -->
     <script src="node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
@@ -71,10 +75,10 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li ng-show="downloading">
+                    <li ng-show="downloading && downSpeed > 0">
                         <a><i class="fa fa-download" aria-hidden="true"></i> {{downSpeed}} Mb/s</a>
                     </li>
-                    <li ng-show="downloading && upSpeed != 0">
+                    <li ng-show="downloading && upSpeed > 0">
                         <a><i class="fa fa-upload" aria-hidden="true"></i> {{upSpeed}} Mb/s</a>
                     </li>
                     <li>
@@ -95,12 +99,14 @@
                             <div ng-controller="modController" data-ng-init="init()">
                                 <h3>ReallifeRPG Mods</h3>
                                 <hr>
-                                <div style="text-align: center" ng-show="loading">
-                                    <img src="resources/loading/cube.svg"/>
-                                </div>
-                                <div class="page" ng-show="!loading">
+                                <div class="page">
                                     <div class="row">
-                                        <div id="modScroll" class="col-lg-8" style="position: relative">
+                                        <div class="col-lg-8" ng-show="loading">
+                                            <div style="text-align: center">
+                                                <img src="resources/loading/cube.svg"/>
+                                            </div>
+                                        </div>
+                                        <div id="modScroll" class="col-lg-8" style="position: relative"  ng-show="!loading">
                                             <div class="row">
                                                 <div class="col-md-6" ng-repeat="mod in mods">
                                                     <div class="panel panel-primary">
@@ -110,8 +116,8 @@
                                                             <h4>{{mod.Name}}</h4>
                                                             <hr>
                                                             <div class="btn-group btn-group-sm">
-                                                                <button class="btn btn-success" ng-click="initDownload(mod)">Download</button>
-                                                                <button class="btn btn-warning" ng-click="initHash(mod)">Prüfen</button>
+                                                                <button class="btn btn-success" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0" >{{mod.state[1]}}</button>
+                                                                <button class="btn btn-warning" ng-click="initHash(mod)" ng-disabled="downloading || mod.state[0] == 0">Prüfen</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -121,25 +127,36 @@
                                         <div class="col-lg-4">
                                             <ul class="list-group list-group-unbordered margin-none">
                                                 <li class="list-group-item">
-                                                    <b>Status</b> <a class="pull-right">{{dlType}}</a>
+                                                    <b>Status</b> <a class="pull-right">{{state}}</a>
                                                 </li>
-                                                <li class="list-group-item">
-                                                    <b>Geschwindigkeit</b> <a class="pull-right">{{fileSpeed}} Mb/s</a>
+                                                <li class="list-group-item" ng-if="speed > 0">
+                                                    <b>Geschwindigkeit</b> <a class="pull-right">{{speed}} Mb/s</a>
                                                 </li>
-                                                <li class="list-group-item">
+                                                <li class="list-group-item" ng-if="progress != null">
                                                     <b>Fortschritt</b> <a class="pull-right">{{progress}} %</a>
                                                 </li>
-                                                <li class="list-group-item">
-                                                    <b>Heruntergelanden</b> <a class="pull-right">{{downloaded}} GB/{{torrentSize}} GB</a>
+                                                <li class="list-group-item" ng-if="size > 0">
+                                                    <b>Heruntergeladen</b> <a class="pull-right">{{downloaded}} GB/{{size}} GB</a>
                                                 </li>
-                                                <li class="list-group-item">
+                                                <li class="list-group-item" ng-if="eta !== ''">
                                                     <b>Verbleibend</b> <a class="pull-right">{{eta}}</a>
                                                 </li>
-                                                <li class="list-group-item">
+                                                <li class="list-group-item" ng-if="maxConns > 0">
                                                     <b>Peers</b> <a class="pull-right">{{peers}}/{{maxConns}}</a>
                                                 </li>
+                                                <li class="list-group-item" ng-if="fileSpeed > 0">
+                                                    <b>Datei</b> <a class="pull-right">{{fileSpeed}} Mb/s</a>
+                                                </li>
+                                                <li class="list-group-item" ng-if="fileName !== ''">
+                                                    <b>Dateiname</b> <a class="pull-right">{{fileName}}</a>
+                                                </li>
+                                                <li class="list-group-item" ng-if="fileProgress > 0">
+                                                    <div class="progress progress-striped active" style="margin-bottom: 0">
+                                                        <div class="progress-bar progress-bar-success" style="width: {{fileProgress}}%"></div>
+                                                    </div>
+                                                </li>
                                             </ul>
-                                            <button class="btn btn-success pull-right btn-sm" style="margin-top: 10px" ng-if="downloading"><i class="fa fa-play" aria-hidden="true"></i> Abbrechen</button>
+                                            <button class="btn btn-danger pull-right btn-sm" style="margin-top: 10px" ng-if="downloading" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> Abbrechen</button>
                                         </div>
                                     </div>
                                     <div class="row">
