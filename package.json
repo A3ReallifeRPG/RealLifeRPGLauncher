@@ -69,7 +69,6 @@
     "request-progress": "^3.0.0",
     "shelljs": "0.7.0",
     "smoothie": "^1.27.0",
-    "standart": "^6.1.0",
     "tether": "^1.4.0",
     "vex-js": "^3.0.0",
     "webtorrent": "^0.98.0"
