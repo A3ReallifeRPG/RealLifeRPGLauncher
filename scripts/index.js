@@ -12,7 +12,7 @@ var App = angular.module('App', []).run(function($rootScope) {
     $rootScope.ArmaPath = "";
 
     try {
-        fs.lstatSync(app.getPath('userData') + "\\settings.nedb");
+        fs.lstatSync(app.getPath('userData') + "\\settings.json");
         $rootScope.NeDB = new Datastore({ filename: app.getPath('userData') + "\\settings.nedb", autoload: true });
     } catch (e) {
         $rootScope.NeDB = new Datastore({ filename: app.getPath('userData') + "\\settings.nedb", autoload: true });
@@ -384,15 +384,15 @@ App.controller('serverController', ['$scope', function ($scope) {
 
 App.controller('changelogController', ['$scope', function ($scope) {
     ipcRenderer.on('to-app', (event, args) => {
-        switch (args.type) {
-    case "changelog-callback":
-        $scope.changelogs = args.data.data;
-        $scope.loading = false;
-        $scope.$apply();
-        $('#changelogScroll').perfectScrollbar({wheelSpeed: 0.5});
-        break;
-    }
-});
+            switch (args.type) {
+            case "changelog-callback":
+                $scope.changelogs = args.data.data;
+                $scope.loading = false;
+                $scope.$apply();
+                $('#changelogScroll').perfectScrollbar({wheelSpeed: 0.5});
+                break;
+            }
+    });
 
     $scope.init = function () {
         $scope.loading = true;
