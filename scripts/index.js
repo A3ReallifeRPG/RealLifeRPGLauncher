@@ -1,7 +1,6 @@
 const {ipcRenderer} = require('electron');
 var moment = require('moment');
 var humanizeDuration = require('humanize-duration');
-var Datastore = require('nedb');
 var fs = require('fs');
 const {dialog} = require('electron').remote;
 const {app} = require('electron').remote;
@@ -13,18 +12,7 @@ var App = angular.module('App', []).run(function($rootScope) {
 
     try {
         fs.lstatSync(app.getPath('userData') + "\\settings.json");
-        $rootScope.NeDB = new Datastore({ filename: app.getPath('userData') + "\\settings.nedb", autoload: true });
     } catch (e) {
-        $rootScope.NeDB = new Datastore({ filename: app.getPath('userData') + "\\settings.nedb", autoload: true });
-
-        var defaultSettings = {
-            _id: 0
-            , armapath: 5
-        };
-
-        $rootScope.NeDB.insert(defaultSettings, function (err, newDoc) {
-
-        });
     }
 
 });
@@ -402,9 +390,7 @@ App.controller('changelogController', ['$scope', function ($scope) {
 
 App.controller('settingsController', ['$scope','$rootScope', function ($scope,$rootScope) {
     $scope.init = function () {
-        $rootScope.NeDB.find({ _id: 0 }, function (err, docs) {
-            console.log(docs);
-        });
+
     };
 
     $scope.chooseArmaPath = function () {

@@ -22,7 +22,8 @@
   "devDependencies": {
     "electron": "1.4.13",
     "electron-builder": "10.15.1",
-    "devtron": "^1.4.0"
+    "devtron": "^1.4.0",
+    "standard": "^8.6.0"
   },
   "build": {
     "appId": "realliferpg.de",

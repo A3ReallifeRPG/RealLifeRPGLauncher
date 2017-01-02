@@ -78,7 +78,7 @@ function quickchecklist(args) {
 
 function hashMod(args) {
     var dllist = [];
-    hashFileRecursive(args.data.data,0,path,dllist,args.args.mod);
+    cleanFileRecursive(listDiff(args.data.data,path,args.args.mod),0,path,hashFileRecursive,args.data.data,0,path,dllist,args.args.mod);
 }
 
 function getHashlist(mod, callback) {
@@ -90,6 +90,50 @@ function getHashlist(mod, callback) {
         mod: mod
     };
     ipcRenderer.send('to-web', args);
+}
+
+function findFileInList(list,path,basepath) {
+    var basepath = basepath.replace(/\\/g, '/');
+
+    var found = false;
+    list.forEach(function (listvalue) {
+        if(basepath + listvalue.RelativPath.replace(/\\/g, '/') === path.replace(/\\/g, '/')) {
+            found = true;
+        }
+    });
+
+    return [found,path];
+}
+
+function listDiff(list,basepath,mod) {
+    var files = walkFolder(basepath + mod.Directories);
+    var toDelete = [];
+    files.forEach(function (filesvalue) {
+        var search = findFileInList(list,filesvalue,basepath);
+        if(!search[0]) {
+            toDelete.push(search[1]);
+        }
+    });
+    return toDelete;
+}
+
+function cleanFileRecursive(list, index, basepath, callback, hashlist, hashIndex, dllist, mod) {
+    var dest = list[index];
+
+    try {
+        fs.unlink(dest);
+        if(list.length > index + 1) {
+            cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod);
+        } else {
+            callback(hashlist, hashIndex, dllist, mod);
+        }
+    } catch (e) {
+        if(list.length > index + 1) {
+            cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod);
+        } else {
+            callback(hashlist, hashIndex, dllist, mod);
+        }
+    }
 }
 
 function downloadFileRecursive(list, index, basepath, dlserver, torrent, torrentURL) {
