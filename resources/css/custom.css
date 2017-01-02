@@ -290,3 +290,7 @@ span.htop:before {
 .page {
     height: 550px;
 }
+
+canvas#smoothie-chart {
+    border: #2780e3 1px solid;
+}

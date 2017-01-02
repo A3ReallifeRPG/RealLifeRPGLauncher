@@ -117,7 +117,7 @@ function listDiff(list,basepath,mod) {
     return toDelete;
 }
 
-function cleanFileRecursive(list, index, basepath, callback, hashlist, hashIndex, dllist, mod) {
+function cleanFileRecursive(list, index, basepath, callback, hashlist, hashIndex, path, dllist, mod) {
     var dest = list[index];
 
     try {
@@ -125,13 +125,13 @@ function cleanFileRecursive(list, index, basepath, callback, hashlist, hashIndex
         if(list.length > index + 1) {
             cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod);
         } else {
-            callback(hashlist, hashIndex, dllist, mod);
+            callback(hashlist, hashIndex, path, dllist, mod);
         }
     } catch (e) {
         if(list.length > index + 1) {
             cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod);
         } else {
-            callback(hashlist, hashIndex, dllist, mod);
+            callback(hashlist, hashIndex, path, dllist, mod);
         }
     }
 }
@@ -191,30 +191,35 @@ function hashFileRecursive(list, index, basepath, dllist, mod) {
     var dest = basepath + list[index].RelativPath;
     var folder = dest.replace(list[index].FileName, '');
 
-    updateProgressHash({
-        index: index,
-        size: list.length
-    }, list[index].FileName,mod);
+    if(cancel) {
+        cancel = false;
+        resetStatus();
+    } else {
+        updateProgressHash({
+            index: index,
+            size: list.length
+        }, list[index].FileName,mod);
 
-    try {
-        fs.lstatSync(folder);
-        fs.lstatSync(dest);
-        hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
-            if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
-                dllist.push(list[index]);
-            }
+        try {
+            fs.lstatSync(folder);
+            fs.lstatSync(dest);
+            hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
+                if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
+                    dllist.push(list[index]);
+                }
+                if (list.length > index + 1) {
+                    hashFileRecursive(list, index + 1, basepath, dllist, mod);
+                } else {
+                    finishProgressHash(dllist, mod);
+                }
+            });
+        } catch (e) {
+            dllist.push(list[index]);
             if (list.length > index + 1) {
                 hashFileRecursive(list, index + 1, basepath, dllist, mod);
             } else {
                 finishProgressHash(dllist, mod);
             }
-        });
-    } catch (e) {
-        dllist.push(list[index]);
-        if (list.length > index + 1) {
-            hashFileRecursive(list, index + 1, basepath, dllist, mod);
-        } else {
-            finishProgressHash(dllist, mod);
         }
     }
 }

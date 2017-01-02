@@ -4,6 +4,7 @@ var humanizeDuration = require('humanize-duration');
 var fs = require('fs');
 const {dialog} = require('electron').remote;
 const {app} = require('electron').remote;
+const storage = require('electron-json-storage');
 
 var App = angular.module('App', []).run(function($rootScope) {
     $rootScope.downloading = false;
@@ -13,6 +14,7 @@ var App = angular.module('App', []).run(function($rootScope) {
     try {
         fs.lstatSync(app.getPath('userData') + "\\settings.json");
     } catch (e) {
+
     }
 
 });
@@ -47,6 +49,20 @@ App.controller('navbarController', ['$scope','$rootScope', function ($scope,$roo
 }]);
 
 App.controller('modController', ['$scope','$rootScope', function ($scope,$rootScope) {
+
+    $scope.state = "Gestoppt";
+    $rootScope.downloading = false;
+    $rootScope.downSpeed = 0;
+    $rootScope.upSpeed = 0;
+    $scope.totalProgress = "";
+    $scope.totalSize = 0;
+    $scope.totalDownloaded = 0;
+    $scope.totalETA = "";
+    $scope.totalPeers = 0;
+    $scope.maxConns = 0;
+    $scope.fileName = "";
+    $scope.fileProgress = "";
+
     ipcRenderer.on('to-app', (event, args) => {
         switch (args.type) {
     case "mod-callback":
@@ -57,55 +73,110 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         $('#modScroll').perfectScrollbar();
         break;
     case "update-dl-progress-server":
-        $rootScope.downloading = true;
-        $scope.state = "Server - Verbunden";
-        $scope.size = toGB(args.state.totalSize);
-        $scope.downloaded = toGB(args.state.totalDownloaded);
-        $scope.graphTimeline.append(new Date().getTime(),args.state.speed);
-        $scope.speed  = toMB(args.state.speed);
-        $scope.fileName = cutName(args.fileName);
-        $scope.fileProgress = (args.state.percent * 100).toFixed(2);
-        $rootScope.downSpeed = $scope.speed;
+        $scope.update({
+            state: "Server - Verbunden",
+            hint: "",
+            downloading: true,
+            downSpeed: toMB(args.state.speed),
+            upSpeed: 0,
+            totalProgress: toFileProgress(args.state.totalSize,args.state.totalDownloaded),
+            totalSize: toGB(args.state.totalSize),
+            totalDownloaded: toGB(args.state.totalDownloaded),
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: cutName(args.fileName),
+            fileProgress: toProgress(args.state.percent)
+        });
+        $scope.graphTimeline.append(new Date().getTime(),toMB(args.state.speed));
         $scope.$apply();
         break;
     case "update-dl-progress-torrent":
-        $scope.state = "Torrent - Verbunden";
-        $rootScope.downloading = true;
-        $scope.graphTimeline.append(new Date().getTime(),args.state.torrentDownloadSpeedState);
-        $scope.speed = toMB(args.state.torrentDownloadSpeedState);
-        $rootScope.downSpeed = $scope.speed;
-        $rootScope.upSpeed = toMB(args.state.torrentUploadSpeedState);
-        $scope.progress = (args.state.torrentProgressState * 100).toFixed(2);
-        $scope.downloaded = toGB(args.state.torrentDownloadedState);
-        $scope.size = toGB(args.state.torrentSizeState);
-        $scope.eta = humanizeDuration(Math.round(args.state.torrentETAState), { language: 'de' , round: true});
-        $scope.peers = args.state.torrentNumPeersState;
-        $scope.maxConns = args.state.torrentMaxConnsState;
-        $scope.fileName = "";
-        $scope.fileProgress = "";
+        $scope.update({
+            state: "Torrent - Verbunden",
+            hint: "",
+            downloading: true,
+            downSpeed: toMB(args.state.torrentDownloadSpeedState),
+            upSpeed: toMB(args.state.torrentUploadSpeedState),
+            totalProgress: toProgress(args.state.torrentProgressState),
+            totalSize: toGB(args.state.torrentSizeState),
+            totalDownloaded: toGB(args.state.torrentDownloadedState),
+            totalETA: humanizeDuration(Math.round(args.state.torrentETAState), {language: 'de', round: true}),
+            totalPeers: args.state.torrentNumPeersState,
+            maxConns: args.state.torrentMaxConnsState,
+            fileName: "",
+            fileProgress: ""
+        });
+        $scope.graphTimeline.append(new Date().getTime(),toMB(args.state.torrentDownloadSpeedState));
         $scope.$apply();
         break;
     case "torrent-init":
-        $scope.state = "Torrent - Verbinden...";
-        $rootScope.downloading = true;
-        $scope.fileProgress = 0;
-        $scope.$apply();
+        $scope.update({
+            state: "Torrent - Verbinden...",
+            hint: "",
+            downloading: true,
+            downSpeed: 0,
+            upSpeed: 0,
+            totalProgress: "",
+            totalSize: 0,
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: "",
+            fileProgress: ""
+        });
         break;
     case "status-change":
-        $scope.state = args.status;
-        $rootScope.downloading = args.downloading;
-        $scope.hint = args.hint;
-        $scope.$apply();
+        $scope.update({
+            state: args.status,
+            hint: args.hint,
+            downloading: args.downloading,
+            downSpeed: 0,
+            upSpeed: 0,
+            totalProgress: "",
+            totalSize: 0,
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: "",
+            fileProgress: ""
+        });
         break;
     case "update-hash-progress":
-        $scope.state = "Überprüfung - Läuft";
-        $scope.progress = (args.state.index/args.state.size * 100).toFixed(2);
-        $scope.fileName = cutName(args.fileName);
-        $scope.$apply();
+        $scope.update({
+            state: "Überprüfung - Läuft",
+            hint: "",
+            downloading: true,
+            downSpeed: toMB(args.state.speed),
+            upSpeed: 0,
+            totalProgress: toProgress(args.state.index/args.state.size),
+            totalSize: 0,
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: cutName(args.fileName),
+            fileProgress: ""
+        });
         break;
     case "update-hash-progress-done":
-        $scope.state = "Überprüfung - Abgeschlossen";
-        $scope.progress = 100;
+        $scope.update({
+            state: "Überprüfung - Abgeschlossen",
+            hint: "",
+            downloading: true,
+            downSpeed: 0,
+            upSpeed: 0,
+            totalProgress: 100,
+            totalSize: 0,
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: "",
+            fileProgress: ""
+        });
         var size = 0;
         for(var i = 0; i < args.list.length ; i++) {
             size += args.list[i].Size;
@@ -115,10 +186,10 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             alertify.confirm(args.list.length + " Dateien müssen heruntergelanden werden (" + toGB(size) + " GB)", function (e) {
                 if (e) {
                     $scope.reset();
-                    $scope.initListDownload(args.list, true, args.mod, $rootScope.ArmaPath);
+                    $scope.initListDownload(args.list, true, args.mod);
                 } else {
                     $scope.reset();
-                    $scope.initListDownload(args.list, false, args.mod, $rootScope.ArmaPath);
+                    $scope.initListDownload(args.list, false, args.mod);
                 }
             });
             spawnNotification(args.list.length + " Dateien müssen heruntergelanden werden (" + toGB(size) + " GB)");
@@ -136,8 +207,8 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         $scope.checkUpdates();
         break;
     case "reset":
-        $scope.reset();
-        $scope.$apply();
+        //$scope.reset();
+        //$scope.$apply();
         break;
     case "update-quickcheck":
         for (var j = 0; j < $scope.mods.length; j++) {
@@ -157,33 +228,22 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
 });
 
     $scope.reset = function () {
-        $scope.state = "Gestoppt";
-        $rootScope.downloading = false;
-        $rootScope.downSpeed = 0;
-        $rootScope.upSpeed = 0;
-        $scope.speed = 0;
-        $scope.progress = null;
-        $scope.downloaded = 0;
-        $scope.size = 0;
-        $scope.eta = "";
-        $scope.fileName = "";
-        $scope.peers = 0;
-        $scope.maxConns = 0;
-        $scope.$apply();
+        $scope.update({
+            state: "Gestoppt",
+            hint: "",
+            downloading: false,
+            downSpeed: 0,
+            upSpeed: 0,
+            totalProgress: "",
+            totalSize: 0,
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: "",
+            fileProgress: ""
+        });
     };
-
-    $scope.state = "Gestoppt";
-    $rootScope.downloading = false;
-    $rootScope.downSpeed = 0;
-    $rootScope.upSpeed = 0;
-    $scope.speed = 0;
-    $scope.progress = null;
-    $scope.downloaded = 0;
-    $scope.size = 0;
-    $scope.eta = "";
-    $scope.fileName = "";
-    $scope.peers = 0;
-    $scope.maxConns = 0;
 
     $scope.init = function () {
         $scope.loading = true;
@@ -192,8 +252,21 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
     };
 
     $scope.initDownload = function (mod) {
-        $rootScope.downloading = true;
-        $scope.state = "Download wird gestarted...";
+        $scope.update({
+            state: "Download wird gestarted...",
+            hint: "",
+            downloading: true,
+            downSpeed: 0,
+            upSpeed: 0,
+            totalProgress: "",
+            totalSize: 0,
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: "",
+            fileProgress: ""
+        });
         var args = {
             type: "start-mod-dwn",
             mod: mod,
@@ -203,25 +276,37 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
     };
 
     $scope.initHash = function (mod) {
-        $rootScope.downloading = true;
-        $scope.state = "Überprüfung wird gestarted...";
+        alertify.log("Überprüfung wird gestartet", 'primary');
         var args = {
             type: "start-mod-hash",
             mod: mod,
-            path : $rootScope.ArmaPath
+            path: $rootScope.ArmaPath
         };
         ipcRenderer.send('to-dwn', args);
     };
 
-    $scope.initListDownload = function(list, torrent, mod, path) {
-        $rootScope.downloading = true;
-        $scope.state = "Download wird gestarted...";
+    $scope.initListDownload = function(list, torrent, mod) {
+        $scope.update({
+            state: "Download wird gestarted...",
+            hint: "",
+            downloading: true,
+            downSpeed: 0,
+            upSpeed: 0,
+            totalProgress: 0,
+            totalSize: 0,
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: 0,
+            maxConns: 0,
+            fileName: "",
+            fileProgress: ""
+        });
         var args = {
             type: "start-list-dwn",
             list: list,
             torrent: torrent,
             mod: mod,
-            path: path
+            path: $rootScope.ArmaPath
         };
         ipcRenderer.send('to-dwn', args);
     };
@@ -229,9 +314,7 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
     $scope.initGraph = function () {
         $scope.chart = new SmoothieChart({
             millisPerPixel: 20,
-            maxValueScale: 1.23,
-            minValueScale: 1.23,
-            grid: {fillStyle: '#ffffff', strokeStyle: 'transparent', borderVisible: true},
+            grid: {fillStyle: '#ffffff',strokeStyle:'#ffffff'},
             labels: {fillStyle: '#000000', disabled: true}
         });
 
@@ -247,6 +330,23 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             type: "cancel"
         };
         ipcRenderer.send('to-dwn', args);
+    };
+
+    $scope.update = function (update) {
+        $scope.state = update.state;
+        $scope.hint = update.hint;
+        $rootScope.downloading = update.downloading;
+        $rootScope.downSpeed = update.downSpeed;
+        $rootScope.upSpeed = update.upSpeed;
+        $scope.totalProgress = update.totalProgress;
+        $scope.totalSize = update.totalSize;
+        $scope.totalDownloaded = update.totalDownloaded;
+        $scope.totalETA = update.totalETA;
+        $scope.totalPeers = update.totalPeers;
+        $scope.maxConns = update.maxConns;
+        $scope.fileName = update.fileName;
+        $scope.fileProgress = update.fileProgress;
+        $scope.$apply();
     };
 
     $scope.$watch(
@@ -265,7 +365,6 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         }, true);
 
     $scope.action = function (mod) {
-        console.log(mod);
         switch (mod.state[0]) {
             case 1:
                 $scope.initDownload(mod);
@@ -279,15 +378,6 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
             default:
                 break;
         }
-    };
-
-    $scope.setStatus = function(status,hint) {
-        if (typeof hint === 'undefined') {
-            hint = "";
-        }
-        $scope.hint = hint;
-        $scope.status = status;
-        $scope.$apply();
     };
 
     $scope.checkUpdates = function () {
@@ -304,7 +394,6 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
                 $scope.mods[i].state = [0,"Kein Pfad gesetzt"];
             }
         }
-        //$scope.setStatus("Suche nach Updates...", "Wir gleichen deine Version der Mods mit der Aktuellen ab.");
     };
 
 }]);
@@ -312,17 +401,17 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
 App.controller('serverController', ['$scope', function ($scope) {
     ipcRenderer.on('to-app', (event, args) => {
         switch (args.type) {
-    case "servers-callback":
-        $scope.servers = args.data.data;
-        $scope.loading = false;
-        $scope.$apply();
-        for (var i = 0; i < $scope.servers.length; i++) {
-            $scope.redrawChart($scope.servers[i]);
-            $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar();
+        case "servers-callback":
+            $scope.servers = args.data.data;
+            $scope.loading = false;
+            $scope.$apply();
+            for (var i = 0; i < $scope.servers.length; i++) {
+                $scope.redrawChart($scope.servers[i]);
+                $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar();
+            }
+            break;
         }
-        break;
-    }
-});
+    });
 
     $scope.redrawChart = function (server) {
         var data = {
@@ -345,7 +434,7 @@ App.controller('serverController', ['$scope', function ($scope) {
         };
 
         var xhx = $("#serverChart" + server.Id);
-        var serverChart1 = new Chart(xhx, {
+        new Chart(xhx, {
             type: 'pie',
             data: data,
             options: {
@@ -390,7 +479,10 @@ App.controller('changelogController', ['$scope', function ($scope) {
 
 App.controller('settingsController', ['$scope','$rootScope', function ($scope,$rootScope) {
     $scope.init = function () {
-
+        storage.get('settings', function(error, data) {
+            if (error) throw error;
+            $rootScope.ArmaPath = data.armapath;
+        });
     };
 
     $scope.chooseArmaPath = function () {

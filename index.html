@@ -111,7 +111,7 @@
                                                 <div class="col-md-6" ng-repeat="mod in mods">
                                                     <div class="panel panel-primary">
                                                         <div class="panel-body" style="text-align: center">
-                                                            <img src="{{mod.ImageUrl}}" width="320px">
+                                                            <img ng-src="{{mod.ImageUrl}}" width="320px">
                                                             <hr>
                                                             <h4>{{mod.Name}}</h4>
                                                             <hr>
@@ -127,19 +127,19 @@
                                         <div class="col-lg-4">
                                             <ul class="list-group list-group-unbordered margin-none">
                                                 <li class="list-group-item">
-                                                    <b>Status</b> <a class="pull-right">{{state}}</a>
+                                                    <b>Status</b> <a class="pull-right" data-hover="tooltip" data-hint="{{hint}}">{{state}}</a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="speed > 0">
-                                                    <b>Geschwindigkeit</b> <a class="pull-right">{{speed}} Mb/s</a>
+                                                <li class="list-group-item" ng-if="downSpeed > 0">
+                                                    <b>Geschwindigkeit</b> <a class="pull-right">{{downSpeed}} Mb/s</a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="progress != null">
-                                                    <b>Fortschritt</b> <a class="pull-right">{{progress}} %</a>
+                                                <li class="list-group-item" ng-if="totalProgress !== ''">
+                                                    <b>Fortschritt</b> <a class="pull-right">{{totalProgress}} %</a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="size > 0">
-                                                    <b>Heruntergeladen</b> <a class="pull-right">{{downloaded}} GB/{{size}} GB</a>
+                                                <li class="list-group-item" ng-if="totalSize > 0">
+                                                    <b>Heruntergeladen</b> <a class="pull-right">{{totalDownloaded}} GB/{{totalSize}} GB</a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="eta !== ''">
-                                                    <b>Verbleibend</b> <a class="pull-right">{{eta}}</a>
+                                                <li class="list-group-item" ng-if="totalETA !== ''">
+                                                    <b>Verbleibend</b> <a class="pull-right">{{totalETA}}</a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="maxConns > 0">
                                                     <b>Peers</b> <a class="pull-right">{{peers}}/{{maxConns}}</a>
@@ -157,14 +157,15 @@
                                                 </li>
                                             </ul>
                                             <button class="btn btn-danger pull-right btn-sm" style="margin-top: 10px" ng-if="downloading" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> Abbrechen</button>
+                                            <br>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <canvas id="smoothie-chart" width="1140" height="70"></canvas>
+                                            <canvas ng-show="downloading && !loading" id="smoothie-chart" width="1140" height="70"></canvas>
                                             <hr>
                                             <div class="progress progress-striped active">
-                                                <div class="progress-bar" style="width: {{progress}}%"></div>
+                                                <div class="progress-bar" style="width: {{totalProgress}}%"></div>
                                             </div>
                                         </div>
 
@@ -296,12 +297,12 @@
                             <hr>
                             <div class="page">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <label for="pathInput">Arma 3 Pfad</label>
                                         <div class="input-group">
                                             <input id="pathInput" class="form-control" type="text" placeholder="Kein Arma Pfad gesetzt" ng-model="ArmaPath" disabled>
                                             <span class="input-group-btn">
-                                                <button class="btn btn-primary" type="button" ng-click="chooseArmaPath()"><span class="glyphicon glyphicon-open-file"></span></button>
+                                                <button ng-disabled="downloading" class="btn btn-primary" type="button" ng-click="chooseArmaPath()"><span class="glyphicon glyphicon-open-file"></span></button>
                                             </span>
                                         </div>
                                     </div>
@@ -321,6 +322,10 @@
             event.preventDefault();
             shell.openExternal(this.href);
         }
+    });
+
+    $(document).ready(function(){
+        $('[data-hover="tooltip"]').tooltip();
     });
 </script>
 </html>

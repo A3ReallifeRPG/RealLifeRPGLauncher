@@ -25,6 +25,14 @@ function toMB(val) {
     return (val / 1000000).toFixed(3);
 }
 
+function toProgress(val) {
+    return (val * 100).toFixed(3);
+}
+
+function toFileProgress(filesize,downloaded) {
+    return (100 / filesize * downloaded).toFixed(2);
+}
+
 function cutName(name) {
     if(name.length > 30) {
         return name.substring(0,30) + "...";
