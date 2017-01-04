@@ -110,6 +110,24 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         $scope.graphTimeline.append(new Date().getTime(),toMB(args.state.torrentDownloadSpeedState));
         $scope.$apply();
         break;
+    case "update-dl-progress-seeding":
+        $scope.update({
+            state: "Torrent - Seeding",
+            hint: "",
+            downloading: true,
+            downSpeed: 0,
+            upSpeed: toMB(args.state.torrentUploadSpeedState),
+            totalProgress: "",
+            totalDownloaded: 0,
+            totalETA: "",
+            totalPeers: args.state.torrentNumPeersState,
+            maxConns: args.state.torrentMaxConnsState,
+            fileName: "",
+            fileProgress: ""
+        });
+        $scope.graphTimeline.append(new Date().getTime(),toMB(args.state.torrentUploadSpeedState));
+        $scope.$apply();
+        break;
     case "torrent-init":
         $scope.update({
             state: "Torrent - Verbinden...",
@@ -206,9 +224,8 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         $scope.reset();
         $scope.checkUpdates();
         break;
-    case "reset":
-        //$scope.reset();
-        //$scope.$apply();
+    case "cancelled":
+        $scope.reset();
         break;
     case "update-quickcheck":
         for (var j = 0; j < $scope.mods.length; j++) {
@@ -250,23 +267,19 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
         getMods();
         $scope.initGraph();
     };
+    
+    $scope.initTorrent = function (mod) {
+        alertify.log("Seeding wird gestartet...", 'primary');
+        var args = {
+            type: "start-mod-seed",
+            mod: mod,
+            path : $rootScope.ArmaPath
+        };
+        ipcRenderer.send('to-dwn', args);
+    };
 
     $scope.initDownload = function (mod) {
-        $scope.update({
-            state: "Download wird gestarted...",
-            hint: "",
-            downloading: true,
-            downSpeed: 0,
-            upSpeed: 0,
-            totalProgress: "",
-            totalSize: 0,
-            totalDownloaded: 0,
-            totalETA: "",
-            totalPeers: 0,
-            maxConns: 0,
-            fileName: "",
-            fileProgress: ""
-        });
+        alertify.log("Download wird gestartet", 'primary');
         var args = {
             type: "start-mod-dwn",
             mod: mod,
@@ -350,9 +363,9 @@ App.controller('modController', ['$scope','$rootScope', function ($scope,$rootSc
     };
 
     $scope.$watch(
-        "progress", function () {
+        "totalProgress", function () {
             var args = {
-                progress: $scope.progress/100
+                progress: $scope.totalProgress/100
             };
             ipcRenderer.send('winprogress-change', args);
         }, true);
@@ -500,6 +513,12 @@ App.controller('settingsController', ['$scope','$rootScope', function ($scope,$r
         } else {
             $rootScope.ArmaPath = '';
         }
+    };
+
+    $scope.saveSettings = function () {
+        storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
+            if (error) throw error;
+        });
     };
 }]);
 

@@ -118,6 +118,7 @@
                                                             <div class="btn-group btn-group-sm">
                                                                 <button class="btn btn-success" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
                                                                 <button class="btn btn-warning" ng-show="mod.state[0] !== 0" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
+                                                                <button class="btn btn-primary" ng-show="mod.state[0] === 3" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -127,7 +128,7 @@
                                         <div class="col-lg-4">
                                             <ul class="list-group list-group-unbordered margin-none">
                                                 <li class="list-group-item">
-                                                    <b>Status</b> <a class="pull-right" data-hover="tooltip" data-hint="{{hint}}">{{state}}</a>
+                                                    <b>Status</b> <a class="pull-right" data-hover="tooltip" title="{{hint}}">{{state}}</a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="downSpeed > 0">
                                                     <b>Geschwindigkeit</b> <a class="pull-right">{{downSpeed}} Mb/s</a>
@@ -142,7 +143,7 @@
                                                     <b>Verbleibend</b> <a class="pull-right">{{totalETA}}</a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="maxConns > 0">
-                                                    <b>Peers</b> <a class="pull-right">{{peers}}/{{maxConns}}</a>
+                                                    <b>Peers</b> <a class="pull-right">{{totalPeers}}/{{maxConns}}</a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="fileSpeed > 0">
                                                     <b>Datei</b> <a class="pull-right">{{fileSpeed}} Mb/s</a>

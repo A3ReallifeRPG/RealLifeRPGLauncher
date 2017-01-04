@@ -11,6 +11,8 @@ var index = 0;
 var cancel = false;
 var downloaded = 0;
 
+let client = window.client = new WebTorrent();
+
 var path = "";
 
 ipcRenderer.on('to-dwn', (event, args) => {
@@ -19,6 +21,12 @@ ipcRenderer.on('to-dwn', (event, args) => {
         cancel = false;
         path = args.path;
         getHashlist(args.mod,"hashlist-callback-dwn");
+        break;
+    case "start-mod-seed":
+        cancel = false;
+        path = args.path;
+        initSeeding(args.path + args.mod.Directories + "\\",args.mod.Torrent);
+        console.log(args.mod.Torrent);
         break;
     case "start-mod-hash":
         cancel = false;
@@ -136,6 +144,33 @@ function cleanFileRecursive(list, index, basepath, callback, hashlist, hashIndex
     }
 }
 
+function initSeeding(dirPath, TorrentURL) {
+    console.log(dirPath);
+    var opts = {
+        path: dirPath
+    };
+    client.add(TorrentURL,opts, function (torrent) {
+        console.log(torrent);
+        var update = setInterval(function () {
+            if(!cancel) {
+                var state = {
+                    torrentUploadSpeedState: client.uploadSpeed,
+                    torrentMaxConnsState: client.maxConns,
+                    torrentRationState: torrent.ratio,
+                    torrentUploadedState: torrent.uploaded,
+                    torrentNumPeersState: torrent.numPeers
+                };
+                updateProgressSeeding(state);
+            } else {
+                torrent.destroy(function () {
+                    clearInterval(update);
+                    cancelled();
+                });
+            }
+        }, 1000);
+    });
+}
+
 function downloadFileRecursive(list, index, basepath, dlserver, torrent, torrentURL) {
 
     var dest = basepath + list[index].RelativPath;
@@ -175,7 +210,7 @@ function dlFileCallback(list,index,dest,basepath,dlserver,torrent,torrentURL) {
         downloaded += list[index].Size;
         if(cancel) {
             cancel = false;
-            resetStatus();
+            cancelled();
         } else {
             if(list.length > index + 1) {
                 downloadFileRecursive(list, index + 1, basepath, dlserver,torrent, torrentURL);
@@ -193,7 +228,7 @@ function hashFileRecursive(list, index, basepath, dllist, mod) {
 
     if(cancel) {
         cancel = false;
-        resetStatus();
+        cancelled();
     } else {
         updateProgressHash({
             index: index,
@@ -232,13 +267,12 @@ function downloadFinished(){
 }
 
 function initTorrent(folder,torrentURL) {
-    var client = new WebTorrent();
-
     changeStatus(true,"Torrent - Verbinden...","Das Verbinden zum Torrent kann einige Minuten dauern.");
     path = folder.replace('addons', '');
     var opts = {
         path: path
     };
+    console.log(path);
     client.add(torrentURL,opts, function (torrent) {
         var update = setInterval(function () {
             if(!cancel) {
@@ -256,9 +290,9 @@ function initTorrent(folder,torrentURL) {
                 };
                 updateProgressTorrent(state);
             } else {
-                client.destroy(function () {
+                torrent.destroy(function () {
                     clearInterval(update);
-                    resetStatus();
+                    cancelled();
                 });
             }
         }, 1000);
@@ -290,6 +324,14 @@ function updateProgressTorrent(state) {
     ipcRenderer.send('to-app', args);
 }
 
+function updateProgressSeeding(state) {
+    var args = {
+        type: "update-dl-progress-seeding",
+        state: state
+    };
+    ipcRenderer.send('to-app', args);
+}
+
 function changeStatus(downloading,status,hint) {
     var args = {
         type: "status-change",
@@ -300,9 +342,9 @@ function changeStatus(downloading,status,hint) {
     ipcRenderer.send('to-app', args);
 }
 
-function resetStatus() {
+function cancelled() {
     var args = {
-        type: "reset"
+        type: "cancelled"
     };
     ipcRenderer.send('to-app', args);
 }
@@ -318,7 +360,6 @@ function updateProgressHash(state,filename,mod) {
 }
 
 function finishProgressHash(list,mod) {
-    resetStatus();
     var args = {
         type: "update-hash-progress-done",
         list: list,
