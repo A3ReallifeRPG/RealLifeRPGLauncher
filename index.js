@@ -36,7 +36,7 @@ App.controller('navbarController', ['$scope','$rootScope', function ($scope,$roo
             icon: 'glyphicon glyphicon-question-sign', slide: 4
         }, {
             icon: 'glyphicon glyphicon-book', slide: 5
-        }];
+        }]
 
     $scope.switchSlide = function (tab) {
         $scope.slide = tab.slide;
@@ -529,14 +529,15 @@ App.controller('settingsController', ['$scope','$rootScope', function ($scope,$r
 
 App.controller('aboutController', ['$scope','$sce', function ($scope,$sce) {
     $scope.init = function () {
-        fs.readFile('readme.md', 'utf8', function (err,data) {
+        fs.readFile('README.md', 'utf8', function (err,data) {
             if (err) {
                 return console.log(err);
+            } else {
+                var markout = marked(data);
+                $scope.aboutContent = $sce.trustAsHtml(markout);
+                $scope.$apply();
+                $('#aboutScroll').perfectScrollbar({suppressScrollX: true,wheelSpeed: 0.5});
             }
-            var markout = marked(data);
-            $scope.aboutContent = $sce.trustAsHtml(markout);
-            $scope.$apply();
-            $('#aboutScroll').perfectScrollbar({suppressScrollX: true,wheelSpeed: 0.5});
         });
 
     };

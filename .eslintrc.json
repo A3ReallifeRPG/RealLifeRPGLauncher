@@ -1,0 +1,12 @@
+{
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "extends": "standard",
+    "installedESLint": true,
+    "plugins": [
+        "standard",
+        "promise"
+    ]
+}

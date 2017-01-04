@@ -17,7 +17,8 @@
   "scripts": {
     "start": "electron .",
     "pack": "build --target dir",
-    "dist": "build"
+    "dist": "build",
+    "test": "standard"
   },
   "build": {
     "appId": "realliferpg.de",
@@ -34,10 +35,16 @@
     }
   },
   "devDependencies": {
+    "devtron": "^1.4.0",
     "electron": "1.4.13",
     "electron-builder": "10.15.1",
-    "devtron": "^1.4.0",
-    "standard": "^8.6.0"
+    "eslint": "^3.12.2",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-config-standard-jsx": "^3.2.0",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-react": "^6.8.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "standard": "*"
   },
   "contributors": [
     {
