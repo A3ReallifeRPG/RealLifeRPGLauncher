@@ -312,6 +312,88 @@
                         </div>
                     </div>
                 </div>
+                <div class="carousel-item">
+                    <div id="faq">
+                        <div class="container">
+                            <h3>FAQ</h3>
+                            <hr>
+                            <div class="page">
+                                <div class="panel-group" id="faqAccordion">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading accordion-toggle question-toggle collapsed" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question0">
+                                            <h4 class="panel-title">
+                                                <a href="#" class="ing">Was ist ein Torrent ?</a>
+                                            </h4>
+                                        </div>
+                                        <div id="question0" class="panel-collapse collapse" style="height: 0px;">
+                                            <div class="panel-body">
+                                                Torrenting ermöglicht das du während du Downloadest allen anderen
+                                                deinen Upload zur Verfügung stellst um ihren Download zu
+                                                beschleunigen.<br>
+                                                So habt ihr höhere Download Geschwindigkeiten und wir sparen
+                                                Serverkosten.<br>
+                                                <br>
+                                                Technische Details des Clients (webtorrent):
+                                                <ul>
+                                                    <li>
+                                                        Torrenting via WebRTC "web-peers" und udp/tcp "bittorent-peers"
+                                                    </li>
+                                                    <li>
+                                                        100% Javascript
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question1">
+                                            <h4 class="panel-title">
+                                                <a href="#" class="ing">Das Verbinden zum Torrent dauert sehr lang, was ist falsch ?</a>
+                                            </h4>
+                                        </div>
+                                        <div id="question1" class="panel-collapse collapse" style="height: 0px;">
+                                            <div class="panel-body">
+                                                Beim Verbinden zum Torrent müssen erst alle vorhandenen Dateien
+                                                geprüft werden.<br>
+                                                Das Verbinden zu Torrent dauert deshalb abhängig von deiner
+                                                CPU/SSD/HDD 5-10 Minuten.<br>
+                                                Warte bitte bis zu 15 Minuten bis du dich im Support meldest<br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default ">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question2">
+                                            <h4 class="panel-title">
+                                                <a href="#" class="ing">Wie kann ich euch durch seeden unterstüzen ?</a>
+                                            </h4>
+                                        </div>
+                                        <div id="question2" class="panel-collapse collapse" style="height: 0px;">
+                                            <div class="panel-body">
+                                                Sobald du den Mod heruntergelanden hast kannst du mit dem Button "Seeden" das Seeding starten.<br>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div id="about">
+                        <div class="container" ng-controller="aboutController" data-ng-init="init()">
+                            <h3>Über</h3>
+                            <hr>
+                            <div class="page" style="position: relative;" id="aboutScroll">
+                                <div class="row">
+                                    <div class="col-md-12" ng-bind-html="aboutContent">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

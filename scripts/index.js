@@ -5,6 +5,7 @@ var fs = require('fs');
 const {dialog} = require('electron').remote;
 const {app} = require('electron').remote;
 const storage = require('electron-json-storage');
+var marked = require('marked');
 
 var App = angular.module('App', []).run(function($rootScope) {
     $rootScope.downloading = false;
@@ -31,6 +32,10 @@ App.controller('navbarController', ['$scope','$rootScope', function ($scope,$roo
             icon: 'glyphicon glyphicon-list-alt', slide: 2
         }, {
             icon: 'glyphicon glyphicon-cog', slide: 3
+        }, {
+            icon: 'glyphicon glyphicon-question-sign', slide: 4
+        }, {
+            icon: 'glyphicon glyphicon-book', slide: 5
         }];
 
     $scope.switchSlide = function (tab) {
@@ -519,6 +524,21 @@ App.controller('settingsController', ['$scope','$rootScope', function ($scope,$r
         storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
             if (error) throw error;
         });
+    };
+}]);
+
+App.controller('aboutController', ['$scope','$sce', function ($scope,$sce) {
+    $scope.init = function () {
+        fs.readFile('readme.md', 'utf8', function (err,data) {
+            if (err) {
+                return console.log(err);
+            }
+            var markout = marked(data);
+            $scope.aboutContent = $sce.trustAsHtml(markout);
+            $scope.$apply();
+            $('#aboutScroll').perfectScrollbar({suppressScrollX: true,wheelSpeed: 0.5});
+        });
+
     };
 }]);
 
