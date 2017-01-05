@@ -5,6 +5,9 @@ const path = require('path')
 const autoUpdater = require('electron').autoUpdater
 const BrowserWindow = require('electron').BrowserWindow
 const {ipcMain} = require('electron')
+const {Menu, Tray} = require('electron')
+
+let tray = null
 
 // ------------------------------------------- squirrel stuff (for updating) ----------------------------------------------------------------
 
@@ -144,19 +147,64 @@ function createWindow () {
   })
   win.loadURL(`file://${__dirname}/index.html`)
 
-  win.on('closed', function () {
-    app.quit()
+  win.on('close', function (e) {
+    e.preventDefault()
+    hideWindows()
   })
 
-  webWin.on('closed', function () {
-    app.quit()
+  webWin.on('close', function (e) {
+    e.preventDefault()
+    hideWindows()
   })
 
-  downWin.on('closed', function () {
-    app.quit()
+  downWin.on('close', function (e) {
+    e.preventDefault()
+    hideWindows()
   })
 
   setUpIpcHandlers()
+}
+
+function hideWindows () {
+  win.hide()
+  webWin.hide()
+  downWin.hide()
+}
+
+function createTray () {
+  tray = new Tray(app.getAppPath() + '\\icon\\tray.ico')
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Schließen',
+      click: function () {
+        app.exit()
+      }
+    },
+    {
+      label: 'Dev-Tools',
+      click: function () {
+        toggleDevTools()
+      }
+    }
+  ])
+  tray.setToolTip('RealLifeRPG Launcher')
+  tray.setContextMenu(contextMenu)
+  tray.on('click', function () {
+    win.isVisible() ? win.hide() : win.show()
+  })
+}
+
+function toggleDevTools () {
+  if (!win || !webWin || !downWin) return
+  if (win.webContents.isDevToolsOpened()) {
+    win.webContents.closeDevTools()
+    webWin.hide()
+    downWin.hide()
+  } else {
+    win.webContents.openDevTools({detach: true})
+    webWin.show()
+    downWin.show()
+  }
 }
 
 function setUpIpcHandlers () {
@@ -175,10 +223,7 @@ function setUpIpcHandlers () {
 
 app.on('ready', function () {
   createWindow()
-})
-
-app.on('window-all-closed', function () {
-  app.quit()
+  createTray()
 })
 
 app.on('activate', function () {
@@ -201,32 +246,4 @@ ipcMain.on('check-for-update', function (event) {
 
 ipcMain.on('focus-window', function (event) {
   win.focus()
-})
-
-ipcMain.on('open-devtools', function (event) {
-  win.webContents.openDevTools({
-    detach: true
-  })
-  webWin.show()
-  downWin.show()
-})
-
-ipcMain.on('close-devtools', function (event) {
-  win.webContents.closeDevTools()
-  webWin.hide()
-  downWin.hide()
-})
-
-ipcMain.on('toggle-devtools', function (event) {
-  if (win.webContents.isDevToolsOpened()) {
-    win.webContents.closeDevTools()
-    webWin.hide()
-    downWin.hide()
-  } else {
-    win.webContents.openDevTools({
-      detach: true
-    })
-    webWin.show()
-    downWin.show()
-  }
 })
