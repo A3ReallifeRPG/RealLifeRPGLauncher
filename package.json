@@ -20,6 +20,11 @@
     "dist": "build",
     "test": "standard"
   },
+  "standard": {
+    "ignore": [
+      "config.js"
+    ]
+  },
   "build": {
     "appId": "realliferpg.de",
     "mac.category": "launcher.application",
@@ -71,7 +76,6 @@
     "jsonist": "^1.3.0",
     "marked": "^0.3.6",
     "mkpath": "1.0.0",
-    "moment": "^2.17.1",
     "perfect-scrollbar": "^0.6.15",
     "progress-stream": "1.2.0",
     "request": "^2.79.0",

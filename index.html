@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="App">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>RealLifeRPG Launcher</title>
@@ -9,9 +9,6 @@
 
     <!-- angular -->
     <script src="node_modules/angular/angular.js"></script>
-
-    <!-- functions -->
-    <script src="resources/functions.js"></script>
 
     <!-- tether -->
     <link href="node_modules/tether/dist/css/tether.min.css" rel="stylesheet">
@@ -52,7 +49,7 @@
 
     <script type="text/javascript" src="index.js"></script>
 </head>
-<body>
+<body ng-app="App">
 <div style="height: 100%;background-color: #222222;" ng-show="!AppLoaded"></div>
 <div id="app" ng-show="AppLoaded">
     <nav class="navbar navbar-default navbar-fixed-top">
