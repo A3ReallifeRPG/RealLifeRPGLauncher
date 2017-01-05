@@ -6,15 +6,15 @@ const {dialog} = require('electron').remote
 const {app} = require('electron').remote
 const storage = require('electron-json-storage')
 var marked = require('marked')
-const Notification = require('electron')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification */
 
 var App = angular.module('App', []).run(function ($rootScope) {
   $rootScope.downloading = false
   $rootScope.AppLoaded = true
   $rootScope.ArmaPath = ''
+  $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion()
 
   try {
     fs.lstatSync(app.getPath('userData') + '\\settings.json')
@@ -48,6 +48,11 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
   $scope.$watch(
     'slide', function () {
       $('#carousel-main').carousel($scope.slide)
+    }, true)
+
+  $scope.$watch(
+    'AppTitle', function () {
+      document.title = $rootScope.AppTitle
     }, true)
 
   $scope.refresh = function () {
@@ -190,7 +195,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $scope.update({
           state: 'Überprüfung - Abgeschlossen',
           hint: '',
-          downloading: true,
+          downloading: false,
           downSpeed: 0,
           upSpeed: 0,
           totalProgress: 100,
@@ -529,7 +534,7 @@ App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
         $scope.$apply()
         $('#aboutScroll').perfectScrollbar({suppressScrollX: true, wheelSpeed: 0.5})
       } else {
-        return console.log(err)
+        console.log(err)
       }
     })
   }
@@ -587,7 +592,7 @@ function cutName (name) {
 }
 
 function spawnNotification (message) {
-  Notification('ReallifeRPG', {
+  new Notification('ReallifeRPG', { // eslint-disable-line
     body: message
   })
 }

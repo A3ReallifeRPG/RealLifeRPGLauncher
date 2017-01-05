@@ -110,6 +110,7 @@ autoUpdater.checkForUpdates()
 let win
 let downWin
 let webWin
+let willClose = false
 
 function createWindow () {
   // web process
@@ -148,18 +149,24 @@ function createWindow () {
   win.loadURL(`file://${__dirname}/index.html`)
 
   win.on('close', function (e) {
-    e.preventDefault()
-    hideWindows()
+    if (!willClose) {
+      e.preventDefault()
+      hideWindows()
+    }
   })
 
   webWin.on('close', function (e) {
-    e.preventDefault()
-    hideWindows()
+    if (!willClose) {
+      e.preventDefault()
+      hideWindows()
+    }
   })
 
   downWin.on('close', function (e) {
-    e.preventDefault()
-    hideWindows()
+    if (!willClose) {
+      e.preventDefault()
+      hideWindows()
+    }
   })
 
   setUpIpcHandlers()
@@ -175,15 +182,24 @@ function createTray () {
   tray = new Tray(app.getAppPath() + '\\icon\\tray.ico')
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Schließen',
-      click: function () {
-        app.exit()
-      }
-    },
-    {
       label: 'Dev-Tools',
       click: function () {
         toggleDevTools()
+      }
+    },
+    {
+      label: 'Restart',
+      click: function () {
+        willClose = true
+        app.relaunch()
+        app.quit()
+      }
+    },
+    {
+      label: 'Beenden',
+      click: function () {
+        willClose = true
+        app.quit()
       }
     }
   ])
