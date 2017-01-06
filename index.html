@@ -9,6 +9,8 @@
 
     <!-- angular -->
     <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/angular-tooltips/dist/angular-tooltips.min.js"></script>
+    <link href="node_modules/angular-tooltips/dist/angular-tooltips.min.css" rel="stylesheet">
 
     <!-- tether -->
     <link href="node_modules/tether/dist/css/tether.min.css" rel="stylesheet">
@@ -43,6 +45,9 @@
     <!-- perfect-scrollbar -->
     <script src="node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
     <link rel="stylesheet" href="node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.min.css">
+
+    <link href="node_modules/icheck/skins/minimal/minimal.css" rel="stylesheet">
+    <script src="node_modules/icheck/icheck.min.js"></script>
 
     <!-- custom css/js -->
     <link rel="stylesheet" href="resources/css/custom.css">
@@ -90,11 +95,18 @@
             <br>
             <br>
             <div class="carousel-inner" role="listbox">
-                <div class="carousel-item active">
+                <div class="item active">
                     <div id="mods">
                         <div class="container">
                             <div ng-controller="modController" data-ng-init="init()">
-                                <h3>ReallifeRPG Mods</h3>
+                                <h3>ReallifeRPG Mods
+                                    <span class="pull-right">
+                                        <span class="pull-right">
+                                            Beta
+                                            <input id="betaSwitch" type="checkbox" title="Beta">
+                                        </span>
+                                    </span>
+                                </h3>
                                 <hr>
                                 <div class="page">
                                     <div class="row">
@@ -125,19 +137,19 @@
                                         <div class="col-lg-4">
                                             <ul class="list-group list-group-unbordered margin-none">
                                                 <li class="list-group-item">
-                                                    <b>Status</b> <a class="pull-right" data-hover="tooltip" title="{{hint}}">{{state}}</a>
+                                                    <b>Status</b> <a class="pull-right"><span tooltips tooltip-template="{{hint}}">{{state}}</span></a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="downSpeed > 0">
-                                                    <b>Geschwindigkeit</b> <a class="pull-right">{{downSpeed}} Mb/s</a>
+                                                    <b>Geschwindigkeit</b> <a class="pull-right"><span tooltips tooltip-template="Download Geschwindigkeit">{{downSpeed}} Mb/s}</span></a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="totalProgress !== ''">
-                                                    <b>Fortschritt</b> <a class="pull-right">{{totalProgress}} %</a>
+                                                    <b>Fortschritt</b> <a class="pull-right"><span tooltips tooltip-template="Gesamtfortschritt">{{totalProgress}} %</span></a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="totalSize > 0">
                                                     <b>Heruntergeladen</b> <a class="pull-right">{{totalDownloaded}} GB/{{totalSize}} GB</a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="totalETA !== ''">
-                                                    <b>Verbleibend</b> <a class="pull-right">{{totalETA}}</a>
+                                                    <b>Verbleibend</b> <a class="pull-right"><span tooltips tooltip-template="Zeit verbleibend">{{totalETA}}</span></a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="maxConns > 0">
                                                     <b>Peers</b> <a class="pull-right">{{totalPeers}}/{{maxConns}}</a>
@@ -173,7 +185,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="item">
                     <div id="servers">
                         <div class="container">
                             <div class="row" ng-controller="serverController" data-ng-init="init()">
@@ -239,7 +251,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="item">
                     <div id="changelog">
                         <div class="container" ng-controller="changelogController" data-ng-init="init()">
                             <h3>ReallifeRPG Changelog</h3>
@@ -288,7 +300,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="item">
                     <div id="settings">
                         <div class="container" ng-controller="settingsController" data-ng-init="init()">
                             <h3>Einstellungen</h3>
@@ -305,11 +317,69 @@
                                         </div>
                                     </div>
                                 </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group form-inline">
+                                            <label for="splashCheck">Kein Splashscreen</label>
+                                            <span class="pull-right">
+                                                <input id="splashCheck" type="checkbox">
+                                            </span>
+                                            <hr>
+                                            <label for="introCheck">Intro überspringen</label>
+                                            <span class="pull-right">
+                                                <input id="introCheck" type="checkbox">
+                                            </span>
+                                            <hr>
+                                            <label for="htCheck">Hyper-Threading</label>
+                                            <span class="pull-right">
+                                                <input id="htCheck" type="checkbox">
+                                            </span>
+                                            <hr>
+                                            <label for="windowedCheck">Fenstermodus</label>
+                                            <span class="pull-right">
+                                                <input id="windowedCheck" type="checkbox">
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="memInput">Maximaler RAM</label>
+                                                    <input ng-model="mem" ng-change="saveSettings()" id="memInput" class="form-control" type="number">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="vmemInput">Maximaler vRam</label>
+                                                    <input ng-model="vram" ng-change="saveSettings()" id="vmemInput" class="form-control" type="number">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="cpuInput">CPU Anzahl</label>
+                                                    <input ng-model="cpu" ng-change="saveSettings()" id="cpuInput" class="form-control" type="number">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="threadsInput">Extra Threads</label>
+                                                    <input ng-model="thread" ng-change="saveSettings()" id="threadsInput" class="form-control" type="number">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="addInput">Zusätzliche Startparameter</label>
+                                                    <input ng-model="add_params" ng-change="saveSettings()" id="addInput" class="form-control" type="text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="item">
                     <div id="faq">
                         <div class="container">
                             <h3>FAQ</h3>
@@ -342,13 +412,25 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="panel panel-default">
+                                    <div class="panel panel-default ">
                                         <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question1">
+                                            <h4 class="panel-title">
+                                                <a href="#" class="ing">Du wirst beim Joinen auf den Server immer wieder gekickt</a>
+                                            </h4>
+                                        </div>
+                                        <div id="question1" class="panel-collapse collapse" style="height: 0px;">
+                                            <div class="panel-body">
+                                                Nutze den Button prüfen zum Überprüfen der Mods
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question2">
                                             <h4 class="panel-title">
                                                 <a href="#" class="ing">Das Verbinden zum Torrent dauert sehr lang, was ist falsch ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question1" class="panel-collapse collapse" style="height: 0px;">
+                                        <div id="question2" class="panel-collapse collapse" style="height: 0px;">
                                             <div class="panel-body">
                                                 Beim Verbinden zum Torrent müssen erst alle vorhandenen Dateien
                                                 geprüft werden.<br>
@@ -359,12 +441,12 @@
                                         </div>
                                     </div>
                                     <div class="panel panel-default ">
-                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question2">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question3">
                                             <h4 class="panel-title">
                                                 <a href="#" class="ing">Wie kann ich euch durch seeden unterstüzen ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question2" class="panel-collapse collapse" style="height: 0px;">
+                                        <div id="question3" class="panel-collapse collapse" style="height: 0px;">
                                             <div class="panel-body">
                                                 Sobald du den Mod heruntergelanden hast kannst du mit dem Button "Seeden" das Seeding starten.<br>
 
@@ -376,7 +458,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="item">
                     <div id="about">
                         <div class="container" ng-controller="aboutController" data-ng-init="init()">
                             <h3>Über</h3>
@@ -397,15 +479,19 @@
 </div>
 </body>
 <script>
-    $(document).on('click', 'a[href^="htt"]', function (event) {
-        if (this.href != "") {
-            event.preventDefault();
-            shell.openExternal(this.href);
-        }
-    });
+  $(document).on('click', 'a[href^="htt"]', function (event) {
+    if (this.href != "") {
+      event.preventDefault();
+      shell.openExternal(this.href);
+    }
+  });
 
-    $(document).ready(function(){
-        $('[data-hover="tooltip"]').tooltip();
+  $(document).ready(function () {
+    $('input').iCheck({
+      checkboxClass: 'icheckbox_minimal',
+      radioClass: 'iradio_minimal',
+      increaseArea: '20%' // optional
     });
+  });
 </script>
 </html>

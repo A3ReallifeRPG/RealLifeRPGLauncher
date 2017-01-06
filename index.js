@@ -9,9 +9,9 @@ const Winreg = require('winreg')
 var marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification */
 
-var App = angular.module('App', []).run(function ($rootScope) {
+var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
   $rootScope.AppLoaded = true
   $rootScope.ArmaPath = ''
@@ -57,6 +57,7 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
 
 App.controller('modController', ['$scope', '$rootScope', function ($scope, $rootScope) {
   $scope.state = 'Gestoppt'
+  $scope.hint = 'Inaktiv'
   $rootScope.downloading = false
   $rootScope.downSpeed = 0
   $rootScope.upSpeed = 0
@@ -68,6 +69,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   $scope.maxConns = 0
   $scope.fileName = ''
   $scope.fileProgress = ''
+  $scope.betaMods = false
 
   ipcRenderer.on('to-app', function (event, args) {
     switch (args.type) {
@@ -81,7 +83,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       case 'update-dl-progress-server':
         $scope.update({
           state: 'Server - Verbunden',
-          hint: '',
+          hint: 'Download via Server läuft',
           downloading: true,
           downSpeed: toMB(args.state.speed),
           upSpeed: 0,
@@ -100,7 +102,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       case 'update-dl-progress-torrent':
         $scope.update({
           state: 'Torrent - Verbunden',
-          hint: '',
+          hint: 'Download via Torrent läuft',
           downloading: true,
           downSpeed: toMB(args.state.torrentDownloadSpeedState),
           upSpeed: toMB(args.state.torrentUploadSpeedState),
@@ -137,7 +139,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       case 'torrent-init':
         $scope.update({
           state: 'Torrent - Verbinden...',
-          hint: '',
+          hint: '5 - 10 Minuten',
           downloading: true,
           downSpeed: 0,
           upSpeed: 0,
@@ -171,7 +173,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       case 'update-hash-progress':
         $scope.update({
           state: 'Überprüfung - Läuft',
-          hint: '',
+          hint: '5 - 10 Minuten',
           downloading: true,
           downSpeed: toMB(args.state.speed),
           upSpeed: 0,
@@ -275,7 +277,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       storage.get('settings', function (error, data) {
         if (error) throw error
         $rootScope.ArmaPath = data.armapath
-        getMods()
+        getMods($scope.betaMods)
         $scope.initGraph()
       })
     } catch (e) {
@@ -402,6 +404,14 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     }
   }
 
+  $('#betaSwitch').on('ifChecked', function (event) {
+    $scope.betaMods = true
+    getMods($scope.betaMods)
+  }).on('ifUnchecked', function (event) {
+    $scope.betaMods = false
+    getMods($scope.betaMods)
+  })
+
   $scope.checkUpdates = function () {
     for (var i = 0; i < $scope.mods.length; i++) {
       if ($rootScope.ArmaPath !== '') {
@@ -426,7 +436,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
             if (error) throw error
           })
-          getMods()
+          getMods($scope.betaMods)
         } else {
           $rootScope.slide = 3
           alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')
@@ -565,9 +575,11 @@ App.controller('serverController', ['$scope', function ($scope) {
         $scope.servers = args.data.data
         $scope.loading = false
         $scope.$apply()
-        for (var i = 0; i < $scope.servers.length; i++) {
-          $scope.redrawChart($scope.servers[i])
-          $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar()
+        if (typeof $scope.servers !== 'undefined') {
+          for (var i = 0; i < $scope.servers.length; i++) {
+            $scope.redrawChart($scope.servers[i])
+            $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar()
+          }
         }
         break
     }
@@ -593,6 +605,83 @@ App.controller('changelogController', ['$scope', function ($scope) {
 }])
 
 App.controller('settingsController', ['$scope', '$rootScope', function ($scope, $rootScope) {
+  $scope.init = function () {
+    storage.get('settings', function (error, data) {
+      if (error) throw error
+      $rootScope.ArmaPath = data.armapath
+      $scope.splash = data.splash
+      if ($scope.splash) {
+        $('#splashCheck').iCheck('check')
+      }
+      $scope.intro = data.intro
+      if ($scope.intro) {
+        $('#introCheck').iCheck('check')
+      }
+      $scope.ht = data.ht
+      if ($scope.ht) {
+        $('#htCheck').iCheck('check')
+      }
+      $scope.windowed = data.windowed
+      if ($scope.windowed) {
+        $('#windowedCheck').iCheck('check')
+      }
+      $scope.mem = parseInt(data.mem)
+      $scope.cpu = parseInt(data.cpu)
+      $scope.vram = parseInt(data.vram)
+      $scope.thread = parseInt(data.thread)
+      $scope.add_params = data.add_params
+    })
+  }
+
+  $('#splashCheck').on('ifChecked', function (event) {
+    $scope.splash = true
+    $scope.saveSettings()
+  }).on('ifUnchecked', function (event) {
+    $scope.splash = false
+    $scope.saveSettings()
+  })
+
+  $('#introCheck').on('ifChecked', function (event) {
+    $scope.intro = true
+    $scope.saveSettings()
+  }).on('ifUnchecked', function (event) {
+    $scope.intro = false
+    $scope.saveSettings()
+  })
+
+  $('#htCheck').on('ifChecked', function (event) {
+    $scope.ht = true
+    $scope.saveSettings()
+  }).on('ifUnchecked', function (event) {
+    $scope.ht = false
+    $scope.saveSettings()
+  })
+
+  $('#windowedCheck').on('ifChecked', function (event) {
+    $scope.windowed = true
+    $scope.saveSettings()
+  }).on('ifUnchecked', function (event) {
+    $scope.windowed = false
+    $scope.saveSettings()
+  })
+
+  $scope.saveSettings = function () {
+    storage.set('settings', {
+      armapath: $rootScope.ArmaPath,
+      splash: $scope.splash,
+      intro: $scope.intro,
+      ht: $scope.ht,
+      windowed: $scope.windowed,
+      mem: $scope.mem,
+      cpu: $scope.cpu,
+      vram: $scope.vram,
+      thread: $scope.thread,
+      add_params: $scope.add_params
+    }, function (error) {
+      if (error) throw error
+    })
+  }
+
   $scope.chooseArmaPath = function () {
     var options = {
       filters: [{
@@ -628,11 +717,15 @@ App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
   }
 }])
 
-function getMods () {
+function getMods (betaMods) {
+  var url = APIBaseURL + APIModsURL
+  if (betaMods) {
+    url += APIBetaADD
+  }
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'mod-callback',
-    url: APIBaseURL + APIModsURL,
+    url: url,
     callBackTarget: 'to-app'
   })
 }

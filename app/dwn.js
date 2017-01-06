@@ -12,7 +12,9 @@ var cancel = false
 var downloaded = 0
 
 // noinspection JSAnnotator
-let client = window.client = new WebTorrent()
+let client = window.client = new WebTorrent({
+  maxConns: 150
+})
 
 var path = ''
 
@@ -190,7 +192,7 @@ function downloadFileRecursive (list, index, basepath, dlserver, torrent, torren
 }
 
 function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrentURL) {
-  changeStatus(true, 'Server - Verbunden')
+  changeStatus(true, 'Server - Verbunden','')
   var size = 0
   for (var i = 0; i < list.length; i++) {
     size += list[i].Size
@@ -260,7 +262,7 @@ function downloadFinished () {
 }
 
 function initTorrent (folder, torrentURL) {
-  changeStatus(true, 'Torrent - Verbinden...', 'Das Verbinden zum Torrent kann einige Minuten dauern.')
+  changeStatus(true, 'Torrent - Verbinden...', '5 - 10 Minuten.')
   path = folder.replace('addons', '')
   var opts = {
     path: path
@@ -290,12 +292,12 @@ function initTorrent (folder, torrentURL) {
       }
     }, 1000)
     torrent.on('done', function () {
-      changeStatus(false, 'Abgeschlossen')
+      changeStatus(false, 'Abgeschlossen', 'Inaktiv')
     })
   })
 
   client.on('error', function (err) {
-    changeStatus(false, 'Torrent - Fehler')
+    changeStatus(false, 'Torrent - Fehler', 'Fataler Fehler')
     console.log(err)
   })
 }

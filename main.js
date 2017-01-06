@@ -198,6 +198,9 @@ function createTray () {
       }
     },
     {
+      type: 'separator'
+    },
+    {
       label: 'Beenden',
       click: function () {
         willClose = true
