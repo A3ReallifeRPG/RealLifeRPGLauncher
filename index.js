@@ -5,6 +5,7 @@ const fs = require('fs')
 const {dialog} = require('electron').remote
 const {app} = require('electron').remote
 const storage = require('electron-json-storage')
+const Winreg = require('winreg')
 var marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 
@@ -15,17 +16,10 @@ var App = angular.module('App', []).run(function ($rootScope) {
   $rootScope.AppLoaded = true
   $rootScope.ArmaPath = ''
   $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion()
-
-  try {
-    fs.lstatSync(app.getPath('userData') + '\\settings.json')
-  } catch (e) {
-
-  }
+  $rootScope.slide = 0
 })
 
 App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-  $scope.slide = 0
-
   $scope.tabs = [
     {
       icon: 'glyphicon glyphicon-home', slide: 0
@@ -42,12 +36,12 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
     }]
 
   $scope.switchSlide = function (tab) {
-    $scope.slide = tab.slide
+    $rootScope.slide = tab.slide
   }
 
-  $scope.$watch(
+  $rootScope.$watch(
     'slide', function () {
-      $('#carousel-main').carousel($scope.slide)
+      $('#carousel-main').carousel($rootScope.slide)
     }, true)
 
   $scope.$watch(
@@ -276,8 +270,17 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
 
   $scope.init = function () {
     $scope.loading = true
-    getMods()
-    $scope.initGraph()
+    try {
+      fs.lstatSync(app.getPath('userData') + '\\settings.json')
+      storage.get('settings', function (error, data) {
+        if (error) throw error
+        $rootScope.ArmaPath = data.armapath
+        getMods()
+        $scope.initGraph()
+      })
+    } catch (e) {
+      $scope.checkregkey1()
+    }
   }
 
   $scope.initTorrent = function (mod) {
@@ -392,7 +395,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $scope.initHash(mod)
         break
       case 3:
-        angular.element($('#bs-navbar-collapse')).injector().switchSlide({slide: 1})
+        $rootScope.slide = 1
         break
       default:
         break
@@ -412,6 +415,101 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $scope.mods[i].state = [0, 'Kein Pfad gesetzt']
       }
     }
+  }
+
+  $scope.savePath = function (path) {
+    if (path !== false) {
+      alertify.set({labels: {ok: 'Richtig', cancel: 'Falsch'}})
+      alertify.confirm('Möglicher Arma Pfad gefunden: ' + path, function (e) {
+        if (e) {
+          $rootScope.ArmaPath = path + '\\'
+          storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
+            if (error) throw error
+          })
+          getMods()
+        } else {
+          $rootScope.slide = 3
+          alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')
+        }
+      })
+    } else {
+      alertify.log('Kein Arma Pfad gefunden', 'danger')
+    }
+  }
+
+  $scope.checkregkey1 = function () {
+    var regKey = new Winreg({
+      hive: Winreg.HKLM,
+      key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410'
+    })
+
+    regKey.keyExists(function (err, exists) {
+      if (err) {
+        console.log(err)
+      }
+      if (exists) {
+        regKey.values(function (err, items) {
+          console.log(err)
+          if (fs.existsSync(items[3].value + '\\arma3.exe')) {
+            $scope.savePath(items[3].value)
+          } else {
+            $scope.checkregkey2()
+          }
+        })
+      } else {
+        $scope.checkregkey2()
+      }
+    })
+  }
+
+  $scope.checkregkey2 = function () {
+    var regKey = new Winreg({
+      hive: Winreg.HKLM,
+      key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410'
+    })
+
+    regKey.keyExists(function (err, exists) {
+      if (err) {
+        console.log(err)
+      }
+      if (exists) {
+        regKey.values(function (err, items) {
+          console.log(err)
+          if (fs.existsSync(items[3].value + '\\arma3.exe')) {
+            $scope.savePath(items[3].value)
+          } else {
+            $scope.checkregkey3()
+          }
+        })
+      } else {
+        $scope.checkregkey3()
+      }
+    })
+  }
+
+  $scope.checkregkey3 = function () {
+    var regKey = new Winreg({
+      hive: Winreg.HKLM,
+      key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3'
+    })
+
+    regKey.keyExists(function (err, exists) {
+      if (err) {
+        console.log(err)
+      }
+      if (exists) {
+        regKey.values(function (err, items) {
+          console.log(err)
+          if (fs.existsSync(items[0].value + '\\arma3.exe')) {
+            $scope.savePath(items[0].value)
+          } else {
+            $scope.savePath(false)
+          }
+        })
+      } else {
+        $scope.savePath(false)
+      }
+    })
   }
 }])
 
@@ -495,13 +593,6 @@ App.controller('changelogController', ['$scope', function ($scope) {
 }])
 
 App.controller('settingsController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-  $scope.init = function () {
-    storage.get('settings', function (error, data) {
-      if (error) throw error
-      $rootScope.ArmaPath = data.armapath
-    })
-  }
-
   $scope.chooseArmaPath = function () {
     var options = {
       filters: [{
@@ -513,16 +604,13 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
     }
     var path = String(dialog.showOpenDialog(options))
     if (path !== 'undefined' && path.indexOf('\\arma3.exe') > -1) {
-      console.log($rootScope.ArmaPath = path.replace('arma3.exe', ''))
+      $rootScope.ArmaPath = path.replace('arma3.exe', '')
+      storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
+        if (error) throw error
+      })
     } else {
       $rootScope.ArmaPath = ''
     }
-  }
-
-  $scope.saveSettings = function () {
-    storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
-      if (error) throw error
-    })
   }
 }])
 

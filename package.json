@@ -37,7 +37,8 @@
     "squirrelWindows": {
       "loadingGif": "build/install-spinner.gif",
       "setupIcon": "build/icon.ico"
-    }
+    },
+    "extraFiles": "README.md"
   },
   "devDependencies": {
     "devtron": "^1.4.0",

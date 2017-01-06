@@ -123,6 +123,7 @@ function createWindow () {
   webWin.webContents.openDevTools({
     detach: false
   })
+
   // download process
   downWin = new BrowserWindow({
     icon: 'icon/workericon.ico',
@@ -133,6 +134,7 @@ function createWindow () {
   downWin.webContents.openDevTools({
     detach: false
   })
+
   // Create the browser window.
   win = new BrowserWindow({
     icon: 'icon/appicon.ico',
