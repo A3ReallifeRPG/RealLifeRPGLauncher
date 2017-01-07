@@ -1,64 +1,95 @@
 {
-    "name": "RealLifeRPG",
-    "version": "1.5.0",
-    "description": "RealLifeRPG Launcher",
-    "homepage": "https://www.realliferpg.de",
-    "author":"RealLifeRPG",
-    "main": "./app/main.js",
-    "license" : "CC-BY-NC-SA-4.0",
-    "readme" : "README.md",
-    "repository" :{
-        "type" : "git",
-        "url" : "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher.git"
+  "name": "RealLifeRPG",
+  "version": "2.0.0",
+  "description": "RealLifeRPG Launcher",
+  "homepage": "https://www.realliferpg.de",
+  "author": "RealLifeRPG",
+  "main": "./main.js",
+  "license": "GPL-3.0",
+  "readme": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/A3ReallifeRPG/RealLifeRPGLauncher.git"
+  },
+  "bugs": {
+    "url": "https://github.com/A3ReallifeRPG/ReallifeRPG5.0/issues"
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "build --target dir",
+    "dist": "build",
+    "test": "standard"
+  },
+  "standard": {
+    "ignore": [
+      "config.js"
+    ]
+  },
+  "build": {
+    "appId": "realliferpg.de",
+    "mac.category": "launcher.application",
+    "win": {
+      "title": "RealLifeRPG Launcher",
+      "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
+      "remoteReleases": "https://static.realliferpg.de/remoteReleases/",
+      "target": "squirrel"
     },
-    "bugs": {
-        "url": "https://github.com/A3ReallifeRPG/ReallifeRPG5.0/issues"
+    "squirrelWindows": {
+      "loadingGif": "build/install-spinner.gif",
+      "setupIcon": "build/icon.ico"
     },
-    "scripts": {
-        "start": "electron .",
-        "postinstall": "install-app-deps",
-        "pack": "build --target dir",
-        "dist": "build",
-        "install": "npm install --prefix ./app"
+    "extraFiles": "README.md"
+  },
+  "devDependencies": {
+    "devtron": "^1.4.0",
+    "electron": "1.4.13",
+    "electron-builder": "10.15.1",
+    "eslint": "^3.12.2",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-config-standard-jsx": "^3.2.0",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-react": "^6.8.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "standard": "*"
+  },
+  "contributors": [
+    {
+      "name": "Kaibu",
+      "email": "notkaibu@gmai.com",
+      "url": "https://github.com/Kaibu"
     },
-    "devDependencies": {
-        "electron": "1.4.4",
-        "electron-builder": "7.14.2"
-    },
-    "build": {
-        "appId": "realliferpg.de",
-        "app-category-type": "launcher.application",
-        "win": {
-            "title": "RealLifeRPG Launcher",
-            "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
-            "remoteReleases": "http://server3.realliferpg.de:8000/files/"
-        },
-        "squirrelWindows": {
-            "loadingGif": "build/install-spinner.gif",
-            "setupIcon": "build/icon.ico"
-        }
-    },
-    "contributors": [{
-        "name": "vabene1111",
-        "email": "vabene1234@googlemail.com",
-        "url": "https://github.com/vabene1111"
-    }, {
-        "name": "Kaibu",
-        "email": "green4ever999@web.de",
-        "url": "https://github.com/Kaibu"
-    }],
-    "dependencies": {
-        "devtron": "^1.2.1",
-        "dwn": "^0.0.2",
-        "electron-json-storage": "^2.0.2",
-        "electron-squirrel-startup": "^1.0.0",
-        "highcharts": "^5.0.0",
-        "mkpath": "^1.0.0",
-        "node-notifier": "^4.6.1",
-        "progress-stream": "^1.2.0",
-        "recursive-readdir": "^2.0.0",
-        "shelljs": "^0.7.0",
-        "winreg": "^1.2.1",
-        "unzip": "^0.1.11"
+    {
+      "name": "vabene1111",
+      "email": "vabene1234@googlemail.com",
+      "url": "https://github.com/vabene1111"
     }
+  ],
+  "dependencies": {
+    "alertify": "^0.3.0",
+    "angular": "^1.6.0",
+    "angular-tooltips": "^1.1.8",
+    "bootstrap": "^3.3.7",
+    "chart.js": "^2.4.0",
+    "electron-json-storage": "^2.1.0",
+    "electron-squirrel-startup": "1.0.0",
+    "font-awesome": "^4.7.0",
+    "hasha": "^2.2.0",
+    "humanize-duration": "^3.10.0",
+    "icheck": "^1.0.2",
+    "jquery": "^3.1.1",
+    "jsonist": "^1.3.0",
+    "marked": "^0.3.6",
+    "mkpath": "1.0.0",
+    "perfect-scrollbar": "^0.6.15",
+    "progress-stream": "1.2.0",
+    "request": "^2.79.0",
+    "request-progress": "^3.0.0",
+    "shelljs": "0.7.0",
+    "smoothie": "^1.27.0",
+    "tether": "^1.4.0",
+    "unzip": "^0.1.11",
+    "vex-js": "^3.0.0",
+    "webtorrent": "^0.98.0",
+    "winreg": "^1.2.2"
+  }
 }
