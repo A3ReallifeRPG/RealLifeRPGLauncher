@@ -192,7 +192,7 @@ function downloadFileRecursive (list, index, basepath, dlserver, torrent, torren
 }
 
 function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrentURL) {
-  changeStatus(true, 'Server - Verbunden','')
+  changeStatus(true, 'Server - Verbunden', '')
   var size = 0
   for (var i = 0; i < list.length; i++) {
     size += list[i].Size

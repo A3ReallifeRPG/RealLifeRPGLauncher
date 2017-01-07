@@ -1,5 +1,5 @@
+/* global TFARFileURL */
 var jsonist = require('jsonist')
-// noinspection JSAnnotator
 const {ipcRenderer} = require('electron')
 var fs = require('fs')
 var request = require('request')
