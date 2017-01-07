@@ -301,6 +301,32 @@
                     </div>
                 </div>
                 <div class="item">
+                    <div id="tfar">
+                        <div class="container" ng-controller="tfarController" data-ng-init="init()">
+                            <h3>Task Force Arma Radio</h3>
+                            <hr>
+                            <div class="page">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        Downloaded eine .ts3_plugin Datei und führt diese aus.<button class="btn btn-success pull-right" ng-click="initTFARDownload()">Download</button>
+                                        <br>
+                                        Teamspeak muss vor der Installation geschlossen werden
+                                        <hr>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="progress progress-striped active">
+                                            <div class="progress-bar" style="width: {{tfarProgress}}%"></div>
+                                        </div>
+                                        <span class="pull-right" ng-if="tfarSpeed !== 0">{{tfarSpeed}} Mb/s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
                     <div id="settings">
                         <div class="container" ng-controller="settingsController" data-ng-init="init()">
                             <h3>Einstellungen</h3>

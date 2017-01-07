@@ -6,7 +6,8 @@ const {dialog} = require('electron').remote
 const {app} = require('electron').remote
 const storage = require('electron-json-storage')
 const Winreg = require('winreg')
-var marked = require('marked')
+const unzip = require('unzip')
+const marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification */
@@ -28,11 +29,13 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
     }, {
       icon: 'glyphicon glyphicon-list-alt', slide: 2
     }, {
-      icon: 'glyphicon glyphicon-cog', slide: 3
+      icon: 'glyphicon glyphicon-headphones', slide: 3
     }, {
-      icon: 'glyphicon glyphicon-question-sign', slide: 4
+      icon: 'glyphicon glyphicon-cog', slide: 4
     }, {
-      icon: 'glyphicon glyphicon-book', slide: 5
+      icon: 'glyphicon glyphicon-question-sign', slide: 5
+    }, {
+      icon: 'glyphicon glyphicon-book', slide: 6
     }]
 
   $scope.switchSlide = function (tab) {
@@ -438,7 +441,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           })
           getMods($scope.betaMods)
         } else {
-          $rootScope.slide = 3
+          $rootScope.slide = 4
           alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')
         }
       })
@@ -715,6 +718,41 @@ App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
       }
     })
   }
+}])
+
+App.controller('tfarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
+  $scope.initTFARDownload = function () {
+    $scope.tfarDownloading = true
+    ipcRenderer.send('to-web', {
+      type: 'start-tfar-download'
+    })
+  }
+
+  $scope.tfarProgress = 0
+  $scope.tfarSpeed = 0
+  $scope.tfarDownloading = false
+
+  ipcRenderer.on('to-app', function (event, args) {
+    switch (args.type) {
+      case 'update-dl-progress-tfar':
+        $scope.tfarProgress = toProgress(args.state.percent)
+        $scope.tfarSpeed = toMB(args.speed)
+        break
+      case 'update-dl-progress-tfar-done':
+        $scope.tfarProgress = 100
+        $scope.tfarSpeed = 0
+        alertify.log('Wird ausgeführt...', 'primary')
+        if (!shell.openItem(args.tfarPath)) {
+          alertify.log('Fehlgeschlagen', 'danger')
+          var stream = fs.createReadStream(args.tfarPath).pipe(unzip.Extract({path: app.getPath('downloads') + '\\TFAR'}))
+          stream.on('close', function () {
+            fs.unlinkSync(app.getPath('downloads') + '\\TFAR\\package.ini')
+            shell.showItemInFolder(app.getPath('downloads') + '\\TFAR')
+          })
+        }
+        break
+    }
+  })
 }])
 
 function getMods (betaMods) {
