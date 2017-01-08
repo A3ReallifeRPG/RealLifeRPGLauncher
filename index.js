@@ -9,6 +9,7 @@ const Winreg = require('winreg')
 const unzip = require('unzip')
 const marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
+const spawn = require('child_process').spawn
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification */
 
@@ -587,6 +588,52 @@ App.controller('serverController', ['$scope', function ($scope) {
         break
     }
   })
+
+  $scope.joinArmaServer = function (server) {
+    storage.get('settings', function (err, data) {
+      if (err) throw err
+
+      var params = []
+
+      params.push('-noLauncher')
+      params.push('-useBE')
+      params.push('-connect=' + server.IpAddress)
+      params.push('-port=' + server.Port)
+      params.push('-mod=' + server.StartParameters)
+      params.push('-password=' + server.ServerPassword)
+
+      if (data.splash) {
+        params.push('-nosplash')
+      }
+      if (data.intro) {
+        params.push('-skipIntro')
+      }
+      if (data.ht) {
+        params.push('-enableHT')
+      }
+      if (data.windowed) {
+        params.push('-window')
+      }
+
+      if (data.mem != null && data.mem !== '') {
+        params.push('-maxMem=' + data.mem)
+      }
+      if (data.vram != null && data.vram !== '') {
+        params.push('-maxVRAM=' + data.vram)
+      }
+      if (data.cpu != null && data.cpu !== '') {
+        params.push('-cpuCount=' + data.cpu)
+      }
+      if (data.thread != null && data.thread !== '') {
+        params.push('-exThreads=' + data.thread)
+      }
+      if (data.add_params != null && data.add_params !== '') {
+        params.push(data.add_params)
+      }
+
+      spawn.spawn((data.armapath + '\\arma3launcher.exe'), params, [])
+    })
+  }
 }])
 
 App.controller('changelogController', ['$scope', function ($scope) {

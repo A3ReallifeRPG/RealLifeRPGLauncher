@@ -5,13 +5,11 @@ var mkpath = require('mkpath')
 var WebTorrent = require('webtorrent')
 var hasha = require('hasha')
 require('events').EventEmitter.defaultMaxListeners = Infinity
-// noinspection JSAnnotator
 const {ipcRenderer} = require('electron')
 
 var cancel = false
 var downloaded = 0
 
-// noinspection JSAnnotator
 let client = window.client = new WebTorrent({
   maxConns: 150
 })

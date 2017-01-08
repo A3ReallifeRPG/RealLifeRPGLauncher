@@ -55,7 +55,7 @@
   "contributors": [
     {
       "name": "Kaibu",
-      "email": "notkaibu@gmai.com",
+      "email": "notkaibu@gmail.com",
       "url": "https://github.com/Kaibu"
     },
     {
@@ -88,7 +88,6 @@
     "smoothie": "^1.27.0",
     "tether": "^1.4.0",
     "unzip": "^0.1.11",
-    "vex-js": "^3.0.0",
     "webtorrent": "^0.98.0",
     "winreg": "^1.2.2"
   }
