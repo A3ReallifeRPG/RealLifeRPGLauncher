@@ -4,7 +4,7 @@
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
-  "main": "./main.js",
+  "main": "main.js",
   "license": "GPL-3.0",
   "readme": "README.md",
   "repository": {
