@@ -17,30 +17,36 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
   $rootScope.AppLoaded = true
   $rootScope.ArmaPath = ''
-  $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion()
+  $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   $rootScope.slide = 0
+
+  $rootScope.refresh = function () {
+    getMods()
+    getServers()
+  }
 })
 
 App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
   $scope.tabs = [
     {
-      icon: 'glyphicon glyphicon-home', slide: 0
+      icon: 'glyphicon glyphicon-home', slide: 0, title: 'Mods'
     }, {
-      icon: 'glyphicon glyphicon-tasks', slide: 1
+      icon: 'glyphicon glyphicon-tasks', slide: 1, title: 'Server'
     }, {
-      icon: 'glyphicon glyphicon-list-alt', slide: 2
+      icon: 'glyphicon glyphicon-list-alt', slide: 2, title: 'Changelog'
     }, {
-      icon: 'glyphicon glyphicon-headphones', slide: 3
+      icon: 'glyphicon glyphicon-headphones', slide: 3, title: 'TFAR'
     }, {
-      icon: 'glyphicon glyphicon-cog', slide: 4
+      icon: 'glyphicon glyphicon-cog', slide: 4, title: 'Einstellungen'
     }, {
-      icon: 'glyphicon glyphicon-question-sign', slide: 5
+      icon: 'glyphicon glyphicon-question-sign', slide: 5, title: 'FAQ'
     }, {
-      icon: 'glyphicon glyphicon-book', slide: 6
+      icon: 'glyphicon glyphicon-book', slide: 6, title: 'Über'
     }]
 
   $scope.switchSlide = function (tab) {
     $rootScope.slide = tab.slide
+    $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + tab.title
   }
 
   $rootScope.$watch(
@@ -52,11 +58,6 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
     'AppTitle', function () {
       document.title = $rootScope.AppTitle
     }, true)
-
-  $scope.refresh = function () {
-    getMods()
-    getServers()
-  }
 }])
 
 App.controller('modController', ['$scope', '$rootScope', function ($scope, $rootScope) {
@@ -418,15 +419,19 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
 
   $scope.checkUpdates = function () {
     for (var i = 0; i < $scope.mods.length; i++) {
-      if ($rootScope.ArmaPath !== '') {
-        $scope.mods[i].state = [0, 'Suche nach Updates...']
-        ipcRenderer.send('to-dwn', {
-          type: 'start-mod-quickcheck',
-          mod: $scope.mods[i],
-          path: $rootScope.ArmaPath
-        })
+      if ($scope.mods[i].HasGameFiles) {
+        if ($rootScope.ArmaPath !== '') {
+          $scope.mods[i].state = [0, 'Suche nach Updates...']
+          ipcRenderer.send('to-dwn', {
+            type: 'start-mod-quickcheck',
+            mod: $scope.mods[i],
+            path: $rootScope.ArmaPath
+          })
+        } else {
+          $scope.mods[i].state = [0, 'Kein Pfad gesetzt']
+        }
       } else {
-        $scope.mods[i].state = [0, 'Kein Pfad gesetzt']
+        $scope.mods[i].state = [3, 'Spielen']
       }
     }
   }
@@ -458,12 +463,10 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
 
     regKey.keyExists(function (err, exists) {
-      if (err) {
-        console.log(err)
-      }
+      if (err) throw err
       if (exists) {
         regKey.values(function (err, items) {
-          console.log(err)
+          if (err) throw err
           if (fs.existsSync(items[3].value + '\\arma3.exe')) {
             $scope.savePath(items[3].value)
           } else {
@@ -483,12 +486,10 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
 
     regKey.keyExists(function (err, exists) {
-      if (err) {
-        console.log(err)
-      }
+      if (err) throw err
       if (exists) {
         regKey.values(function (err, items) {
-          console.log(err)
+          if (err) throw err
           if (fs.existsSync(items[3].value + '\\arma3.exe')) {
             $scope.savePath(items[3].value)
           } else {
@@ -508,12 +509,10 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
 
     regKey.keyExists(function (err, exists) {
-      if (err) {
-        console.log(err)
-      }
+      if (err) throw err
       if (exists) {
         regKey.values(function (err, items) {
-          console.log(err)
+          if (err) throw err
           if (fs.existsSync(items[0].value + '\\arma3.exe')) {
             $scope.savePath(items[0].value)
           } else {
@@ -525,7 +524,8 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       }
     })
   }
-}])
+}
+])
 
 App.controller('serverController', ['$scope', function ($scope) {
   $scope.redrawChart = function (server) {
@@ -657,7 +657,10 @@ App.controller('changelogController', ['$scope', function ($scope) {
 App.controller('settingsController', ['$scope', '$rootScope', function ($scope, $rootScope) {
   $scope.init = function () {
     storage.get('settings', function (error, data) {
-      if (error) throw error
+      if (error) {
+        $scope.loaded = true
+        throw error
+      }
       $rootScope.ArmaPath = data.armapath
       $scope.splash = data.splash
       if ($scope.splash) {
@@ -680,42 +683,60 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
       $scope.vram = parseInt(data.vram)
       $scope.thread = parseInt(data.thread)
       $scope.add_params = data.add_params
+      $scope.loaded = true
     })
   }
 
   $('#splashCheck').on('ifChecked', function (event) {
-    $scope.splash = true
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.splash = true
+      $scope.saveSettings()
+    }
   }).on('ifUnchecked', function (event) {
-    $scope.splash = false
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.splash = false
+      $scope.saveSettings()
+    }
   })
 
   $('#introCheck').on('ifChecked', function (event) {
-    $scope.intro = true
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.intro = true
+      $scope.saveSettings()
+    }
   }).on('ifUnchecked', function (event) {
-    $scope.intro = false
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.intro = false
+      $scope.saveSettings()
+    }
   })
 
   $('#htCheck').on('ifChecked', function (event) {
-    $scope.ht = true
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.ht = true
+      $scope.saveSettings()
+    }
   }).on('ifUnchecked', function (event) {
-    $scope.ht = false
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.ht = false
+      $scope.saveSettings()
+    }
   })
 
   $('#windowedCheck').on('ifChecked', function (event) {
-    $scope.windowed = true
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.windowed = true
+      $scope.saveSettings()
+    }
   }).on('ifUnchecked', function (event) {
-    $scope.windowed = false
-    $scope.saveSettings()
+    if ($scope.loaded) {
+      $scope.windowed = false
+      $scope.saveSettings()
+    }
   })
 
   $scope.saveSettings = function () {
+    console.log('meh')
     storage.set('settings', {
       armapath: $rootScope.ArmaPath,
       splash: $scope.splash,
@@ -744,11 +765,11 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
     var path = String(dialog.showOpenDialog(options))
     if (path !== 'undefined' && path.indexOf('\\arma3.exe') > -1) {
       $rootScope.ArmaPath = path.replace('arma3.exe', '')
-      storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
-        if (error) throw error
-      })
+      $scope.saveSettings()
+      $rootScope.refresh()
     } else {
       $rootScope.ArmaPath = ''
+      $scope.saveSettings()
     }
   }
 }])

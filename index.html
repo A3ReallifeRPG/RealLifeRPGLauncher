@@ -115,19 +115,21 @@
                                                 <img src="resources/loading/cube.svg"/>
                                             </div>
                                         </div>
-                                        <div id="modScroll" class="col-lg-8" style="position: relative"  ng-show="!loading">
-                                            <div class="row">
-                                                <div class="col-md-6" ng-repeat="mod in mods">
-                                                    <div class="panel panel-primary">
-                                                        <div class="panel-body" style="text-align: center">
-                                                            <img ng-src="{{mod.ImageUrl}}" width="320px">
-                                                            <hr>
-                                                            <h4>{{mod.Name}}</h4>
-                                                            <hr>
-                                                            <div class="btn-group btn-group-sm">
-                                                                <button class="btn btn-success" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
-                                                                <button class="btn btn-warning" ng-show="mod.state[0] !== 0" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
-                                                                <button class="btn btn-primary" ng-show="mod.state[0] === 3" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
+                                        <div id="modScroll" class="col-lg-8" style="position: relative">
+                                            <div ng-show="!loading">
+                                                <div class="row">
+                                                    <div class="col-md-6" ng-repeat="mod in mods">
+                                                        <div class="panel panel-primary">
+                                                            <div class="panel-body" style="text-align: center">
+                                                                <img ng-src="{{mod.ImageUrl}}" width="320px">
+                                                                <hr>
+                                                                <h4>{{mod.Name}}</h4>
+                                                                <hr>
+                                                                <div class="btn-group btn-group-sm">
+                                                                    <button class="btn btn-success" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
+                                                                    <button class="btn btn-warning" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
+                                                                    <button class="btn btn-primary" ng-show="mod.state[0] === 3 && mod.HasGameFiles" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
