@@ -317,6 +317,15 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
+  $scope.initUpdate = function (mod) {
+    alertify.log('Update wird gestartet', 'primary')
+    ipcRenderer.send('to-dwn', {
+      type: 'start-mod-update',
+      mod: mod,
+      path: $rootScope.ArmaPath
+    })
+  }
+
   $scope.initListDownload = function (list, torrent, mod) {
     $scope.update({
       state: 'Download wird gestarted...',
@@ -399,7 +408,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $scope.initDownload(mod)
         break
       case 2:
-        $scope.initHash(mod)
+        $scope.initUpdate(mod)
         break
       case 3:
         $rootScope.slide = 1

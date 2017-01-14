@@ -141,8 +141,8 @@
                                                 <li class="list-group-item">
                                                     <b>Status</b> <a class="pull-right"><span tooltips tooltip-template="{{hint}}">{{state}}</span></a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="downSpeed > 0">
-                                                    <b>Geschwindigkeit</b> <a class="pull-right"><span tooltips tooltip-template="Download Geschwindigkeit">{{downSpeed}} Mb/s}</span></a>
+                                                <li class="list-group-item" ng-if="downloading">
+                                                    <b>Geschwindigkeit</b> <a class="pull-right"><span tooltips tooltip-template="Download Geschwindigkeit">{{downSpeed}} Mb/s</span></a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="totalProgress !== ''">
                                                     <b>Fortschritt</b> <a class="pull-right"><span tooltips tooltip-template="Gesamtfortschritt">{{totalProgress}} %</span></a>

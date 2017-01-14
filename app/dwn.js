@@ -41,6 +41,11 @@ ipcRenderer.on('to-dwn', function (event, args) {
       path = args.path
       getHashlist(args.mod, 'hashlist-callback-quickcheck')
       break
+    case 'start-mod-update':
+      cancel = false
+      path = args.path
+      getHashlist(args.mod, 'hashlist-callback-update')
+      break
     case 'hashlist-callback-dwn':
       cancel = false
       dwnMod(args)
@@ -48,6 +53,10 @@ ipcRenderer.on('to-dwn', function (event, args) {
     case 'hashlist-callback-hash':
       cancel = false
       hashMod(args)
+      break
+    case 'hashlist-callback-update':
+      cancel = false
+      updateMod(args)
       break
     case 'start-list-dwn':
       cancel = false
@@ -70,6 +79,11 @@ function dwnMod (args) {
 
 function dwnlist (args) {
   downloadFileRecursive(args.list, 0, path, args.mod.DownloadUrl, args.torrent, args.mod.Torrent)
+}
+
+function updateMod (args) {
+  var dllist = []
+  quickCheckRecursiveList(args.data.data, 0, path, dllist, args.args.mod)
 }
 
 function quickchecklist (args) {
@@ -265,7 +279,6 @@ function initTorrent (folder, torrentURL) {
   var opts = {
     path: path
   }
-  console.log(path)
   client.add(torrentURL, opts, function (torrent) {
     var update = setInterval(function () {
       if (!cancel) {
@@ -402,6 +415,47 @@ function quickCheckRecursive (list, index, basepath, mod) {
       update: 1,
       mod: mod
     })
+  }
+}
+
+function quickCheckRecursiveList (list, index, basepath, dllist, mod) {
+  try {
+    var dest = basepath + list[index].RelativPath
+    var stats
+    stats = fs.lstatSync(dest)
+    if (dest.includes('.bisign')) {
+      hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
+        if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
+          dllist.push(list[index])
+        } else {
+          if (list.length > index + 1) {
+            quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
+          } else {
+            finishProgressHash(dllist, mod)
+          }
+        }
+      })
+    } else if (list[index].Size !== stats.size) {
+      dllist.push(list[index])
+      if (list.length > index + 1) {
+        quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
+      } else {
+        finishProgressHash(dllist, mod)
+      }
+    } else {
+      if (list.length > index + 1) {
+        quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
+      } else {
+        finishProgressHash(dllist, mod)
+      }
+    }
+  } catch (e) {
+    dllist.push(list[index])
+    if (list.length > index + 1) {
+      quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
+    } else {
+      finishProgressHash(dllist, mod)
+    }
   }
 }
 
