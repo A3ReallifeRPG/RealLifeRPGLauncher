@@ -19,9 +19,10 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.ArmaPath = ''
   $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   $rootScope.slide = 0
+  $rootScope.betaMods = false
 
   $rootScope.refresh = function () {
-    getMods()
+    getMods($rootScope.betaMods)
     getServers()
   }
 })
@@ -74,7 +75,6 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   $scope.maxConns = 0
   $scope.fileName = ''
   $scope.fileProgress = ''
-  $scope.betaMods = false
 
   ipcRenderer.on('to-app', function (event, args) {
     switch (args.type) {
@@ -86,19 +86,20 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $('#modScroll').perfectScrollbar()
         break
       case 'update-dl-progress-server':
+        console.log((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)),args.state.speed)
         $scope.update({
           state: 'Server - Verbunden',
           hint: 'Download via Server läuft',
           downloading: true,
           downSpeed: toMB(args.state.speed),
           upSpeed: 0,
-          totalProgress: toFileProgress(args.state.totalSize, args.state.totalDownloaded),
+          totalProgress: toFileProgress(args.state.totalSize, args.state.totalDownloaded + args.state.size.transferred),
           totalSize: toGB(args.state.totalSize),
-          totalDownloaded: toGB(args.state.totalDownloaded),
-          totalETA: '',
+          totalDownloaded: toGB(args.state.totalDownloaded + args.state.size.transferred),
+          totalETA: humanizeDuration(Math.round(((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)) / args.state.speed) * 1000), {language: 'de', round: true}),
           totalPeers: 0,
           maxConns: 0,
-          fileName: cutName(args.fileName),
+          fileName: cutName(args.state.fileName),
           fileProgress: toProgress(args.state.percent)
         })
         $scope.graphTimeline.append(new Date().getTime(), toMB(args.state.speed))
@@ -282,7 +283,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       storage.get('settings', function (error, data) {
         if (error) throw error
         $rootScope.ArmaPath = data.armapath
-        getMods($scope.betaMods)
+        getMods($rootScope.betaMods)
         $scope.initGraph()
       })
     } catch (e) {
@@ -291,7 +292,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.initTorrent = function (mod) {
-    alertify.log('Seeding wird gestartet...', 'primary')
+    alertify.log('Seeding wird gestartet', 'primary')
     ipcRenderer.send('to-dwn', {
       type: 'start-mod-seed',
       mod: mod,
@@ -366,6 +367,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.cancel = function () {
+    alertify.log('Wird abgebrochen...', 'primary')
     ipcRenderer.send('to-dwn', {
       type: 'cancel'
     })
@@ -419,11 +421,11 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $('#betaSwitch').on('ifChecked', function (event) {
-    $scope.betaMods = true
-    getMods($scope.betaMods)
+    $rootScope.betaMods = true
+    getMods($rootScope.betaMods)
   }).on('ifUnchecked', function (event) {
     $scope.betaMods = false
-    getMods($scope.betaMods)
+    getMods($rootScope.betaMods)
   })
 
   $scope.checkUpdates = function () {
@@ -454,7 +456,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
             if (error) throw error
           })
-          getMods($scope.betaMods)
+          getMods($rootScope.betaMods)
         } else {
           $rootScope.slide = 4
           alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')

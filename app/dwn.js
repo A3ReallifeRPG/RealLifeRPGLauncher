@@ -74,10 +74,12 @@ ipcRenderer.on('to-dwn', function (event, args) {
 })
 
 function dwnMod (args) {
+  downloaded = 0
   downloadFileRecursive(args.data.data, 0, path, args.args.mod.DownloadUrl, true, args.args.mod.Torrent)
 }
 
 function dwnlist (args) {
+  downloaded = 0
   downloadFileRecursive(args.list, 0, path, args.mod.DownloadUrl, args.torrent, args.mod.Torrent)
 }
 
@@ -212,7 +214,9 @@ function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrent
   progress(request(dlserver + list[index].RelativPath), {}).on('progress', function (state) {
     state.totalSize = size
     state.totalDownloaded = downloaded
-    updateProgressServer(state, list[index].FileName)
+    state.fileName = list[index].FileName
+    state.fileSize = list[index].Size
+    updateProgressServer(state)
   }).on('error', function (err) {
     console.log(err)
   }).on('end', function () {
@@ -303,7 +307,7 @@ function initTorrent (folder, torrentURL) {
       }
     }, 1000)
     torrent.on('done', function () {
-      changeStatus(false, 'Abgeschlossen', 'Inaktiv')
+      changeStatus(false, 'Abgeschlossen - Prüfung austehend', 'Inaktiv')
     })
   })
 
@@ -313,11 +317,10 @@ function initTorrent (folder, torrentURL) {
   })
 }
 
-function updateProgressServer (state, filename) {
+function updateProgressServer (state) {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-server',
-    state: state,
-    fileName: filename
+    state: state
   })
 }
 
