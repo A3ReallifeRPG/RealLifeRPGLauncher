@@ -117,7 +117,8 @@ function createWindow () {
   webWin = new BrowserWindow({
     icon: 'icon/workericon.ico',
     width: 1000,
-    height: 550
+    height: 550,
+    show: false
   })
   webWin.loadURL(`file://${__dirname}/app/web.html`)
   webWin.webContents.openDevTools({
@@ -128,7 +129,8 @@ function createWindow () {
   downWin = new BrowserWindow({
     icon: 'icon/workericon.ico',
     width: 1000,
-    height: 550
+    height: 550,
+    show: false
   })
   downWin.loadURL(`file://${__dirname}/app/dwn.html`)
   downWin.webContents.openDevTools({
@@ -145,9 +147,7 @@ function createWindow () {
     maxWidth: 1920,
     maxHeight: 1080
   })
-  win.webContents.openDevTools({
-    detach: true
-  })
+
   win.loadURL(`file://${__dirname}/index.html`)
 
   win.on('close', function (e) {

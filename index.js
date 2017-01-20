@@ -86,7 +86,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $('#modScroll').perfectScrollbar()
         break
       case 'update-dl-progress-server':
-        console.log((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)),args.state.speed)
+        console.log((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)), args.state.speed)
         $scope.update({
           state: 'Server - Verbunden',
           hint: 'Download via Server läuft',
