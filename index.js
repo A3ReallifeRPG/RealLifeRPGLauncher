@@ -9,7 +9,7 @@ const Winreg = require('winreg')
 const unzip = require('unzip')
 const marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
-const spawn = require('child_process').spawn
+const child = require('child_process')
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification */
 
@@ -24,6 +24,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.refresh = function () {
     getMods($rootScope.betaMods)
     getServers()
+    getChangelog()
   }
 })
 
@@ -96,7 +97,10 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           totalProgress: toFileProgress(args.state.totalSize, args.state.totalDownloaded + args.state.size.transferred),
           totalSize: toGB(args.state.totalSize),
           totalDownloaded: toGB(args.state.totalDownloaded + args.state.size.transferred),
-          totalETA: humanizeDuration(Math.round(((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)) / args.state.speed) * 1000), {language: 'de', round: true}),
+          totalETA: humanizeDuration(Math.round(((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)) / args.state.speed) * 1000), {
+            language: 'de',
+            round: true
+          }),
           totalPeers: 0,
           maxConns: 0,
           fileName: cutName(args.state.fileName),
@@ -600,50 +604,56 @@ App.controller('serverController', ['$scope', function ($scope) {
     }
   })
 
-  $scope.joinArmaServer = function (server) {
-    storage.get('settings', function (err, data) {
-      if (err) throw err
+  $scope.joinServer = function (server) {
+    if (server.appId === 107410) {
+      storage.get('settings', function (err, data) {
+        if (err) throw err
 
-      var params = []
+        var params = []
 
-      params.push('-noLauncher')
-      params.push('-useBE')
-      params.push('-connect=' + server.IpAddress)
-      params.push('-port=' + server.Port)
-      params.push('-mod=' + server.StartParameters)
-      params.push('-password=' + server.ServerPassword)
+        params.push('-noLauncher')
+        params.push('-useBE')
+        params.push('-connect=' + server.IpAddress)
+        params.push('-port=' + server.Port)
+        params.push('-mod=' + server.StartParameters)
+        params.push('-password=' + server.ServerPassword)
 
-      if (data.splash) {
-        params.push('-nosplash')
-      }
-      if (data.intro) {
-        params.push('-skipIntro')
-      }
-      if (data.ht) {
-        params.push('-enableHT')
-      }
-      if (data.windowed) {
-        params.push('-window')
-      }
+        if (data.splash) {
+          params.push('-nosplash')
+        }
+        if (data.intro) {
+          params.push('-skipIntro')
+        }
+        if (data.ht) {
+          params.push('-enableHT')
+        }
+        if (data.windowed) {
+          params.push('-window')
+        }
 
-      if (data.mem != null && data.mem !== '') {
-        params.push('-maxMem=' + data.mem)
-      }
-      if (data.vram != null && data.vram !== '') {
-        params.push('-maxVRAM=' + data.vram)
-      }
-      if (data.cpu != null && data.cpu !== '') {
-        params.push('-cpuCount=' + data.cpu)
-      }
-      if (data.thread != null && data.thread !== '') {
-        params.push('-exThreads=' + data.thread)
-      }
-      if (data.add_params != null && data.add_params !== '') {
-        params.push(data.add_params)
-      }
+        if (data.mem != null && data.mem !== '') {
+          params.push('-maxMem=' + data.mem)
+        }
+        if (data.vram != null && data.vram !== '') {
+          params.push('-maxVRAM=' + data.vram)
+        }
+        if (data.cpu != null && data.cpu !== '') {
+          params.push('-cpuCount=' + data.cpu)
+        }
+        if (data.thread != null && data.thread !== '') {
+          params.push('-exThreads=' + data.thread)
+        }
+        if (data.add_params != null && data.add_params !== '') {
+          params.push(data.add_params)
+        }
 
-      spawn.spawn((data.armapath + '\\arma3launcher.exe'), params, [])
-    })
+        spawnNotification('Arma wird gestartet...')
+        child.spawn((data.armapath + '\\arma3launcher.exe'), params, [])
+      })
+    } else {
+      spawnNotification('Das Spiel wird gestartet...')
+      shell.openExternal('steam://connect/' + server.IpAddress + ':' + server.Port)
+    }
   }
 }])
 
