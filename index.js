@@ -757,7 +757,6 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
   })
 
   $scope.saveSettings = function () {
-    console.log('meh')
     storage.set('settings', {
       armapath: $rootScope.ArmaPath,
       splash: $scope.splash,
