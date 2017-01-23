@@ -110,6 +110,7 @@ autoUpdater.checkForUpdates()
 let win
 let downWin
 let webWin
+let loadWin
 let willClose = false
 
 function createWindow () {
@@ -117,7 +118,7 @@ function createWindow () {
   webWin = new BrowserWindow({
     icon: 'icon/workericon.ico',
     width: 1000,
-    height: 550,
+    height: 500,
     show: false
   })
   webWin.loadURL(`file://${__dirname}/app/web.html`)
@@ -129,7 +130,7 @@ function createWindow () {
   downWin = new BrowserWindow({
     icon: 'icon/workericon.ico',
     width: 1000,
-    height: 550,
+    height: 500,
     show: false
   })
   downWin.loadURL(`file://${__dirname}/app/dwn.html`)
@@ -141,14 +142,22 @@ function createWindow () {
   win = new BrowserWindow({
     icon: 'icon/appicon.ico',
     width: 1320,
-    height: 750,
+    height: 700,
     minWidth: 1320,
-    minHeight: 750,
-    maxWidth: 1920,
-    maxHeight: 1080
+    minHeight: 700,
+    show: false
   })
 
-  win.loadURL(`file://${__dirname}/index.html`)
+  win.loadURL(`file://${__dirname}/app.html`)
+
+  loadWin = new BrowserWindow({
+    icon: 'icon/appicon.ico',
+    width: 200,
+    height: 210,
+    frame: false
+  })
+
+  loadWin.loadURL(`file://${__dirname}/app/loading.html`)
 
   win.on('close', function (e) {
     if (!willClose) {
@@ -242,6 +251,19 @@ function setUpIpcHandlers () {
   })
 }
 
+const shouldQuit = app.makeSingleInstance(function (commandLine, workingDirectory) {
+  if (win) {
+    if (win.isMinimized()) win.restore()
+    if (!win.isVisible()) win.show()
+    win.focus()
+  }
+})
+
+if (shouldQuit) {
+  willClose = true
+  app.quit()
+}
+
 app.on('ready', function () {
   createWindow()
   createTray()
@@ -255,6 +277,11 @@ app.on('activate', function () {
 
 ipcMain.on('winprogress-change', function (event, arg) {
   win.setProgressBar(arg.progress)
+})
+
+ipcMain.on('app-loaded', function (event) {
+  win.show()
+  loadWin.destroy()
 })
 
 ipcMain.on('restartOnUpdate', function (event, arg) {

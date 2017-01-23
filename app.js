@@ -11,7 +11,7 @@ const marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 const child = require('child_process')
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL */
 
 var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
@@ -19,10 +19,17 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.ArmaPath = ''
   $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   $rootScope.slide = 0
-  $rootScope.betaMods = false
+
+  storage.get('settings', function (error, data) {
+    if (error) {
+      $rootScope.theme = 'light'
+      throw error
+    }
+    $rootScope.theme = data.theme
+  })
 
   $rootScope.refresh = function () {
-    getMods($rootScope.betaMods)
+    getMods()
     getServers()
     getChangelog()
   }
@@ -87,7 +94,6 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $('#modScroll').perfectScrollbar()
         break
       case 'update-dl-progress-server':
-        console.log((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)), args.state.speed)
         $scope.update({
           state: 'Server - Verbunden',
           hint: 'Download via Server läuft',
@@ -245,6 +251,14 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       case 'cancelled':
         $scope.reset()
         break
+      case 'notification-callback':
+        console.log(args)
+        if (args.data.Active) {
+          alertify.alert(args.data.Notification, function () {
+            alertify.message('OK')
+          })
+        }
+        break
       case 'update-quickcheck':
         for (var j = 0; j < $scope.mods.length; j++) {
           if ($scope.mods[j].Id === args.mod.Id) {
@@ -287,7 +301,8 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       storage.get('settings', function (error, data) {
         if (error) throw error
         $rootScope.ArmaPath = data.armapath
-        getMods($rootScope.betaMods)
+        $rootScope.theme = data.theme
+        getMods()
         $scope.initGraph()
       })
     } catch (e) {
@@ -357,17 +372,29 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.initGraph = function () {
-    $scope.chart = new SmoothieChart({
+    var bgColor = ''
+    var graphColor = ''
+
+    if ($rootScope.theme === 'light') {
+      bgColor = '#ffffff'
+      graphColor = '#2780e3'
+    } else if ($rootScope.theme === 'dark') {
+      bgColor = '#2b3e50'
+      graphColor = '#df691a'
+    }
+
+    var graphOptions = {
       millisPerPixel: 20,
-      grid: {fillStyle: '#ffffff', strokeStyle: '#ffffff'},
+      grid: {fillStyle: bgColor, strokeStyle: bgColor},
       labels: {fillStyle: '#000000', disabled: true}
-    })
+    }
+    $scope.chart = new SmoothieChart(graphOptions)
 
     var canvas = document.getElementById('smoothie-chart')
 
     $scope.graphTimeline = new TimeSeries()
-    $scope.chart.addTimeSeries($scope.graphTimeline, {lineWidth: 2, strokeStyle: '#2780e3'})
-    $scope.chart.streamTo(canvas, 1000)
+    $scope.chart.addTimeSeries($scope.graphTimeline, {lineWidth: 2, strokeStyle: graphColor})
+    $scope.chart.streamTo(canvas, 2000)
   }
 
   $scope.cancel = function () {
@@ -376,6 +403,28 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       type: 'cancel'
     })
   }
+
+  $rootScope.$watch(
+    'theme', function () {
+      if ($scope.chart != null) {
+        console.log($scope.chart)
+        var bgColor = ''
+        var graphColor = ''
+
+        if ($rootScope.theme === 'light') {
+          bgColor = '#ffffff'
+          graphColor = '#2780e3'
+        } else if ($rootScope.theme === 'dark') {
+          bgColor = '#2b3e50'
+          graphColor = '#df691a'
+        }
+
+        $scope.chart.options.grid.fillStyle = bgColor
+        $scope.chart.options.grid.strokeStyle = bgColor
+        $scope.chart.seriesSet[0].options.lineWidth = 2
+        $scope.chart.seriesSet[0].options.strokeStyle = graphColor
+      }
+    }, true)
 
   $scope.update = function (update) {
     $scope.state = update.state
@@ -424,14 +473,6 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     }
   }
 
-  $('#betaSwitch').on('ifChecked', function (event) {
-    $rootScope.betaMods = true
-    getMods($rootScope.betaMods)
-  }).on('ifUnchecked', function (event) {
-    $scope.betaMods = false
-    getMods($rootScope.betaMods)
-  })
-
   $scope.checkUpdates = function () {
     for (var i = 0; i < $scope.mods.length; i++) {
       if ($scope.mods[i].HasGameFiles) {
@@ -460,7 +501,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
             if (error) throw error
           })
-          getMods($rootScope.betaMods)
+          getMods()
         } else {
           $rootScope.slide = 4
           alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')
@@ -579,6 +620,7 @@ App.controller('serverController', ['$scope', function ($scope) {
   $scope.init = function () {
     $scope.loading = true
     getServers()
+    getNotification()
   }
 
   $scope.showTab = function (tabindex) {
@@ -680,6 +722,7 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
     storage.get('settings', function (error, data) {
       if (error) {
         $scope.loaded = true
+        $rootScope.theme = 'light'
         throw error
       }
       $rootScope.ArmaPath = data.armapath
@@ -704,6 +747,12 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
       $scope.vram = parseInt(data.vram)
       $scope.thread = parseInt(data.thread)
       $scope.add_params = data.add_params
+      $rootScope.theme = data.theme
+      if ($rootScope.theme === 'dark') {
+        $('#darkSwitch').iCheck('check')
+      } else if ($rootScope.theme === 'light') {
+        $('#lightSwitch').iCheck('check')
+      }
       $scope.loaded = true
     })
   }
@@ -756,6 +805,20 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
     }
   })
 
+  $('#lightSwitch').on('ifChecked', function (event) {
+    if ($scope.loaded) {
+      $rootScope.theme = 'light'
+      $rootScope.$apply()
+      $scope.saveSettings()
+    }
+  }).on('ifUnchecked', function (event) {
+    if ($scope.loaded) {
+      $rootScope.theme = 'dark'
+      $rootScope.$apply()
+      $scope.saveSettings()
+    }
+  })
+
   $scope.saveSettings = function () {
     storage.set('settings', {
       armapath: $rootScope.ArmaPath,
@@ -767,7 +830,8 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
       cpu: $scope.cpu,
       vram: $scope.vram,
       thread: $scope.thread,
-      add_params: $scope.add_params
+      add_params: $scope.add_params,
+      theme: $rootScope.theme
     }, function (error) {
       if (error) throw error
     })
@@ -874,6 +938,15 @@ function getServers () {
   })
 }
 
+function getNotification () {
+  ipcRenderer.send('to-web', {
+    type: 'get-url',
+    callback: 'notification-callback',
+    url: APIBaseURL + APINotificationURL,
+    callBackTarget: 'to-app'
+  })
+}
+
 function toGB (val) {
   return (val / 1000000000).toFixed(3)
 }
@@ -902,4 +975,8 @@ function spawnNotification (message) {
   new Notification('ReallifeRPG', { // eslint-disable-line
     body: message
   })
+}
+
+function appLoaded () { // eslint-disable-line
+  ipcRenderer.send('app-loaded')
 }

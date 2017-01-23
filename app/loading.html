@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ReallifeRPG</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #ffffff;
+        user-drag: none;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-drag: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        outline: none !important
+    }
+    .load-bar {
+        position: relative;
+        margin-top: 0;
+        width: 100%;
+        height: 6px;
+        background-color: #fdba2c;
+    }
+    .bar {
+        content: "";
+        display: inline;
+        position: absolute;
+        width: 0;
+        height: 100%;
+        left: 50%;
+        text-align: center;
+    }
+    .bar:nth-child(1) {
+        background-color: #292929;
+        animation: loading 3s linear infinite;
+    }
+    .bar:nth-child(2) {
+        background-color: #6F91C8;
+        animation: loading 3s linear 1s infinite;
+    }
+    .bar:nth-child(3) {
+        background-color: #ff5959;
+        animation: loading 3s linear 2s infinite;
+    }
+    @keyframes loading {
+        from {left: 50%; width: 0;z-index:100;}
+        33.3333% {left: 0; width: 100%;z-index: 10;}
+        to {left: 0; width: 100%;}
+    }
+</style>
+<body>
+    <img src="../resources/loading/rlcat.gif" height="200" width="200">
+    <div class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+</body>
+</html>

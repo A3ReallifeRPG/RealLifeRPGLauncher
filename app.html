@@ -15,7 +15,6 @@
     <!-- tether -->
     <link href="node_modules/tether/dist/css/tether.min.css" rel="stylesheet">
     <script src="node_modules/tether/dist/js/tether.min.js"></script>
-    <script src="node_modules/tether/dist/js/tether.min.js"></script>
 
     <!-- jquery -->
     <script type="text/javascript">
@@ -23,7 +22,7 @@
     </script>
 
     <!-- bootstrap -->
-    <link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css">
+    <link ng-href="resources/bootstrap/css/bootstrap_{{theme}}.min.css" rel="stylesheet">
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
     <!-- fa icons-->
@@ -34,6 +33,11 @@
 
     <!-- chartjs -->
     <script src="node_modules/chart.js/dist/Chart.min.js"></script>
+
+    <!-- shepherd -->
+    <link rel="stylesheet" href="node_modules/tether-shepherd/dist/css/shepherd-theme-square.css"/>
+    <script src="node_modules/tether-shepherd/dist/js/shepherd.min.js"></script>
+    <script src="node_modules/tether-shepherd/dist/js/tether.js"></script>
 
     <!-- alertify -->
     <script src="node_modules/alertify/lib/alertify.min.js"></script>
@@ -52,11 +56,10 @@
     <!-- custom css/js -->
     <link rel="stylesheet" href="resources/css/custom.css">
 
-    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="app.js"></script>
 </head>
 <body>
-<div style="height: 100%;background-color: #222222;" ng-show="!AppLoaded"></div>
-<div id="app" ng-show="AppLoaded">
+<div id="app">
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -99,14 +102,7 @@
                     <div id="mods">
                         <div class="container">
                             <div ng-controller="modController" data-ng-init="init()">
-                                <h3>ReallifeRPG Mods
-                                    <span class="pull-right">
-                                        <span class="pull-right">
-                                            Beta
-                                            <input id="betaSwitch" type="checkbox" title="Beta">
-                                        </span>
-                                    </span>
-                                </h3>
+                                <h3>ReallifeRPG Mods</h3>
                                 <hr>
                                 <div class="page">
                                     <div class="row">
@@ -208,15 +204,17 @@
                                             <br>
                                             <div class="row">
                                                 <div class="col-md-4">
-                                                    <canvas id="serverChart{{server.Id}}" width="387" height="387"></canvas>
+                                                    <canvas ng-show="{{server.appId === 107410}}" id="serverChart{{server.Id}}" width="387" height="387"/>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <h5>Spieler <span class="pull-right">{{server.Playercount}}/{{server.Slots}}</span></h5>
-                                                    <ul id="playerScroll{{server.Id}}" class="list-group list-group-unbordered margin-none" style="height: 350px;position: relative;">
-                                                        <li class="list-group-item" ng-repeat="player in server.Players">
-                                                            <b>{{player}}</b>
-                                                        </li>
-                                                    </ul>
+                                                    <div ng-show="{{server.Playercount != 0}}">
+                                                        <h5>Spieler <span class="pull-right">{{server.Playercount}}/{{server.Slots}}</span></h5>
+                                                        <ul id="playerScroll{{server.Id}}" class="list-group list-group-unbordered margin-none" style="height: 350px;position: relative;">
+                                                            <li class="list-group-item" ng-repeat="player in server.Players">
+                                                                <b>{{player}}</b>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <h5>Daten</h5>
@@ -259,41 +257,39 @@
                             <h3>ReallifeRPG Changelog</h3>
                             <hr>
                             <div class="page">
-                                <div class="panel panel-primary">
-                                    <div class="panel-body">
-                                        <div class="row" id="changelogScroll" style="height: 450px;position: relative;">
-                                            <div class="col-md-3">
-                                                <div class="list-group">
-                                                    <a class="list-group-item" ng-repeat="changelog in changelogs" href="#{{changelog.id}}">{{changelog.version}} - {{changelog.release_at}}</a>
-                                                </div>
+                                <div class="row" id="changelogScroll" style="height: 450px;position: relative;">
+                                    <div class="col-md-3">
+                                        <div class="list-group">
+                                            <a class="list-group-item" ng-repeat="changelog in changelogs" href="#{{changelog.id}}">{{changelog.version}} - {{changelog.release_at}}</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="panel panel-primary" ng-repeat="changelog in changelogs">
+                                            <div class="panel-heading">
+                                                <span class="htop" id="{{changelog.id}}">Update {{changelog.version}}</span> <span class="pull-right">{{changelog.release_at}}</span>
                                             </div>
-                                            <div class="col-md-9">
-                                                <div class="panel panel-primary" ng-repeat="changelog in changelogs">
-                                                    <div class="panel-heading">
-                                                        <span class="htop" id="{{changelog.id}}">Update {{changelog.version}}</span> <span class="pull-right">{{changelog.release_at}}</span>
-                                                    </div>
-                                                    <div class="panel-body">
-                                                        <div ng-if="changelog.change_mission.length > 0">
-                                                            <h4>Mission</h4>
-                                                            <ul>
-                                                                <li ng-repeat="content in changelog.change_mission">{{content}}</li>
-                                                            </ul>
-                                                        </div>
-                                                        <div ng-if="changelog.change_map.length > 0">
-                                                            <h4>Map</h4>
-                                                            <ul>
-                                                                <li ng-repeat="content in changelog.change_map">{{content}}</li>
-                                                            </ul>
-                                                        </div>
-                                                        <div ng-if="changelog.change_mod.length > 0">
-                                                            <h4>Mod</h4>
-                                                            <ul>
-                                                                <li ng-repeat="content in changelog.change_mod">{{content}}</li>
-                                                            </ul>
-                                                        </div>
-                                                        <code ng-if="changelog.note != ''">{{changelog.note}}</code>
-                                                    </div>
+                                            <div class="panel-body">
+                                                <div ng-if="changelog.change_mission.length > 0">
+                                                    <h4>Mission</h4>
+                                                    <ul>
+                                                        <li ng-repeat="content in changelog.change_mission">
+                                                            {{content}}
+                                                        </li>
+                                                    </ul>
                                                 </div>
+                                                <div ng-if="changelog.change_map.length > 0">
+                                                    <h4>Map</h4>
+                                                    <ul>
+                                                        <li ng-repeat="content in changelog.change_map">{{content}}</li>
+                                                    </ul>
+                                                </div>
+                                                <div ng-if="changelog.change_mod.length > 0">
+                                                    <h4>Mod</h4>
+                                                    <ul>
+                                                        <li ng-repeat="content in changelog.change_mod">{{content}}</li>
+                                                    </ul>
+                                                </div>
+                                                <code ng-if="changelog.note != ''">{{changelog.note}}</code>
                                             </div>
                                         </div>
                                     </div>
@@ -401,6 +397,25 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <hr class="margin-none">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <form>
+                                            <div class="form-group form-inline">
+                                                <h5>Theme</h5>
+                                                <label for="lightSwitch">Light</label>
+                                                <span class="pull-right">
+                                                        <input id="lightSwitch" type="radio" name="theme">
+                                                </span>
+                                                <br>
+                                                <label for="darkSwitch">Night</label>
+                                                <span class="pull-right">
+                                                        <input id="darkSwitch" type="radio" name="theme">
+                                                </span>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -538,6 +553,7 @@
       radioClass: 'iradio_minimal',
       increaseArea: '20%' // optional
     });
+    appLoaded()
   });
 </script>
 </html>
