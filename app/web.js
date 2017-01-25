@@ -12,7 +12,7 @@ ipcRenderer.on('to-web', function (event, args) {
       getUrl(args)
       break
     case 'start-tfar-download' :
-      downloadTFAR()
+      downloadTFAR(args.version)
       break
   }
 })
@@ -34,8 +34,9 @@ function getUrlCallback (args, err, data, resp) {
   })
 }
 
-function downloadTFAR () {
-  progress(request(TFARFileURL), {}).on('progress', function (state) {
+function downloadTFAR (version) {
+  console.log(TFARFileURL + '_' + version)
+  progress(request(TFARFileURL + '_' + version), {}).on('progress', function (state) {
     updateProgressTFAR(state)
   }).on('error', function (err) {
     console.log(err)

@@ -6,6 +6,7 @@ const autoUpdater = require('electron').autoUpdater
 const BrowserWindow = require('electron').BrowserWindow
 const {ipcMain} = require('electron')
 const {Menu, Tray} = require('electron')
+const os = require('os')
 
 let tray = null
 
@@ -78,15 +79,6 @@ function handleSquirrelEvent () {
 autoUpdater.addListener('update-available', function (event) {
 
 })
-autoUpdater.addListener('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateURL) {
-  var args = {
-    releaseNotes: releaseNotes,
-    releaseName: releaseName,
-    releaseDate: releaseDate,
-    updateURL: updateURL
-  }
-  win.webContents.send('update-downloaded', args)
-})
 
 autoUpdater.addListener('error', function (error) { // eslint-disable-line
 
@@ -142,13 +134,23 @@ function createWindow () {
   win = new BrowserWindow({
     icon: 'icon/appicon.ico',
     width: 1320,
-    height: 700,
+    height: 710,
     minWidth: 1320,
-    minHeight: 700,
+    minHeight: 710,
     show: false
   })
 
-  win.loadURL(`file://${__dirname}/app.html`)
+  win.loadURL(`file://${__dirname}/index.html`)
+
+  autoUpdater.addListener('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateURL) {
+    var args = {
+      releaseNotes: releaseNotes,
+      releaseName: releaseName,
+      releaseDate: releaseDate,
+      updateURL: updateURL
+    }
+    win.webContents.send('update-downloaded', args)
+  })
 
   loadWin = new BrowserWindow({
     icon: 'icon/appicon.ico',
@@ -160,25 +162,44 @@ function createWindow () {
   loadWin.loadURL(`file://${__dirname}/app/loading.html`)
 
   win.on('close', function (e) {
-    if (!willClose) {
+    if (!willClose && os.release().startsWith('10')) {
       e.preventDefault()
       hideWindows()
+    } else {
+      willClose = true
+      app.quit()
     }
   })
 
   webWin.on('close', function (e) {
-    if (!willClose) {
+    if (!willClose && os.release().startsWith('10')) {
       e.preventDefault()
       hideWindows()
+    } else {
+      willClose = true
+      app.quit()
     }
   })
 
   downWin.on('close', function (e) {
-    if (!willClose) {
+    if (!willClose && os.release().startsWith('10')) {
       e.preventDefault()
       hideWindows()
+    } else {
+      willClose = true
+      app.quit()
     }
   })
+
+  if (process.argv[2] === '-beta') {
+    global.beta = {
+      beta: true
+    }
+  } else {
+    global.beta = {
+      beta: false
+    }
+  }
 
   setUpIpcHandlers()
 }
@@ -282,14 +303,6 @@ ipcMain.on('winprogress-change', function (event, arg) {
 ipcMain.on('app-loaded', function (event) {
   win.show()
   loadWin.destroy()
-})
-
-ipcMain.on('restartOnUpdate', function (event, arg) {
-  autoUpdater.quitAndInstall()
-})
-
-ipcMain.on('check-for-update', function (event) {
-  autoUpdater.checkForUpdates()
 })
 
 ipcMain.on('focus-window', function (event) {

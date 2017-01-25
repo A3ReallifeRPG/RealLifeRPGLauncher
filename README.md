@@ -2,7 +2,7 @@
 
 # RealLifeRPGLauncher
 
-![alt tag](https://travis-ci.org/A3ReallifeRPG/RealLifeRPGLauncher.svg?branch=master) [![GitHub release](https://img.shields.io/github/release/A3ReallifeRPG/RealLifeRPGLauncher.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases/latest) [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Github All Releases](https://img.shields.io/github/downloads/A3ReallifeRPG/RealLifeRPGLauncher/total.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases)  [![Github All Releases](https://img.shields.io/badge/Download-58,9_MB-green.svg)](https://deploy.realliferpg.de/)
+![alt tag](https://travis-ci.org/A3ReallifeRPG/RealLifeRPGLauncher.svg?branch=master) [![GitHub release](https://img.shields.io/github/release/A3ReallifeRPG/RealLifeRPGLauncher.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases/latest) [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Github All Releases](https://img.shields.io/github/downloads/A3ReallifeRPG/RealLifeRPGLauncher/total.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases)  [![Github All Releases](https://img.shields.io/badge/Download-60,5_MB-green.svg)](https://deploy.realliferpg.de/)
 
 Willkommen im Repository des RealLifeRPG Launchers.
 

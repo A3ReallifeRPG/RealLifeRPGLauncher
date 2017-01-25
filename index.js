@@ -10,6 +10,7 @@ const unzip = require('unzip')
 const marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 const child = require('child_process')
+const beta = require('electron').remote.getGlobal('beta')
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL */
 
@@ -19,13 +20,17 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.ArmaPath = ''
   $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   $rootScope.slide = 0
+  $rootScope.theme = 'light'
 
   storage.get('settings', function (error, data) {
     if (error) {
       $rootScope.theme = 'light'
       throw error
     }
-    $rootScope.theme = data.theme
+
+    if (typeof data.theme !== 'undefined') {
+      $rootScope.theme = data.theme
+    }
   })
 
   $rootScope.refresh = function () {
@@ -191,7 +196,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: 'Überprüfung - Läuft',
           hint: '5 - 10 Minuten',
           downloading: true,
-          downSpeed: toMB(args.state.speed),
+          downSpeed: 0,
           upSpeed: 0,
           totalProgress: toProgress(args.state.index / args.state.size),
           totalSize: 0,
@@ -252,11 +257,8 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         $scope.reset()
         break
       case 'notification-callback':
-        console.log(args)
         if (args.data.Active) {
-          alertify.alert(args.data.Notification, function () {
-            alertify.message('OK')
-          })
+          alertify.alert(args.data.Notification)
         }
         break
       case 'update-quickcheck':
@@ -301,7 +303,6 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       storage.get('settings', function (error, data) {
         if (error) throw error
         $rootScope.ArmaPath = data.armapath
-        $rootScope.theme = data.theme
         getMods()
         $scope.initGraph()
       })
@@ -407,7 +408,6 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   $rootScope.$watch(
     'theme', function () {
       if ($scope.chart != null) {
-        console.log($scope.chart)
         var bgColor = ''
         var graphColor = ''
 
@@ -725,6 +725,9 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
         $rootScope.theme = 'light'
         throw error
       }
+      if (typeof data.theme !== 'undefined') {
+        $rootScope.theme = data.theme
+      }
       $rootScope.ArmaPath = data.armapath
       $scope.splash = data.splash
       if ($scope.splash) {
@@ -747,7 +750,6 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
       $scope.vram = parseInt(data.vram)
       $scope.thread = parseInt(data.thread)
       $scope.add_params = data.add_params
-      $rootScope.theme = data.theme
       if ($rootScope.theme === 'dark') {
         $('#darkSwitch').iCheck('check')
       } else if ($rootScope.theme === 'light') {
@@ -873,10 +875,11 @@ App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
 }])
 
 App.controller('tfarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-  $scope.initTFARDownload = function () {
+  $scope.initTFARDownload = function (version) {
     $scope.tfarDownloading = true
     ipcRenderer.send('to-web', {
-      type: 'start-tfar-download'
+      type: 'start-tfar-download',
+      version: version
     })
   }
 
@@ -907,9 +910,9 @@ App.controller('tfarController', ['$scope', '$rootScope', function ($scope, $roo
   })
 }])
 
-function getMods (betaMods) {
+function getMods () {
   var url = APIBaseURL + APIModsURL
-  if (betaMods) {
+  if (beta.beta) {
     url += APIBetaADD
   }
   ipcRenderer.send('to-web', {
@@ -980,3 +983,7 @@ function spawnNotification (message) {
 function appLoaded () { // eslint-disable-line
   ipcRenderer.send('app-loaded')
 }
+
+ipcRenderer.on('update-downloaded', function (event, args) {
+  spawnNotification('Update zur Version ' + args.releaseName + ' bereit.')
+})

@@ -211,7 +211,11 @@ function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrent
   for (var i = 0; i < list.length; i++) {
     size += list[i].Size
   }
-  progress(request(dlserver + list[index].RelativPath), {}).on('progress', function (state) {
+  var requestobj = null
+  progress(requestobj = request(dlserver + list[index].RelativPath), {}).on('progress', function (state) {
+    if (cancel) {
+      requestobj.abort()
+    }
     state.totalSize = size
     state.totalDownloaded = downloaded
     state.fileName = list[index].FileName

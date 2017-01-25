@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -16,9 +16,10 @@
   },
   "scripts": {
     "start": "electron .",
+    "beta": "electron . -beta",
     "pack": "build --target dir",
     "dist": "build",
-    "test": "standard"
+    "test": "standard ; start"
   },
   "standard": {
     "ignore": [
@@ -89,7 +90,7 @@
     "tether": "^1.4.0",
     "tether-shepherd": "^1.8.1",
     "unzip": "^0.1.11",
-    "webtorrent": "^0.98.0",
-    "winreg": "^1.2.2"
+    "webtorrent": "^0.98.3",
+    "winreg": "^1.2.3"
   }
 }
