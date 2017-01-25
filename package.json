@@ -19,7 +19,7 @@
     "beta": "electron . -beta",
     "pack": "build --target dir",
     "dist": "build",
-    "test": "standard ; start"
+    "test": "standard"
   },
   "standard": {
     "ignore": [
