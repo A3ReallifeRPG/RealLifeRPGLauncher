@@ -62,6 +62,7 @@ ipcRenderer.on('to-dwn', function (event, args) {
     case 'start-list-dwn':
       cancel = false
       path = args.path
+      console.log(args)
       dwnlist(args)
       break
     case 'hashlist-callback-quickcheck':
