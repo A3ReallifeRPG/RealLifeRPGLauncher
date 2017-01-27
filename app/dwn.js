@@ -9,6 +9,7 @@ const {ipcRenderer} = require('electron')
 
 var cancel = false
 var downloaded = 0
+var update = null
 
 let client = window.client = new WebTorrent({
   maxConns: 150
@@ -75,7 +76,11 @@ ipcRenderer.on('to-dwn', function (event, args) {
 
 function dwnMod (args) {
   downloaded = 0
-  downloadFileRecursive(args.data.data, 0, path, args.args.mod.DownloadUrl, true, args.args.mod.Torrent)
+  if (args.args.mod.Torrent !== '') {
+    downloadFileRecursive(args.data.data, 0, path, args.args.mod.DownloadUrl, true, args.args.mod.Torrent)
+  } else {
+    downloadFileRecursive(args.data.data, 0, path, args.args.mod.DownloadUrl, false, args.args.mod.Torrent)
+  }
 }
 
 function dwnlist (args) {
@@ -159,10 +164,17 @@ function cleanFileRecursive (list, index, basepath, callback, hashlist, hashInde
 }
 
 function initSeeding (dirPath, TorrentURL) {
+  update = setInterval(function () {
+    var state = {
+      torrentUploadSpeedState: client.progress
+    }
+    updateProgressTorrentInit(state)
+  }, 1000)
   client.add(TorrentURL, {
     path: dirPath
   }, function (torrent) {
-    var update = setInterval(function () {
+    clearInterval(update)
+    update = setInterval(function () {
       if (!cancel) {
         var state = {
           torrentUploadSpeedState: client.uploadSpeed,
@@ -189,17 +201,25 @@ function downloadFileRecursive (list, index, basepath, dlserver, torrent, torren
 
   try {
     stats = fs.lstatSync(folder)
-    if (!(stats.isDirectory() && folder.includes('addons') && torrent)) {
+    if (!(stats.isDirectory() && folder.includes('addons'))) {
       dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
     } else {
-      initTorrent(folder, torrentURL)
+      if (torrent) {
+        initTorrent(folder, torrentURL)
+      } else {
+        dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
+      }
     }
   } catch (e) {
     mkpath(folder, function () {
       if (!folder.includes('addons') && torrent) {
         dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
       } else {
-        initTorrent(folder, torrentURL)
+        if (torrent) {
+          initTorrent(folder, torrentURL)
+        } else {
+          dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
+        }
       }
     })
   }
@@ -282,13 +302,19 @@ function downloadFinished () {
 }
 
 function initTorrent (folder, torrentURL) {
-  changeStatus(true, 'Torrent - Verbinden...', '5 - 10 Minuten.')
   path = folder.replace('addons', '')
   var opts = {
     path: path
   }
+  update = setInterval(function () {
+    var state = {
+      torrentUploadSpeedState: client.progress
+    }
+    updateProgressTorrentInit(state)
+  }, 1000)
   client.add(torrentURL, opts, function (torrent) {
-    var update = setInterval(function () {
+    clearInterval(update)
+    update = setInterval(function () {
       if (!cancel) {
         var state = {
           torrentDownloadSpeedState: client.downloadSpeed,
@@ -338,6 +364,13 @@ function updateProgressTorrent (state) {
 function updateProgressSeeding (state) {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-seeding',
+    state: state
+  })
+}
+
+function updateProgressTorrentInit (state) {
+  ipcRenderer.send('to-app', {
+    type: 'update-torrent-progress-init',
     state: state
   })
 }

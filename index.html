@@ -76,6 +76,16 @@
                     <li ng-repeat="tab in tabs" ng-class={'active':(slide==$index)}>
                         <a ng-click="switchSlide(tab)"><span class="{{tab.icon}}"></span></a>
                     </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">ReallifeRPG <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="https://realliferpg.de" target="_blank">Website</a></li>
+                            <li><a href="https://forum.realliferpg.de" target="_blank">Forum</a></li>
+                            <li><a href="https://wiki.realliferpg.de" target="_blank">Wiki</a></li>
+                            <li class="divider"></li>
+                            <li><a href="https://github.com/A3ReallifeRPG/" target="_blank">Github</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li ng-show="downloading && downSpeed > 0">
@@ -117,12 +127,13 @@
                                                             <div class="panel-body" style="text-align: center">
                                                                 <img ng-src="{{mod.ImageUrl}}" width="320px">
                                                                 <hr>
-                                                                <h4>{{mod.Name}}</h4>
+                                                                <h4 tooltips tooltip-template="{{mod.Description}}">{{mod.Name}}</h4>
                                                                 <hr>
                                                                 <div class="btn-group btn-group-sm">
-                                                                    <button class="btn btn-success" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
-                                                                    <button class="btn btn-warning" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
-                                                                    <button class="btn btn-primary" ng-show="mod.state[0] === 3 && mod.HasGameFiles" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
+                                                                    <button class="btn btn-success btn-sm" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
+                                                                    <button class="btn btn-warning btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
+                                                                    <button class="btn btn-primary btn-sm" ng-show="mod.state[0] === 3 && mod.HasGameFiles" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
+                                                                    <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="openModDir(mod)"><span class=" glyphicon glyphicon-folder-open"></span></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -135,7 +146,7 @@
                                                 <li class="list-group-item">
                                                     <b>Status</b> <a class="pull-right"><span tooltips tooltip-template="{{hint}}">{{state}}</span></a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="downloading">
+                                                <li class="list-group-item" ng-if="downloading && downSpeed > 0">
                                                     <b>Geschwindigkeit</b> <a class="pull-right"><span tooltips tooltip-template="Download Geschwindigkeit">{{downSpeed}} Mb/s</span></a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="totalProgress !== ''">
@@ -162,7 +173,7 @@
                                                     </div>
                                                 </li>
                                             </ul>
-                                            <button class="btn btn-danger pull-right btn-sm" style="margin-top: 10px" ng-if="downloading" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> Abbrechen</button>
+                                            <button class="btn btn-danger pull-right btn-sm" style="margin-top: 10px" ng-if="downloading && canCancel" ng-click="cancel()"><span class="glyphicon glyphicon-remove"></span> Abbrechen</button>
                                             <br>
                                         </div>
                                     </div>
@@ -202,7 +213,7 @@
                                             <br>
                                             <div class="row">
                                                 <div class="col-md-4">
-                                                    <canvas ng-show="{{server.appId === 107410}}" id="serverChart{{server.Id}}" width="387" height="387"/>
+                                                    <canvas ng-show="{{server.appId === 107410 && server.Gamemode === 1}}" id="serverChart{{server.Id}}" width="387" height="387"/>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div ng-show="{{server.Playercount != 0}}">
@@ -217,26 +228,37 @@
                                                 <div class="col-md-4">
                                                     <h5>Daten</h5>
                                                     <ul class="list-group list-group-unbordered margin-none">
-                                                        <li class="list-group-item">
+                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
                                                             <b>Zivilisten</b> <a class="pull-right"><span class="label label-civ">{{server.Civilians}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item">
+                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
                                                             <b>Polizisten</b> <a class="pull-right"><span class="label label-cop">{{server.Cops}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item">
+                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
                                                             <b>Medics</b> <a class="pull-right"><span class="label label-medic">{{server.Medics}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item">
+                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
                                                             <b>Adac</b> <a class="pull-right"><span class="label label-adac">{{server.Adac}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item">
+                                                        <li class="list-group-item" ng-show="{{server.appId === 107410}}">
                                                             <b>IP:Port</b> <a class="pull-right">{{server.IpAddress}}:{{server.Port}}</a>
                                                         </li>
-                                                        <li class="list-group-item">
+                                                        <li class="list-group-item" ng-show="server.StartParameters !== '' && server.StartParameters.length < 20">
                                                             <b>Parameter</b> <a class="pull-right">{{server.StartParameters}}</a>
                                                         </li>
                                                         <li class="list-group-item">
                                                             <b>Passwort</b> <a class="pull-right">{{server.ServerPassword}}</a>
+                                                        </li>
+                                                        <li class="list-group-item" ng-show="server.Description !== '' && server.Description !== null">
+                                                            <b>Informationen</b>
+                                                        </li>
+                                                        <li class="list-group-item" ng-show="server.Description !== '' && server.Description !== null" ng-bind-html="server.DescriptionHTML">
+                                                        </li>
+                                                        <li class="list-group-item" ng-show="server.StartParameters !== '' && server.StartParameters.length >= 20">
+                                                            <b>Parameter</b>
+                                                        </li>
+                                                        <li class="list-group-item" ng-show="server.StartParameters !== '' && server.StartParameters.length >= 20">
+                                                            <a>{{server.StartParameters}}</a>
                                                         </li>
                                                     </ul>
                                                     <button class="btn btn-success pull-right btn-sm" style="margin-top: 10px" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
@@ -262,32 +284,38 @@
                                         </div>
                                     </div>
                                     <div class="col-md-9">
-                                        <div class="panel panel-primary" ng-repeat="changelog in changelogs">
-                                            <div class="panel-heading">
-                                                <span class="htop" id="{{changelog.id}}">Update {{changelog.version}}</span> <span class="pull-right">{{changelog.release_at}}</span>
-                                            </div>
-                                            <div class="panel-body">
-                                                <div ng-if="changelog.change_mission.length > 0">
-                                                    <h4>Mission</h4>
-                                                    <ul>
-                                                        <li ng-repeat="content in changelog.change_mission">
-                                                            {{content}}
-                                                        </li>
-                                                    </ul>
+                                        <div class="panel-group" id="changelogAccordion">
+                                            <div class="panel panel-default" ng-repeat="changelog in changelogs">
+                                                <div class="panel-heading accordion-toggle question-toggle collapsed" data-toggle="collapse" data-parent="#changelogAccordion" data-target="#change{{changelog.id}}">
+                                                    <h4 class="panel-title">
+                                                        <span class="htop" id="{{changelog.id}}">Update {{changelog.version}}</span> <span class="pull-right">{{changelog.release_at}}</span>
+                                                    </h4>
                                                 </div>
-                                                <div ng-if="changelog.change_map.length > 0">
-                                                    <h4>Map</h4>
-                                                    <ul>
-                                                        <li ng-repeat="content in changelog.change_map">{{content}}</li>
-                                                    </ul>
+                                                <div id="change{{changelog.id}}" class="panel-collapse collapse" style="height: 0;">
+                                                    <div class="panel-body">
+                                                        <div ng-if="changelog.change_mission.length">
+                                                            <h4>Mission</h4>
+                                                            <ul>
+                                                                <li ng-repeat="content in changelog.change_mission">
+                                                                    {{content}}
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div ng-if="changelog.change_map.length">
+                                                            <h4>Map</h4>
+                                                            <ul>
+                                                                <li ng-repeat="content in changelog.change_map">{{content}}</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div ng-if="changelog.change_mod.length">
+                                                            <h4>Mod</h4>
+                                                            <ul>
+                                                                <li ng-repeat="content in changelog.change_mod">{{content}}</li>
+                                                            </ul>
+                                                        </div>
+                                                        <code ng-if="changelog.note != ''">{{changelog.note}}</code>
+                                                    </div>
                                                 </div>
-                                                <div ng-if="changelog.change_mod.length > 0">
-                                                    <h4>Mod</h4>
-                                                    <ul>
-                                                        <li ng-repeat="content in changelog.change_mod">{{content}}</li>
-                                                    </ul>
-                                                </div>
-                                                <code ng-if="changelog.note != ''">{{changelog.note}}</code>
                                             </div>
                                         </div>
                                     </div>
@@ -441,7 +469,7 @@
                                                 <a href="#" class="ing">Was ist ein Torrent ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question0" class="panel-collapse collapse" style="height: 0px;">
+                                        <div id="question0" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
                                                 Torrenting ermöglicht das du während du Downloadest allen anderen
                                                 deinen Upload zur Verfügung stellst um ihren Download zu
@@ -467,7 +495,7 @@
                                                 <a href="#" class="ing">Du wirst beim Joinen auf den Server immer wieder gekickt</a>
                                             </h4>
                                         </div>
-                                        <div id="question1" class="panel-collapse collapse" style="height: 0px;">
+                                        <div id="question1" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
                                                 Nutze den Button "Prüfen" zum Überprüfen der Mods
                                             </div>
@@ -479,7 +507,7 @@
                                                 <a href="#" class="ing">Das Verbinden zum Torrent dauert sehr lang, was ist falsch ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question2" class="panel-collapse collapse" style="height: 0px;">
+                                        <div id="question2" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
                                                 Beim Verbinden zum Torrent müssen erst alle vorhandenen Dateien
                                                 geprüft werden.<br>
@@ -495,7 +523,7 @@
                                                 <a href="#" class="ing">Wie kann ich euch durch seeden unterstüzen ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question3" class="panel-collapse collapse" style="height: 0px;">
+                                        <div id="question3" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
                                                 Sobald du den Mod heruntergelanden hast kannst du mit dem Button "Seeden" das Seeding starten. Danke! <3<br>
                                             </div>
@@ -504,16 +532,19 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question4">
                                             <h4 class="panel-title">
-                                                <a href="#" class="ing">Ein Bug! Was nun ?</a>
+                                                <a href="#" class="ing">Ein Bug im Launcher! Was nun ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question4" class="panel-collapse collapse" style="height: 0px;">
+                                        <div id="question4" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
-                                                Melde dich im Support falls der Bug deinen Download verhindert.<br>
+                                                Alle Bugs Ingame bitte nur im <a href="https://forum.realliferpg.de/wpbt/">Bugtracker</a>
                                                 <br>
-                                                Ansonsten melde bitte deinen Bug via
+                                                <br>
+                                                Melde dich im Support falls der Bug deinen Download verhindert.
+                                                <br>
+                                                Ansonsten melde bitte deinen Bug im Launcher via
                                                 <ul>
-                                                    <li><a href="https://forum.realliferpg.de/wpbt/">Bugtracker</a></li>
+                                                    <li><a href="https://forum.realliferpg.de/wpbt/index.php?product/2-reallife-rpg/">Bugtracker</a></li>
                                                     <li><a href="https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/issues">Github</a></li>
                                                     <li><a href="mailto:NotKaibu@gmail.com">Per Mail an NotKaibu@gmail.com</a></li>
                                                 </ul>

@@ -134,9 +134,9 @@ function createWindow () {
   win = new BrowserWindow({
     icon: 'icon/appicon.ico',
     width: 1320,
-    height: 710,
+    height: 730,
     minWidth: 1320,
-    minHeight: 710,
+    minHeight: 730,
     show: false
   })
 

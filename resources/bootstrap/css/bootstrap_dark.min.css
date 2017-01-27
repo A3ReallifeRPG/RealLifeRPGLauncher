@@ -8257,7 +8257,7 @@ button.close {
 }
 
 .dropdown-menu > li > a {
-    font-size: 12px;
+    font-size: 15px;
 }
 
 .btn-group.open .dropdown-toggle {
@@ -8629,4 +8629,8 @@ alertify
 
 .alertify-log-primary {
     background-color: #df691a;
+}
+
+.question-toggle {
+    cursor: pointer;
 }

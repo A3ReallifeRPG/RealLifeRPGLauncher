@@ -20,11 +20,11 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.ArmaPath = ''
   $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   $rootScope.slide = 0
-  $rootScope.theme = 'light'
+  $rootScope.theme = 'dark'
 
   storage.get('settings', function (error, data) {
     if (error) {
-      $rootScope.theme = 'light'
+      $rootScope.theme = 'dark'
       throw error
     }
 
@@ -78,6 +78,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   $scope.state = 'Gestoppt'
   $scope.hint = 'Inaktiv'
   $rootScope.downloading = false
+  $scope.canCancel = false
   $rootScope.downSpeed = 0
   $rootScope.upSpeed = 0
   $scope.totalProgress = ''
@@ -103,6 +104,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: 'Server - Verbunden',
           hint: 'Download via Server läuft',
           downloading: true,
+          canCancel: true,
           downSpeed: toMB(args.state.speed),
           upSpeed: 0,
           totalProgress: toFileProgress(args.state.totalSize, args.state.totalDownloaded + args.state.size.transferred),
@@ -125,6 +127,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: 'Torrent - Verbunden',
           hint: 'Download via Torrent läuft',
           downloading: true,
+          canCancel: true,
           downSpeed: toMB(args.state.torrentDownloadSpeedState),
           upSpeed: toMB(args.state.torrentUploadSpeedState),
           totalProgress: toProgress(args.state.torrentProgressState),
@@ -144,6 +147,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: 'Torrent - Seeding',
           hint: '',
           downloading: true,
+          canCancel: true,
           downSpeed: 0,
           upSpeed: toMB(args.state.torrentUploadSpeedState),
           totalProgress: '',
@@ -162,6 +166,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: 'Torrent - Verbinden...',
           hint: '5 - 10 Minuten',
           downloading: true,
+          canCancel: false,
           downSpeed: 0,
           upSpeed: 0,
           totalProgress: '',
@@ -179,6 +184,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: args.status,
           hint: args.hint,
           downloading: args.downloading,
+          canCancel: true,
           downSpeed: 0,
           upSpeed: 0,
           totalProgress: '',
@@ -196,6 +202,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: 'Überprüfung - Läuft',
           hint: '5 - 10 Minuten',
           downloading: true,
+          canCancel: true,
           downSpeed: 0,
           upSpeed: 0,
           totalProgress: toProgress(args.state.index / args.state.size),
@@ -213,6 +220,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           state: 'Überprüfung - Abgeschlossen',
           hint: '',
           downloading: false,
+          canCancel: true,
           downSpeed: 0,
           upSpeed: 0,
           totalProgress: 100,
@@ -229,22 +237,44 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           size += args.list[i].Size
         }
         if (size !== 0) {
-          alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
-          alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + toGB(size) + ' GB)', function (e) {
-            if (e) {
-              $scope.reset()
-              $scope.initListDownload(args.list, true, args.mod)
-            } else {
-              $scope.reset()
-              $scope.initListDownload(args.list, false, args.mod)
-            }
-          })
+          if (args.mod.Torrent !== '') {
+            alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
+            alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + toGB(size) + ' GB)', function (e) {
+              if (e) {
+                $scope.reset()
+                $scope.initListDownload(args.list, true, args.mod)
+              } else {
+                $scope.reset()
+                $scope.initListDownload(args.list, false, args.mod)
+              }
+            })
+          } else {
+            $scope.initListDownload(args.list, false, args.mod)
+          }
           spawnNotification(args.list.length + ' Dateien müssen heruntergelanden werden (' + toGB(size) + ' GB)')
           $scope.$apply()
         } else {
           spawnNotification('Überprüfung abgeschlossen - Mod ist aktuell.')
           $scope.reset()
         }
+        break
+      case 'update-torrent-progress-init':
+        $scope.update({
+          state: 'Torrent - Verbinden',
+          hint: '5 - 10 Minuten',
+          downloading: true,
+          canCancel: false,
+          downSpeed: 0,
+          upSpeed: 0,
+          totalProgress: toProgress(args.state.torrentUploadSpeedState),
+          totalSize: 0,
+          totalDownloaded: 0,
+          totalETA: '',
+          totalPeers: 0,
+          maxConns: 0,
+          fileName: '',
+          fileProgress: ''
+        })
         break
       case 'update-dl-progress-done':
         $scope.state = 'Abgeschlossen'
@@ -283,6 +313,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       state: 'Gestoppt',
       hint: '',
       downloading: false,
+      canCancel: false,
       downSpeed: 0,
       upSpeed: 0,
       totalProgress: '',
@@ -352,6 +383,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       state: 'Download wird gestarted...',
       hint: '',
       downloading: true,
+      canCancel: true,
       downSpeed: 0,
       upSpeed: 0,
       totalProgress: 0,
@@ -430,6 +462,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     $scope.state = update.state
     $scope.hint = update.hint
     $rootScope.downloading = update.downloading
+    $scope.canCancel = update.canCancel
     $rootScope.downSpeed = update.downSpeed
     $rootScope.upSpeed = update.upSpeed
     $scope.totalProgress = update.totalProgress
@@ -471,6 +504,10 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       default:
         break
     }
+  }
+
+  $scope.openModDir = function (mod) {
+    shell.showItemInFolder($rootScope.ArmaPath + '\\' + mod.Directories + '\\addons')
   }
 
   $scope.checkUpdates = function () {
@@ -583,7 +620,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
 }
 ])
 
-App.controller('serverController', ['$scope', function ($scope) {
+App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
   $scope.redrawChart = function (server) {
     var data = {
       labels: [
@@ -638,6 +675,7 @@ App.controller('serverController', ['$scope', function ($scope) {
         $scope.$apply()
         if (typeof $scope.servers !== 'undefined') {
           for (var i = 0; i < $scope.servers.length; i++) {
+            $scope.servers[i].DescriptionHTML = $sce.trustAsHtml($scope.servers[i].Description)
             $scope.redrawChart($scope.servers[i])
             $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar()
           }
@@ -722,7 +760,7 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
     storage.get('settings', function (error, data) {
       if (error) {
         $scope.loaded = true
-        $rootScope.theme = 'light'
+        $rootScope.theme = 'dark'
         throw error
       }
       if (typeof data.theme !== 'undefined') {
