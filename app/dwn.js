@@ -278,6 +278,11 @@ function hashFileRecursive (list, index, basepath, dllist, mod) {
       hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
         if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
           dllist.push(list[index])
+          if (list.length > index + 1) {
+            quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
+          } else {
+            finishProgressHash(dllist, mod)
+          }
         }
         if (list.length > index + 1) {
           hashFileRecursive(list, index + 1, basepath, dllist, mod)
