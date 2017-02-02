@@ -88,6 +88,12 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li ng-show="update_ready">
+                        <a ng-click="relaunchUpdate()"><span class="glyphicon glyphicon-repeat"></span></a>
+                    </li>
+                    <li ng-show="updating">
+                        <a class="updating"><img src="resources/loading/ring-alt.svg"></a>
+                    </li>
                     <li ng-show="downloading && downSpeed > 0">
                         <a><i class="fa fa-download" aria-hidden="true"></i> {{downSpeed}} Mb/s</a>
                     </li>

@@ -21,6 +21,8 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   $rootScope.slide = 0
   $rootScope.theme = 'dark'
+  $rootScope.updating = false
+  $rootScope.update_ready = false
 
   storage.get('settings', function (error, data) {
     if (error) {
@@ -33,11 +35,41 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
     }
   })
 
+  $rootScope.relaunchUpdate = function () {
+    ipcRenderer.send('quitAndInstall')
+  }
+
   $rootScope.refresh = function () {
     getMods()
     getServers()
     getChangelog()
   }
+
+  ipcRenderer.on('checking-for-update', function (event) {
+    alertify.log('Suche nach Updates...', 'primary')
+    $rootScope.updating = true
+    $rootScope.$apply()
+  })
+
+  ipcRenderer.on('update-not-available', function (event) {
+    alertify.log('Launcher ist aktuell', 'primary')
+    $rootScope.updating = false
+    $rootScope.$apply()
+  })
+
+  ipcRenderer.on('update-available', function (event) {
+    spawnNotification('Update verfügbar, wird geladen...')
+    alertify.log('Update verfügbar, wird geladen...', 'primary')
+    $rootScope.updating = true
+    $rootScope.$apply()
+  })
+
+  ipcRenderer.on('update-downloaded', function (event, args) {
+    spawnNotification('Update zur Version ' + args.releaseName + ' bereit.')
+    $rootScope.updating = false
+    $rootScope.update_ready = true
+    $rootScope.$apply()
+  })
 })
 
 App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
@@ -1022,6 +1054,3 @@ function appLoaded () { // eslint-disable-line
   ipcRenderer.send('app-loaded')
 }
 
-ipcRenderer.on('update-downloaded', function (event, args) {
-  spawnNotification('Update zur Version ' + args.releaseName + ' bereit.')
-})

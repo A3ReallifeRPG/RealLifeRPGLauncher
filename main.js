@@ -76,19 +76,7 @@ function handleSquirrelEvent () {
   }
 }
 
-autoUpdater.addListener('update-available', function (event) {
-
-})
-
 autoUpdater.addListener('error', function (error) { // eslint-disable-line
-
-})
-
-autoUpdater.addListener('checking-for-update', function (event) {
-
-})
-
-autoUpdater.addListener('update-not-available', function (event) {
 
 })
 
@@ -152,6 +140,18 @@ function createWindow () {
     win.webContents.send('update-downloaded', args)
   })
 
+  autoUpdater.addListener('checking-for-update', function (event) {
+    win.webContents.send('checking-for-update')
+  })
+
+  autoUpdater.addListener('update-not-available', function (event) {
+    win.webContents.send('update-not-available')
+  })
+
+  autoUpdater.addListener('update-available', function (event) {
+    win.webContents.send('update-available')
+  })
+
   loadWin = new BrowserWindow({
     icon: 'icon/appicon.ico',
     width: 200,
@@ -213,6 +213,12 @@ function hideWindows () {
 function createTray () {
   tray = new Tray(app.getAppPath() + '\\icon\\tray.ico')
   const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Auf Updates prüfen',
+      click: function () {
+        autoUpdater.checkForUpdates()
+      }
+    },
     {
       label: 'Dev-Tools',
       click: function () {
@@ -307,4 +313,10 @@ ipcMain.on('app-loaded', function (event) {
 
 ipcMain.on('focus-window', function (event) {
   win.focus()
+})
+
+ipcMain.on('quitAndInstall', function (event) {
+  autoUpdater.quitAndInstall()
+  willClose = true
+  app.quit()
 })

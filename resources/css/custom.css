@@ -289,3 +289,18 @@ span.htop:before {
 .page {
     height: 500px;
 }
+
+.navbar-collapse {
+    max-height: 50px;
+}
+
+.updating {
+    padding-bottom: 15px !important;
+    padding-top: 13px !important;
+}
+
+.updating > img {
+    height: 20px;
+    width: auto;
+}
+
