@@ -343,6 +343,10 @@ function initTorrent (folder, torrentURL) {
       }
     }, 1000)
     torrent.on('done', function () {
+      torrent.destroy(function () {
+        clearInterval(update)
+        cancelled()
+      })
       changeStatus(false, 'Abgeschlossen - Prüfung austehend', 'Inaktiv')
     })
   })
