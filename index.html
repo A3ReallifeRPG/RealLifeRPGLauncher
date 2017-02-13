@@ -51,6 +51,9 @@
     <link href="node_modules/icheck/skins/minimal/minimal.css" rel="stylesheet">
     <script src="node_modules/icheck/icheck.min.js"></script>
 
+    <!-- leaflet -->
+    <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
+
     <!-- custom css/js -->
     <link rel="stylesheet" href="resources/css/custom.css">
 
@@ -386,22 +389,22 @@
                                         <div class="form-group form-inline">
                                             <label for="splashCheck">Kein Splashscreen</label>
                                             <span class="pull-right">
-                                                <input id="splashCheck" type="checkbox">
+                                                <input class="icheck" id="splashCheck" type="checkbox">
                                             </span>
                                             <hr>
                                             <label for="introCheck">Intro überspringen</label>
                                             <span class="pull-right">
-                                                <input id="introCheck" type="checkbox">
+                                                <input class="icheck" id="introCheck" type="checkbox">
                                             </span>
                                             <hr>
                                             <label for="htCheck">Hyper-Threading</label>
                                             <span class="pull-right">
-                                                <input id="htCheck" type="checkbox">
+                                                <input class="icheck" id="htCheck" type="checkbox">
                                             </span>
                                             <hr>
                                             <label for="windowedCheck">Fenstermodus</label>
                                             <span class="pull-right">
-                                                <input id="windowedCheck" type="checkbox">
+                                                <input class="icheck" id="windowedCheck" type="checkbox">
                                             </span>
                                         </div>
                                     </div>
@@ -446,12 +449,12 @@
                                                 <h5>Theme</h5>
                                                 <label for="lightSwitch">Light</label>
                                                 <span class="pull-right">
-                                                        <input id="lightSwitch" type="radio" name="theme">
+                                                        <input class="icheck" id="lightSwitch" type="radio" name="theme">
                                                 </span>
                                                 <br>
                                                 <label for="darkSwitch">Night</label>
                                                 <span class="pull-right">
-                                                        <input id="darkSwitch" type="radio" name="theme">
+                                                        <input class="icheck" id="darkSwitch" type="radio" name="theme">
                                                 </span>
                                             </div>
                                         </form>
@@ -562,6 +565,17 @@
                     </div>
                 </div>
                 <div class="item">
+                    <div id="map">
+                        <div class="container" ng-controller="mapController" data-ng-init="init()">
+                            <h3>Map</h3>
+                            <hr>
+                            <div class="page">
+                                <div id="leaflet_map" style="width: 100%; height: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
                     <div id="about">
                         <div class="container" ng-controller="aboutController" data-ng-init="init()">
                             <h3>Über</h3>
@@ -590,7 +604,7 @@
   });
 
   $(document).ready(function () {
-    $('input').iCheck({
+    $('.icheck').iCheck({
       checkboxClass: 'icheckbox_minimal',
       radioClass: 'iradio_minimal',
       increaseArea: '20%' // optional

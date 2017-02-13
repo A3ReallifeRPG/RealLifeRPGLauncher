@@ -287,7 +287,7 @@ span.htop:before {
 }
 
 .page {
-    height: 500px;
+    height: 530px;
 }
 
 .navbar-collapse {
@@ -302,5 +302,9 @@ span.htop:before {
 .updating > img {
     height: 20px;
     width: auto;
+}
+
+#leaflet_map {
+    background: #C7E6FC !important;
 }
 

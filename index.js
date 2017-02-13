@@ -11,8 +11,9 @@ const marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 const child = require('child_process')
 const beta = require('electron').remote.getGlobal('beta')
+const L = require('leaflet')
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL */
 
 var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
@@ -87,7 +88,9 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
     }, {
       icon: 'glyphicon glyphicon-question-sign', slide: 5, title: 'FAQ'
     }, {
-      icon: 'glyphicon glyphicon-book', slide: 6, title: 'Über'
+      icon: 'glyphicon glyphicon-map-marker', slide: 6, title: 'Map'
+    }, {
+      icon: 'glyphicon glyphicon-book', slide: 7, title: 'Über'
     }]
 
   $scope.switchSlide = function (tab) {
@@ -743,19 +746,19 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
           params.push('-window')
         }
 
-        if (data.mem != null && data.mem !== '') {
+        if (data.mem != null && data.mem !== '' && typeof data.mem !== 'undefined') {
           params.push('-maxMem=' + data.mem)
         }
-        if (data.vram != null && data.vram !== '') {
+        if (data.vram != null && data.vram !== '' && typeof data.vram !== 'undefined') {
           params.push('-maxVRAM=' + data.vram)
         }
-        if (data.cpu != null && data.cpu !== '') {
+        if (data.cpu != null && data.cpu !== '' && typeof data.cpu !== 'undefined') {
           params.push('-cpuCount=' + data.cpu)
         }
-        if (data.thread != null && data.thread !== '') {
+        if (data.thread != null && data.thread !== '' && typeof data.thread !== 'undefined') {
           params.push('-exThreads=' + data.thread)
         }
-        if (data.add_params != null && data.add_params !== '') {
+        if (data.add_params != null && data.add_params !== '' && typeof data.add_params !== 'undefined') {
           params.push(data.add_params)
         }
 
@@ -930,6 +933,88 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
   }
 }])
 
+App.controller('mapController', ['$scope', function ($scope) {
+  ipcRenderer.on('to-app', function (event, args) {
+    switch (args.type) {
+      case 'fuelstations-callback':
+        $scope.fuelstations = args.data.data
+        $scope.updateFuels()
+        break
+    }
+  })
+
+  $scope.updateFuels = function () {
+    for (var i = 0; i < $scope.fuelstations.length; i++) {
+      $scope.fuelstations[i].Markers = []
+
+      for (var j = 0; j < $scope.fuelstations[i].Fuelstations.length; j++) {
+        var tmpArr = $scope.fuelstations[i].Fuelstations[j].Pos.replace('[', '').replace(']', '').split(',')
+        var fuel = Math.round(($scope.fuelstations[i].Fuelstations[j].Fuel / 30000) * 100)
+        var m = {
+          x: (tmpArr[0] / 10240) * 16384,
+          y: ((10240 - tmpArr[1]) / 10240) * 16384
+        }
+
+        $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
+          icon: $scope.gasMarker
+        }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-success" style="width: ' + fuel + '%"></div></div>', {
+          autoClose: false,
+          minWidth: 150
+        }))
+      }
+    }
+
+    var overlayMaps = {
+      'Server 1 Tankstellen': L.layerGroup($scope.fuelstations[0].Markers),
+      'Server 2 Tankstellen': L.layerGroup($scope.fuelstations[1].Markers)
+    }
+
+    L.control.layers(overlayMaps).addTo($scope.map)
+  }
+
+  $scope.init = function () {
+    getFuelstations()
+
+    var roads = L.tileLayer('https://tiles.realliferpg.de/1/{z}/{x}/{y}.png', {
+      id: 'roads',
+      minZoom: 1,
+      maxZoom: 6,
+      attribution: '<a href="https://realliferpg.de">Abramia Map by ReallifeRPG</a>',
+      tms: true
+    })
+
+    var sat = L.tileLayer('https://tiles.realliferpg.de/2/{z}/{x}/{y}.png', {
+      id: 'sat',
+      minZoom: 1,
+      maxZoom: 6,
+      attribution: '<a href="https://realliferpg.de">Abramia Map by ReallifeRPG</a>',
+      tms: true
+    })
+
+    $scope.map = L.map('leaflet_map', {
+      layers: [roads]
+    }).setView([0, 0], 1)
+
+    var baseLayers = {
+      'Straßen': roads,
+      'Satellit': sat
+    }
+
+    $scope.gasMarker = L.icon({
+      iconUrl: 'icon/gas.png',
+      iconSize: [32, 37], // size of the icon
+      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+    })
+
+    L.control.layers(baseLayers).addTo($scope.map)
+
+    var southWest = $scope.map.unproject([0, 16384], $scope.map.getMaxZoom())
+    var northEast = $scope.map.unproject([16384, 0], $scope.map.getMaxZoom())
+    $scope.map.setMaxBounds(new L.LatLngBounds(southWest, northEast))
+  }
+}])
+
 App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
   $scope.init = function () {
     fs.readFile('README.md', 'utf8', function (err, data) {
@@ -1016,6 +1101,15 @@ function getNotification () {
     type: 'get-url',
     callback: 'notification-callback',
     url: APIBaseURL + APINotificationURL,
+    callBackTarget: 'to-app'
+  })
+}
+
+function getFuelstations () {
+  ipcRenderer.send('to-web', {
+    type: 'get-url',
+    callback: 'fuelstations-callback',
+    url: APIBaseURL + APIFuelStationURL,
     callBackTarget: 'to-app'
   })
 }
