@@ -99,7 +99,10 @@ function createWindow () {
     icon: 'icon/workericon.ico',
     width: 1000,
     height: 500,
-    show: false
+    show: false,
+    webPreferences: {
+      webSecurity: false
+    }
   })
   webWin.loadURL(`file://${__dirname}/app/web.html`)
   webWin.webContents.openDevTools({
@@ -111,7 +114,10 @@ function createWindow () {
     icon: 'icon/workericon.ico',
     width: 1000,
     height: 500,
-    show: false
+    show: false,
+    webPreferences: {
+      webSecurity: false
+    }
   })
   downWin.loadURL(`file://${__dirname}/app/dwn.html`)
   downWin.webContents.openDevTools({
@@ -125,7 +131,10 @@ function createWindow () {
     height: 730,
     minWidth: 1320,
     minHeight: 730,
-    show: false
+    show: false,
+    webPreferences: {
+      webSecurity: false
+    }
   })
 
   win.loadURL(`file://${__dirname}/index.html`)
@@ -156,7 +165,10 @@ function createWindow () {
     icon: 'icon/appicon.ico',
     width: 200,
     height: 210,
-    frame: false
+    frame: false,
+    webPreferences: {
+      webSecurity: false
+    }
   })
 
   loadWin.loadURL(`file://${__dirname}/app/loading.html`)

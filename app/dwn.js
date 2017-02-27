@@ -91,7 +91,7 @@ function dwnlist (args) {
 
 function updateMod (args) {
   var dllist = []
-  quickCheckRecursiveList(args.data.data, 0, path, dllist, args.args.mod)
+  cleanFileRecursive(listDiff(args.data.data, path, args.args.mod), 0, path, quickCheckRecursiveList, args.data.data, 0, path, dllist, args.args.mod)
 }
 
 function quickchecklist (args) {
@@ -278,11 +278,6 @@ function hashFileRecursive (list, index, basepath, dllist, mod) {
       hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
         if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
           dllist.push(list[index])
-          if (list.length > index + 1) {
-            quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
-          } else {
-            finishProgressHash(dllist, mod)
-          }
         }
         if (list.length > index + 1) {
           hashFileRecursive(list, index + 1, basepath, dllist, mod)
@@ -477,12 +472,11 @@ function quickCheckRecursiveList (list, index, basepath, dllist, mod) {
       hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
         if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
           dllist.push(list[index])
+        }
+        if (list.length > index + 1) {
+          quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
         } else {
-          if (list.length > index + 1) {
-            quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
-          } else {
-            finishProgressHash(dllist, mod)
-          }
+          finishProgressHash(dllist, mod)
         }
       })
     } else if (list[index].Size !== stats.size) {
