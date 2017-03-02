@@ -12,6 +12,8 @@ const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 const child = require('child_process')
 const beta = require('electron').remote.getGlobal('beta')
 const L = require('leaflet')
+const Shepherd = require('tether-shepherd')
+const os = require('os')
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL */
 
@@ -71,26 +73,139 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
     $rootScope.update_ready = true
     $rootScope.$apply()
   })
+
+  $rootScope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+    $rootScope.tour = new Shepherd.Tour({
+      defaults: {
+        classes: 'shepherd-theme-square-dark'
+      }
+    })
+
+    $rootScope.tour.addStep('start', {
+      title: 'Willkommen',
+      text: 'Hallo! Du hast dir gerade unseren Launcher geladen, wir wollen dich auf eine kleine Tour einladen um dich mit ihm vetraut zu machen.',
+      buttons: [{
+        text: 'Nein Danke',
+        classes: 'shepherd-button-secondary',
+        action: $rootScope.tour.cancel
+      }, {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }]
+    })
+
+    $rootScope.tour.addStep('mods', {
+      title: 'Mods',
+      text: 'Hier kannst du unsere Mods downloaden und prüfen sowie das Spiel starten.',
+      attachTo: '.modsTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('servers', {
+      title: 'Server',
+      text: 'Hier findest du alle unsere Server und Informationen zu ihnen, auch kannst du von diesem Tab direkt auf einen Server joinen.',
+      attachTo: '.serversTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('changelog', {
+      title: 'Changelog',
+      text: 'Hier findest du immer alle Änderungen an der Mission, der Map und den Mods.',
+      attachTo: '.changelogTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('tfar', {
+      title: 'Task Force Radio',
+      text: 'Hier kannst du das Task Force Radio Plugin für deinen Teamspeak 3 Client installieren, sowie einen Skin der im ReallifeRPG Stil gehalten ist.',
+      attachTo: '.tfarTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('settings', {
+      title: 'Einstellungen',
+      text: 'Hier findest du Einstellungen wie den Arma 3 Pfad, CPU Anzahl, Theme des Launchers und vieles mehr.',
+      attachTo: '.settingsTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('faq', {
+      title: 'FAQ',
+      text: 'Hier werden viele oft gestellte Fragen direkt beantwortet. Schau kurz mal hier nach bevor du dich im Support meldest, vielleicht wird deine Frage ja direkt beantwortet.',
+      attachTo: '.faqTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('map', {
+      title: 'Karte',
+      text: 'Hier findest du eine Karte von Abramia auf der du dir den Füllstand aller Tankstellen anzeigen lassen kannst.',
+      attachTo: '.mapTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('about', {
+      title: 'Über',
+      text: 'Hier kannst du Allgemeine Informationen zum Launcher finden',
+      attachTo: '.aboutTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.addStep('about', {
+      title: 'Neu laden',
+      text: 'Mit einem Klick kannst du hier Mods, Server und Changelog neu von uns abfragen.',
+      attachTo: '.reloadTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      }
+    })
+
+    $rootScope.tour.start()
+  })
 })
 
 App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
   $scope.tabs = [
     {
-      icon: 'glyphicon glyphicon-home', slide: 0, title: 'Mods'
+      icon: 'glyphicon glyphicon-home', slide: 0, title: 'Mods', tag: 'modsTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-tasks', slide: 1, title: 'Server'
+      icon: 'glyphicon glyphicon-tasks', slide: 1, title: 'Server', tag: 'serversTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-list-alt', slide: 2, title: 'Changelog'
+      icon: 'glyphicon glyphicon-list-alt', slide: 2, title: 'Changelog', tag: 'changelogTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-headphones', slide: 3, title: 'TFAR'
+      icon: 'glyphicon glyphicon-headphones', slide: 3, title: 'TFAR', tag: 'tfarTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-cog', slide: 4, title: 'Einstellungen'
+      icon: 'glyphicon glyphicon-cog', slide: 4, title: 'Einstellungen', tag: 'settingsTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-question-sign', slide: 5, title: 'FAQ'
+      icon: 'glyphicon glyphicon-question-sign', slide: 5, title: 'FAQ', tag: 'faqTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-map-marker', slide: 6, title: 'Map'
+      icon: 'glyphicon glyphicon-map-marker', slide: 6, title: 'Map', tag: 'mapTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-book', slide: 7, title: 'Über'
+      icon: 'glyphicon glyphicon-book', slide: 7, title: 'Über', tag: 'aboutTabBtn'
     }]
 
   $scope.switchSlide = function (tab) {
@@ -1064,6 +1179,19 @@ App.controller('tfarController', ['$scope', '$rootScope', function ($scope, $roo
     }
   })
 }])
+
+App.directive('onFinishRender', function ($timeout) {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attr) {
+      if (scope.$last === true) {
+        $timeout(function () {
+          scope.$emit(attr.onFinishRender);
+        });
+      }
+    }
+  }
+});
 
 function getMods () {
   var url = APIBaseURL + APIModsURL

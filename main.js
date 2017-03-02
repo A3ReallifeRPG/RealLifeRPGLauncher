@@ -91,7 +91,6 @@ let win
 let downWin
 let webWin
 let loadWin
-let willClose = false
 
 function createWindow () {
   // web process
@@ -174,52 +173,22 @@ function createWindow () {
   loadWin.loadURL(`file://${__dirname}/app/loading.html`)
 
   win.on('close', function (e) {
-    if (!willClose && os.release().startsWith('10')) {
-      e.preventDefault()
-      hideWindows()
-    } else {
-      willClose = true
-      app.quit()
-    }
+    app.quit()
   })
 
   webWin.on('close', function (e) {
-    if (!willClose && os.release().startsWith('10')) {
-      e.preventDefault()
-      hideWindows()
-    } else {
-      willClose = true
-      app.quit()
-    }
+    app.quit()
   })
 
   downWin.on('close', function (e) {
-    if (!willClose && os.release().startsWith('10')) {
-      e.preventDefault()
-      hideWindows()
-    } else {
-      willClose = true
-      app.quit()
-    }
+    app.quit()
   })
 
-  if (process.argv[2] === '-beta') {
-    global.beta = {
-      beta: true
-    }
-  } else {
-    global.beta = {
-      beta: false
-    }
-  }
+  loadWin.on('close', function (e) {
+    app.quit()
+  })
 
   setUpIpcHandlers()
-}
-
-function hideWindows () {
-  win.hide()
-  webWin.hide()
-  downWin.hide()
 }
 
 function createTray () {
@@ -240,7 +209,6 @@ function createTray () {
     {
       label: 'Restart',
       click: function () {
-        willClose = true
         app.relaunch()
         app.quit()
       }
@@ -251,7 +219,6 @@ function createTray () {
     {
       label: 'Beenden',
       click: function () {
-        willClose = true
         app.quit()
       }
     }
@@ -259,7 +226,7 @@ function createTray () {
   tray.setToolTip('RealLifeRPG Launcher')
   tray.setContextMenu(contextMenu)
   tray.on('click', function () {
-    win.isVisible() ? win.hide() : win.show()
+    win.isMinimized() ? win.restore() : win.minimize()
   })
 }
 
@@ -299,7 +266,6 @@ const shouldQuit = app.makeSingleInstance(function (commandLine, workingDirector
 })
 
 if (shouldQuit) {
-  willClose = true
   app.quit()
 }
 
@@ -329,6 +295,5 @@ ipcMain.on('focus-window', function (event) {
 
 ipcMain.on('quitAndInstall', function (event) {
   autoUpdater.quitAndInstall()
-  willClose = true
   app.quit()
 })
