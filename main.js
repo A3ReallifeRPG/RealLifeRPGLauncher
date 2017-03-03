@@ -6,7 +6,6 @@ const autoUpdater = require('electron').autoUpdater
 const BrowserWindow = require('electron').BrowserWindow
 const {ipcMain} = require('electron')
 const {Menu, Tray} = require('electron')
-const os = require('os')
 
 let tray = null
 

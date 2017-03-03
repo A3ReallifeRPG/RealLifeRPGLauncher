@@ -10,10 +10,8 @@ const unzip = require('unzip')
 const marked = require('marked')
 const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 const child = require('child_process')
-const beta = require('electron').remote.getGlobal('beta')
 const L = require('leaflet')
 const Shepherd = require('tether-shepherd')
-const os = require('os')
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL */
 
@@ -74,7 +72,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
     $rootScope.$apply()
   })
 
-  $rootScope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+  $rootScope.$on('ngRepeatFinished', function () {
     $rootScope.tour = new Shepherd.Tour({
       defaults: {
         classes: 'shepherd-theme-square-dark'
@@ -87,7 +85,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: [{
         text: 'Nein Danke',
         classes: 'shepherd-button-secondary',
-        action: $rootScope.tour.cancel
+        action: $rootScope.endTour
       }, {
         text: 'Weiter',
         action: $rootScope.tour.next
@@ -101,6 +99,12 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 0
+          $rootScope.$apply()
+        }
       }
     })
 
@@ -111,6 +115,12 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 1
+          $rootScope.$apply()
+        }
       }
     })
 
@@ -121,6 +131,12 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 2
+          $rootScope.$apply()
+        }
       }
     })
 
@@ -131,6 +147,12 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 3
+          $rootScope.$apply()
+        }
       }
     })
 
@@ -141,6 +163,12 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 4
+          $rootScope.$apply()
+        }
       }
     })
 
@@ -151,6 +179,12 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 5
+          $rootScope.$apply()
+        }
       }
     })
 
@@ -161,31 +195,62 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 6
+          $rootScope.$apply()
+        }
       }
     })
 
     $rootScope.tour.addStep('about', {
       title: 'Über',
-      text: 'Hier kannst du Allgemeine Informationen zum Launcher finden',
+      text: 'Hier kannst du allgemeine Informationen zum Launcher finden.',
       attachTo: '.aboutTabBtn bottom',
       buttons: {
         text: 'Weiter',
         action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 7
+          $rootScope.$apply()
+        }
       }
     })
 
-    $rootScope.tour.addStep('about', {
-      title: 'Neu laden',
-      text: 'Mit einem Klick kannst du hier Mods, Server und Changelog neu von uns abfragen.',
-      attachTo: '.reloadTabBtn bottom',
+    $rootScope.tour.addStep('end', {
+      title: 'Viel Spaß!',
+      text: 'Genug gelesen, lad dir unseren Mod runter, installier Task Force Radio, betritt den Server und entdecke deine ganz eigene Weise auf ReallifeRPG zu spielen.',
       buttons: {
-        text: 'Weiter',
-        action: $rootScope.tour.next
+        text: 'Beenden',
+        action: $rootScope.endTour
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 0
+          $rootScope.$apply()
+        }
       }
     })
 
-    $rootScope.tour.start()
+    storage.get('tour', function (err, data) {
+      if (err) {
+        throw err
+      }
+      if (typeof data.tour === 'undefined' || data.tour === null) {
+        $rootScope.tour.start()
+      }
+    })
   })
+
+  $rootScope.endTour = function () {
+    $rootScope.tour.cancel()
+    storage.set('tour', {tour: true}, function (error) {
+      if (error) throw error
+    })
+  }
 })
 
 App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
@@ -210,18 +275,22 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
 
   $scope.switchSlide = function (tab) {
     $rootScope.slide = tab.slide
-    $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + tab.title
   }
 
   $rootScope.$watch(
     'slide', function () {
       $('#carousel-main').carousel($rootScope.slide)
+      $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + $scope.tabs[$rootScope.slide].title
     }, true)
 
   $scope.$watch(
     'AppTitle', function () {
       document.title = $rootScope.AppTitle
     }, true)
+
+  $scope.tourApp = function () {
+    $rootScope.tour.start()
+  }
 }])
 
 App.controller('modController', ['$scope', '$rootScope', function ($scope, $rootScope) {
@@ -1186,16 +1255,16 @@ App.directive('onFinishRender', function ($timeout) {
     link: function (scope, element, attr) {
       if (scope.$last === true) {
         $timeout(function () {
-          scope.$emit(attr.onFinishRender);
-        });
+          scope.$emit(attr.onFinishRender)
+        })
       }
     }
   }
-});
+})
 
 function getMods () {
   var url = APIBaseURL + APIModsURL
-  if (beta.beta) {
+  if (fs.existsSync(app.getPath('userData') + '/beta')) {
     url += APIBetaADD
   }
   ipcRenderer.send('to-web', {
