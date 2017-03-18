@@ -1213,35 +1213,46 @@ App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
   }
 }])
 
-App.controller('tfarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-  $scope.initTFARDownload = function (version) {
-    $scope.tfarDownloading = true
-    ipcRenderer.send('to-web', {
-      type: 'start-tfar-download',
-      version: version
-    })
+App.controller('tfarController', ['$scope', '$rootScope', function ($scope) {
+  $scope.initFileDownload = function (file) {
+    if (!$scope.fileDownloading) {
+      $scope.fileDownloading = true
+      ipcRenderer.send('to-web', {
+        type: 'start-file-download',
+        file: file
+      })
+    } else {
+      alertify.log('Download läuft bereits', 'danger')
+    }
   }
 
-  $scope.tfarProgress = 0
-  $scope.tfarSpeed = 0
-  $scope.tfarDownloading = false
+  $scope.fileProgress = 0
+  $scope.fileSpeed = 0
+  $scope.fileDownloading = false
 
   ipcRenderer.on('to-app', function (event, args) {
     switch (args.type) {
-      case 'update-dl-progress-tfar':
-        $scope.tfarProgress = toProgress(args.state.percent)
-        $scope.tfarSpeed = toMB(args.speed)
+      case 'update-dl-progress-file':
+        $scope.fileProgress = toProgress(args.state.percent)
+        $scope.fileSpeed = toMB(args.state.speed)
+        $scope.$apply()
         break
-      case 'update-dl-progress-tfar-done':
-        $scope.tfarProgress = 100
-        $scope.tfarSpeed = 0
+      case 'update-dl-progress-file-done':
+        $scope.fileProgress = 100
+        $scope.fileSpeed = 0
+        $scope.fileDownloading = false
+        $scope.$apply()
         alertify.log('Wird ausgeführt...', 'primary')
-        if (!shell.openItem(args.tfarPath)) {
+        if (!shell.openItem(args.filePath)) {
           alertify.log('Fehlgeschlagen', 'danger')
-          var stream = fs.createReadStream(args.tfarPath).pipe(unzip.Extract({path: app.getPath('downloads') + '\\TFAR'}))
+          var stream = fs.createReadStream(args.filePath).pipe(unzip.Extract({path: app.getPath('downloads') + '\\ReallifeRPG'}))
           stream.on('close', function () {
-            fs.unlinkSync(app.getPath('downloads') + '\\TFAR\\package.ini')
-            shell.showItemInFolder(app.getPath('downloads') + '\\TFAR')
+            try {
+              fs.unlinkSync(app.getPath('downloads') + '\\ReallifeRPG\\package.ini')
+            } catch (err) {
+              console.log(err)
+            }
+            shell.showItemInFolder(app.getPath('downloads') + '\\ReallifeRPG')
           })
         }
         break

@@ -1,4 +1,4 @@
-/* global TFARFileURL */
+/* global STATICFILESERVE */
 var jsonist = require('jsonist')
 const {ipcRenderer} = require('electron')
 var fs = require('fs')
@@ -11,14 +11,15 @@ ipcRenderer.on('to-web', function (event, args) {
     case 'get-url' :
       getUrl(args)
       break
-    case 'start-tfar-download' :
-      downloadTFAR(args.version)
+    case 'start-file-download' :
+      downloadFILE(args.file)
       break
   }
 })
 
 function getUrl (args) {
   var fn = function (err, data, resp) {
+    console.log(err, resp)
     getUrlCallback(args, err, data, resp)
   }
   jsonist.get(args.url, fn)
@@ -34,23 +35,19 @@ function getUrlCallback (args, err, data, resp) {
   })
 }
 
-function downloadTFAR (version) {
-  console.log(TFARFileURL + '_' + version)
-  progress(request(TFARFileURL + '_' + version), {}).on('progress', function (state) {
-    updateProgressTFAR(state)
+function downloadFILE (file) {
+  console.log(STATICFILESERVE + file)
+  progress(request(STATICFILESERVE + file), {}).on('progress', function (state) {
+    ipcRenderer.send('to-app', {
+      type: 'update-dl-progress-file',
+      state: state
+    })
   }).on('error', function (err) {
     console.log(err)
   }).on('end', function () {
     ipcRenderer.send('to-app', {
-      type: 'update-dl-progress-tfar-done',
-      tfarPath: app.getPath('downloads') + '\\ReallifeRPGTFAR.ts3_plugin'
+      type: 'update-dl-progress-file-done',
+      filePath: app.getPath('downloads') + '\\' + file
     })
-  }).pipe(fs.createWriteStream(app.getPath('downloads') + '\\ReallifeRPGTFAR.ts3_plugin'))
-}
-
-function updateProgressTFAR (state) {
-  ipcRenderer.send('to-app', {
-    type: 'update-dl-progress-tfar',
-    state: state
-  })
+  }).pipe(fs.createWriteStream(app.getPath('downloads') + '\\' + file))
 }
