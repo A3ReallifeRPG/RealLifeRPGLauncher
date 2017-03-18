@@ -222,7 +222,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
 
     $rootScope.tour.addStep('end', {
       title: 'Viel Spaß!',
-      text: 'Genug gelesen, lad dir unseren Mod runter, installier Task Force Radio, betritt den Server und entdecke deine ganz eigene Weise auf ReallifeRPG zu spielen.',
+      text: 'Genug gelesen, lad dir unseren Mod runter, installier Task Force Radio, betritt den Server und entdecke deine ganz eigene Weise auf ReallifeRPG zu spielen. Viel Spaß von unserem ganzen Team!',
       buttons: {
         text: 'Beenden',
         action: $rootScope.endTour
@@ -1356,4 +1356,3 @@ function spawnNotification (message) {
 function appLoaded () { // eslint-disable-line
   ipcRenderer.send('app-loaded')
 }
-
