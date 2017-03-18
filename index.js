@@ -507,6 +507,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         break
       case 'notification-callback':
         if (args.data.Active) {
+          alertify.set({labels: {ok: 'Ok'}})
           alertify.alert(args.data.Notification)
         }
         break
