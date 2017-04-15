@@ -12,8 +12,9 @@ const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 const child = require('child_process')
 const L = require('leaflet')
 const Shepherd = require('tether-shepherd')
+const ps = require('ps-node')
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL */
 
 var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
@@ -24,6 +25,9 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.theme = 'dark'
   $rootScope.updating = false
   $rootScope.update_ready = false
+  $rootScope.player_data = null
+  $rootScope.apiKey = ''
+  $rootScope.logged_in = false
 
   storage.get('settings', function (error, data) {
     if (error) {
@@ -36,6 +40,16 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
     }
   })
 
+  storage.get('player', function (error, data) {
+    if (error) throw error
+
+    if (typeof data.apikey !== 'undefined') {
+      $rootScope.apiKey = data.apikey
+      getPlayerData($rootScope.apiKey)
+      $rootScope.logged_in = true
+    }
+  })
+
   $rootScope.relaunchUpdate = function () {
     ipcRenderer.send('quitAndInstall')
   }
@@ -44,7 +58,56 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
     getMods()
     getServers()
     getChangelog()
+    if ($rootScope.logged_in) {
+      getPlayerData($rootScope.apiKey)
+    }
   }
+
+  $rootScope.login = function () {
+    alertify.prompt('Bitte füge deinen Login-Schlüssel ein', function (e, str) {
+      if (e) {
+        $.ajax({
+          url: APIBaseURL + APIValidatePlayerURL + str,
+          type: 'GET',
+          success: function (data) {
+            console.log(data)
+            if (data.status === 'Success') {
+              alertify.success('Willkommen ' + data.name)
+              $rootScope.ApiKey = str
+              getPlayerData(str)
+              $rootScope.logged_in = true
+              storage.set('player', {apikey: str}, function (error) {
+                if (error) throw error
+              })
+              $rootScope.$apply()
+            } else {
+              alertify.log('Falscher Schlüssel', 'danger')
+              $rootScope.login()
+            }
+          }
+        })
+      }
+    }, '')
+  }
+
+  $rootScope.logout = function () {
+    storage.remove('player', function (error) {
+      if (error) throw error
+    })
+    $rootScope.ApiKey = ''
+    $rootScope.player_data = null
+    $rootScope.logged_in = false
+    $rootScope.$apply()
+  }
+
+  ipcRenderer.on('to-app', function (event, args) {
+    if (typeof args.args !== 'undefined') {
+      if (args.args.callback === 'player-callback') {
+        $rootScope.player_data = args.data.data[0]
+        $rootScope.$apply()
+      }
+    }
+  })
 
   ipcRenderer.on('checking-for-update', function (event) {
     alertify.log('Suche nach Updates...', 'primary')
@@ -955,6 +1018,34 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
       shell.openExternal('steam://connect/' + server.IpAddress + ':' + server.Port)
     }
   }
+
+  $scope.pingServer = function (server) {
+    fs.writeFile(app.getPath('downloads') + '\\ReallifeRPGDebug.rdp', 'full address:s:' + server.IpAddress, function (err) {
+      if (err) {
+        return console.log(err)
+      }
+      shell.openExternal(app.getPath('downloads') + '\\ReallifeRPGDebug.rdp')
+      ps.lookup({
+        command: 'mstsc'
+      }, function (err, resultList) {
+        if (err) throw err
+        resultList.forEach(function (process) {
+          if (process) {
+            ps.kill(process.pid, function (err) {
+              if (err) {
+                throw err
+              } else {
+                fs.unlink(app.getPath('downloads') + '\\ReallifeRPGDebug.rdp', function (err) {
+                  if (err) throw err
+                })
+                console.log('Process %s has been killed!', process.pid)
+              }
+            })
+          }
+        })
+      })
+    })
+  }
 }])
 
 App.controller('changelogController', ['$scope', function ($scope) {
@@ -1355,4 +1446,13 @@ function spawnNotification (message) {
 
 function appLoaded () { // eslint-disable-line
   ipcRenderer.send('app-loaded')
+}
+
+function getPlayerData (ApiKey) {
+  ipcRenderer.send('to-web', {
+    type: 'get-url',
+    callback: 'player-callback',
+    url: APIBaseURL + APIPlayerURL + ApiKey,
+    callBackTarget: 'to-app'
+  })
 }

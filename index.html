@@ -95,6 +95,15 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown" ng-show="logged_in">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{player_data.name}} <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a ng-click="logout()">Logout</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a ng-click="login()" ng-if="!logged_in"><span class="glyphicon glyphicon-log-in"></span></a>
+                    </li>
                     <li>
                         <a href="https://donate.realliferpg.de/"><i class="fa fa-heart" aria-hidden="true"></i></a>
                     </li>
@@ -279,7 +288,10 @@
                                                             <a>{{server.StartParameters}}</a>
                                                         </li>
                                                     </ul>
-                                                    <button class="btn btn-success pull-right btn-sm" style="margin-top: 10px" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
+                                                    <span class="pull-right">
+                                                        <button class="btn btn-success pull-right btn-sm" tooltips tooltip-template="Behebt Probleme beim Verbinden" style="margin-top: 10px" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
+                                                        <button class="btn btn-success pull-right btn-sm" tooltips tooltip-template="Dem Server beitreten" style="margin-top: 10px" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
