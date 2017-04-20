@@ -13,6 +13,7 @@ const child = require('child_process')
 const L = require('leaflet')
 const Shepherd = require('tether-shepherd')
 const ps = require('ps-node')
+const exec = require('child_process').exec
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL */
 
@@ -1020,29 +1021,22 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
   }
 
   $scope.pingServer = function (server) {
-    fs.writeFile(app.getPath('downloads') + '\\ReallifeRPGDebug.rdp', 'full address:s:' + server.IpAddress, function (err) {
-      if (err) {
-        return console.log(err)
-      }
-      shell.openExternal(app.getPath('downloads') + '\\ReallifeRPGDebug.rdp')
-      ps.lookup({
-        command: 'mstsc'
-      }, function (err, resultList) {
-        if (err) throw err
-        resultList.forEach(function (process) {
-          if (process) {
-            ps.kill(process.pid, function (err) {
-              if (err) {
-                throw err
-              } else {
-                fs.unlink(app.getPath('downloads') + '\\ReallifeRPGDebug.rdp', function (err) {
-                  if (err) throw err
-                })
-                console.log('Process %s has been killed!', process.pid)
-              }
-            })
-          }
-        })
+    exec('mstsc /v ' + server.IpAddress, function () {
+    })
+    ps.lookup({
+      command: 'mstsc'
+    }, function (err, resultList) {
+      if (err) throw err
+      resultList.forEach(function (process) {
+        if (process) {
+          ps.kill(process.pid, function (err) {
+            if (err) {
+              throw err
+            } else {
+              console.log('Process %s has been killed!', process.pid)
+            }
+          })
+        }
       })
     })
   }
