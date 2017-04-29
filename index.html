@@ -101,8 +101,11 @@
                             <li><a ng-click="logout()">Logout</a></li>
                         </ul>
                     </li>
+                    <li ng-show="!logged_in && logging_in">
+                        <a class="updating"><img src="resources/loading/ring-alt.svg"></a>
+                    </li>
                     <li>
-                        <a ng-click="login()" ng-if="!logged_in"><span class="glyphicon glyphicon-log-in"></span></a>
+                        <a ng-click="login()" ng-if="!logged_in && !logging_in"><span class="glyphicon glyphicon-log-in"></span></a>
                     </li>
                     <li>
                         <a href="https://donate.realliferpg.de/"><i class="fa fa-heart" aria-hidden="true"></i></a>

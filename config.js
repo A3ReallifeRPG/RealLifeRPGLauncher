@@ -8,7 +8,6 @@ var APIServersURL = 'servers/'
 
 var APIModsURL = 'mods'
 var APIModHashlistURL = 'mod/hashlist/'
-var APIBetaADD = '/beta'
 
 var APIFuelStationURL = 'fuelstations'
 

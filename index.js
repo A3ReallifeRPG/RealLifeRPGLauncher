@@ -15,7 +15,7 @@ const Shepherd = require('tether-shepherd')
 const ps = require('ps-node')
 const exec = require('child_process').exec
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIBetaADD alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL */
 
 var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
@@ -29,6 +29,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.player_data = null
   $rootScope.apiKey = ''
   $rootScope.logged_in = false
+  $rootScope.logging_in = false
 
   storage.get('settings', function (error, data) {
     if (error) {
@@ -46,8 +47,14 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
 
     if (typeof data.apikey !== 'undefined') {
       $rootScope.apiKey = data.apikey
+      $rootScope.logging_in = true
       getPlayerData($rootScope.apiKey)
-      $rootScope.logged_in = true
+    } else {
+      storage.get('settings', function (error, data) {
+        if (error) throw error
+        $rootScope.ArmaPath = data.armapath
+        $rootScope.getMods()
+      })
     }
   })
 
@@ -56,7 +63,10 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   }
 
   $rootScope.refresh = function () {
-    getMods()
+    storage.get('settings', function (err) {
+      if (err) throw err
+      $rootScope.getMods()
+    })
     getServers()
     getChangelog()
     if ($rootScope.logged_in) {
@@ -71,15 +81,14 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
           url: APIBaseURL + APIValidatePlayerURL + str,
           type: 'GET',
           success: function (data) {
-            console.log(data)
             if (data.status === 'Success') {
               alertify.success('Willkommen ' + data.name)
-              $rootScope.ApiKey = str
-              getPlayerData(str)
-              $rootScope.logged_in = true
               storage.set('player', {apikey: str}, function (error) {
                 if (error) throw error
               })
+              $rootScope.apiKey = str
+              $rootScope.logging_in = true
+              getPlayerData(str)
               $rootScope.$apply()
             } else {
               alertify.log('Falscher Schlüssel', 'danger')
@@ -98,13 +107,36 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
     $rootScope.ApiKey = ''
     $rootScope.player_data = null
     $rootScope.logged_in = false
-    $rootScope.$apply()
+    storage.get('settings', function (err) {
+      if (err) throw err
+      $rootScope.getMods()
+    })
+  }
+
+  $rootScope.getMods = function () {
+    var url = APIBaseURL + APIModsURL
+    if ($rootScope.logged_in) {
+      url += '/' + $rootScope.apiKey
+    }
+    ipcRenderer.send('to-web', {
+      type: 'get-url',
+      callback: 'mod-callback',
+      url: url,
+      callBackTarget: 'to-app'
+    })
   }
 
   ipcRenderer.on('to-app', function (event, args) {
     if (typeof args.args !== 'undefined') {
       if (args.args.callback === 'player-callback') {
         $rootScope.player_data = args.data.data[0]
+        $rootScope.logged_in = true
+        $rootScope.logging_in = false
+        storage.get('settings', function (error, data) {
+          if (error) throw error
+          $rootScope.ArmaPath = data.armapath
+          $rootScope.getMods()
+        })
         $rootScope.$apply()
       }
     }
@@ -615,12 +647,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     $scope.loading = true
     try {
       fs.lstatSync(app.getPath('userData') + '\\settings.json')
-      storage.get('settings', function (error, data) {
-        if (error) throw error
-        $rootScope.ArmaPath = data.armapath
-        getMods()
-        $scope.initGraph()
-      })
+      $scope.initGraph()
     } catch (e) {
       $scope.checkregkey1()
     }
@@ -822,7 +849,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
             if (error) throw error
           })
-          getMods()
+          $rootScope.getMods()
         } else {
           $rootScope.slide = 4
           alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')
@@ -1358,19 +1385,6 @@ App.directive('onFinishRender', function ($timeout) {
     }
   }
 })
-
-function getMods () {
-  var url = APIBaseURL + APIModsURL
-  if (fs.existsSync(app.getPath('userData') + '/beta')) {
-    url += APIBetaADD
-  }
-  ipcRenderer.send('to-web', {
-    type: 'get-url',
-    callback: 'mod-callback',
-    url: url,
-    callBackTarget: 'to-app'
-  })
-}
 
 function getChangelog () {
   ipcRenderer.send('to-web', {
