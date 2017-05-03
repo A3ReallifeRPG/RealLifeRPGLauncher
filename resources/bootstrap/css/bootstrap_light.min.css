@@ -7490,3 +7490,19 @@ canvas#smoothie-chart {
 .alertify-log-primary {
     background-color: #2780E3;
 }
+
+a.white {
+    color: #ffffff;
+}
+
+a.white:hover {
+    color: #ffffff;
+}
+
+.center {
+    text-align: center;
+}
+
+.panel-head-nomargin {
+    margin-bottom: 0;
+}

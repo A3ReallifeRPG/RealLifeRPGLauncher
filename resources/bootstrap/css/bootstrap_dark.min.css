@@ -8649,3 +8649,19 @@ alertify
     border: 1px solid transparent;
     border-radius: 0;
 }
+
+a.white {
+    color: #ffffff;
+}
+
+a.white:hover {
+    color: #ffffff;
+}
+
+.center {
+    text-align: center;
+}
+
+.panel-head-nomargin {
+    margin-bottom: 0;
+}

@@ -18,4 +18,6 @@ var APIChangelogURL = 'changelog'
 var APIPlayerURL = 'player/'
 var APIValidatePlayerURL = 'player/validate/'
 
+var APITwitchURL = 'twitch'
+
 var STATICFILESERVE = 'http://static.realliferpg.de/arma/'

@@ -15,7 +15,7 @@ const Shepherd = require('tether-shepherd')
 const ps = require('ps-node')
 const exec = require('child_process').exec
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
 
 var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
@@ -69,6 +69,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
     })
     getServers()
     getChangelog()
+    getTwitch()
     if ($rootScope.logged_in) {
       getPlayerData($rootScope.apiKey)
     }
@@ -284,6 +285,22 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       }
     })
 
+    $rootScope.tour.addStep('Twitch', {
+      title: 'Über',
+      text: 'Hier findest du immer Streamer die gerade auf unserem Server spielen.',
+      attachTo: '.twitchTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      },
+      when: {
+        show: function () {
+          $rootScope.slide = 6
+          $rootScope.$apply()
+        }
+      }
+    })
+
     $rootScope.tour.addStep('map', {
       title: 'Karte',
       text: 'Hier findest du eine Karte von Abramia auf der du dir den Füllstand aller Tankstellen anzeigen lassen kannst.',
@@ -294,7 +311,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       },
       when: {
         show: function () {
-          $rootScope.slide = 6
+          $rootScope.slide = 7
           $rootScope.$apply()
         }
       }
@@ -310,7 +327,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
       },
       when: {
         show: function () {
-          $rootScope.slide = 7
+          $rootScope.slide = 8
           $rootScope.$apply()
         }
       }
@@ -364,9 +381,11 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
     }, {
       icon: 'glyphicon glyphicon-question-sign', slide: 5, title: 'FAQ', tag: 'faqTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-map-marker', slide: 6, title: 'Map', tag: 'mapTabBtn'
+      icon: 'fa fa-twitch', slide: 6, title: 'Twitch', tag: 'twitchTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-book', slide: 7, title: 'Über', tag: 'aboutTabBtn'
+      icon: 'glyphicon glyphicon-map-marker', slide: 7, title: 'Map', tag: 'mapTabBtn'
+    }, {
+      icon: 'glyphicon glyphicon-book', slide: 8, title: 'Über', tag: 'aboutTabBtn'
     }]
 
   $scope.switchSlide = function (tab) {
@@ -433,6 +452,26 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           maxConns: 0,
           fileName: cutName(args.state.fileName),
           fileProgress: toProgress(args.state.percent)
+        })
+        $scope.graphTimeline.append(new Date().getTime(), toMB(args.state.speed))
+        $scope.$apply()
+        break
+      case 'update-dl-progress-server-bisign':
+        $scope.update({
+          state: 'Server - Verbunden',
+          hint: 'Download via Server läuft',
+          downloading: true,
+          canCancel: true,
+          downSpeed: 0,
+          upSpeed: 0,
+          totalProgress: toFileProgress(args.state.totalSize, args.state.totalDownloaded),
+          totalSize: toGB(args.state.totalSize),
+          totalDownloaded: toGB(args.state.totalDownloaded),
+          totalETA: 'Lade .bisign Dateien',
+          totalPeers: 0,
+          maxConns: 0,
+          fileName: cutName(args.state.fileName),
+          fileProgress: 100
         })
         $scope.graphTimeline.append(new Date().getTime(), toMB(args.state.speed))
         $scope.$apply()
@@ -779,11 +818,15 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     $scope.totalProgress = update.totalProgress
     $scope.totalSize = update.totalSize
     $scope.totalDownloaded = update.totalDownloaded
-    $scope.totalETA = update.totalETA
     $scope.totalPeers = update.totalPeers
     $scope.maxConns = update.maxConns
     $scope.fileName = update.fileName
     $scope.fileProgress = update.fileProgress
+    if (update.totalETA === 'Infinity Jahre') {
+      $scope.totalETA = 'Berechne...'
+    } else {
+      $scope.totalETA = update.totalETA
+    }
     $scope.$apply()
   }
 
@@ -1373,6 +1416,26 @@ App.controller('tfarController', ['$scope', '$rootScope', function ($scope) {
   })
 }])
 
+App.controller('twitchController', ['$scope', function ($scope) {
+  ipcRenderer.on('to-app', function (event, args) {
+    switch (args.type) {
+      case 'twitch-callback':
+        for (var i = 0; i < args.data.data.length; i++) {
+          args.data.data[i].sliced = args.data.data[i].status.slice(0, 25)
+        }
+        $scope.twitchers = args.data.data
+        $('#twitchScroll').perfectScrollbar({
+          suppressScrollX: true
+        })
+        break
+    }
+  })
+
+  $scope.init = function () {
+    getTwitch()
+  }
+}])
+
 App.directive('onFinishRender', function ($timeout) {
   return {
     restrict: 'A',
@@ -1380,6 +1443,7 @@ App.directive('onFinishRender', function ($timeout) {
       if (scope.$last === true) {
         $timeout(function () {
           scope.$emit(attr.onFinishRender)
+          appLoaded()
         })
       }
     }
@@ -1418,6 +1482,15 @@ function getFuelstations () {
     type: 'get-url',
     callback: 'fuelstations-callback',
     url: APIBaseURL + APIFuelStationURL,
+    callBackTarget: 'to-app'
+  })
+}
+
+function getTwitch () {
+  ipcRenderer.send('to-web', {
+    type: 'get-url',
+    callback: 'twitch-callback',
+    url: APIBaseURL + APITwitchURL,
     callBackTarget: 'to-app'
   })
 }

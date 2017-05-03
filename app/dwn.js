@@ -227,7 +227,6 @@ function downloadFileRecursive (list, index, basepath, dlserver, torrent, torren
 }
 
 function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrentURL) {
-  changeStatus(true, 'Server - Verbunden', '')
   var size = 0
   for (var i = 0; i < list.length; i++) {
     size += list[i].Size
@@ -245,6 +244,14 @@ function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrent
   }).on('error', function (err) {
     console.log(err)
   }).on('end', function () {
+    if (list[index].RelativPath.includes('.bisign')) {
+      updateProgressServerBisign({
+        totalSize: size,
+        totalDownloaded: downloaded,
+        fileName: list[index].FileName,
+        fileSize: list[index].Size
+      })
+    }
     downloaded += list[index].Size
     if (cancel) {
       cancel = false
@@ -355,6 +362,13 @@ function initTorrent (folder, torrentURL) {
 function updateProgressServer (state) {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-server',
+    state: state
+  })
+}
+
+function updateProgressServerBisign (state) {
+  ipcRenderer.send('to-app', {
+    type: 'update-dl-progress-server-bisign',
     state: state
   })
 }

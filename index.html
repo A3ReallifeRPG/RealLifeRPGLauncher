@@ -605,6 +605,30 @@
                     </div>
                 </div>
                 <div class="item">
+                    <div id="twitch">
+                        <div class="container" ng-controller="twitchController" data-ng-init="init()">
+                            <h3>Twitch</h3>
+                            <hr>
+                            <div class="page" style="position: relative;" id="twitchScroll">
+                                <div class="row">
+                                    <div class="col-md-4" ng-repeat="twitch in twitchers">
+                                        <div class="panel panel-primary">
+                                            <div class="panel panel-heading panel-head-nomargin">
+                                                <a class="white" href="{{twitch.url}}" target="_blank">{{twitch.sliced}} <span ng-if="twitch.status.length > 25">... </span></a> <a class="white" href="{{twitch.url}}" target="_blank"><span class="pull-right label label-success">{{twitch.display_name}} <i class="fa fa-twitch" aria-hidden="true"></i></span></a>
+                                            </div>
+                                            <div class="panel panel-body center">
+                                                <a class="white" href="{{twitch.url}}" target="_blank"><img ng-src="{{twitch.preview_large}}" height="187" width="333"></a>
+                                                <hr>
+                                                <a class="white" href="{{twitch.url}}" target="_blank"><span class="label label-info label-large">{{twitch.average_fps}}FPS@{{twitch.video_height}}p für {{twitch.viewers}} Zuschauer mit {{twitch.delay}}s. Verzögerung</span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
                     <div id="map">
                         <div class="container" ng-controller="mapController" data-ng-init="init()">
                             <h3>Map</h3>
@@ -649,7 +673,6 @@
       radioClass: 'iradio_minimal',
       increaseArea: '20%' // optional
     });
-    appLoaded()
   });
 </script>
 </html>
