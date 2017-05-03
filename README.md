@@ -2,13 +2,16 @@
 
 # RealLifeRPGLauncher
 
-![alt tag](https://travis-ci.org/A3ReallifeRPG/RealLifeRPGLauncher.svg?branch=master) [![GitHub release](https://img.shields.io/github/release/A3ReallifeRPG/RealLifeRPGLauncher.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases/latest) [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Github All Releases](https://img.shields.io/github/downloads/A3ReallifeRPG/RealLifeRPGLauncher/total.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases)  [![Github All Releases](https://img.shields.io/badge/Download-60,5_MB-green.svg)](https://deploy.realliferpg.de/)
+![alt tag](https://travis-ci.org/A3ReallifeRPG/RealLifeRPGLauncher.svg?branch=master) [![GitHub release](https://img.shields.io/github/release/A3ReallifeRPG/RealLifeRPGLauncher.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases/latest) [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![Github All Releases](https://img.shields.io/github/downloads/A3ReallifeRPG/RealLifeRPGLauncher/total.svg)](https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases)
 
 Willkommen im Repository des RealLifeRPG Launchers.
 
 Unser Launcher ist OpenSource, ihr könnt euch die gesammte Source herunterladen/bearbeiten.  
 
 Gerne könnt ihr auch zur Weiterentwicklung beitragen, mehr Infos dazu findet ihr weiter unten.
+
+Wir haben unseren Launcher öffentlich gemacht um der Arma Community in diesem Bereich einen kleinen Anstoß zu geben ebenfalls über Open Source Lösungen nachzudenken.
+Wenn ihr den Launcher nutzen wollt oder von ihm lernt würden wir uns über ein bisschen Credit sehr freuen und bitte ändert aus rein praktikablen Gründen für die Nutzer Icon und Bootstrap Theme.
 
 ## Über RealLifeRPG
 
