@@ -76,6 +76,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   }
 
   $rootScope.login = function () {
+    alertify.set({labels: {ok: 'Ok'}})
     alertify.prompt('Bitte füge deinen Login-Schlüssel ein', function (e, str) {
       if (e) {
         $.ajax({
@@ -591,7 +592,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           size += args.list[i].Size
         }
         if (size !== 0) {
-          if (args.mod.Torrent !== '') {
+          if (args.mod.Torrent !== '' && args.mod.Torrent !== null) {
             alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
             alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + toGB(size) + ' GB)', function (e) {
               if (e) {
@@ -1295,12 +1296,28 @@ App.controller('mapController', ['$scope', function ($scope) {
           y: ((10240 - tmpArr[1]) / 10240) * 16384
         }
 
-        $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
-          icon: $scope.gasMarker
-        }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-success" style="width: ' + fuel + '%"></div></div>', {
-          autoClose: false,
-          minWidth: 150
-        }))
+        if (fuel > 70) {
+          $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
+            icon: $scope.gasMarkerGreen
+          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-success" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + $scope.fuelstations[i].Fuelstations[j].Fuel + '/30000 Liter </span></div>', {
+            autoClose: false,
+            minWidth: 150
+          }))
+        } else if (fuel > 30) {
+          $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
+            icon: $scope.gasMarkerOrange
+          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-warning" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + $scope.fuelstations[i].Fuelstations[j].Fuel + '/30000 Liter </span></div>', {
+            autoClose: false,
+            minWidth: 150
+          }))
+        } else {
+          $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
+            icon: $scope.gasMarkerRed
+          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-danger" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + $scope.fuelstations[i].Fuelstations[j].Fuel + '/30000 Liter </span></div>', {
+            autoClose: false,
+            minWidth: 150
+          }))
+        }
       }
     }
 
@@ -1342,6 +1359,27 @@ App.controller('mapController', ['$scope', function ($scope) {
 
     $scope.gasMarker = L.icon({
       iconUrl: 'icon/gas.png',
+      iconSize: [32, 37], // size of the icon
+      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+    })
+
+    $scope.gasMarkerGreen = L.icon({
+      iconUrl: 'icon/gas_green.png',
+      iconSize: [32, 37], // size of the icon
+      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+    })
+
+    $scope.gasMarkerOrange = L.icon({
+      iconUrl: 'icon/gas_orange.png',
+      iconSize: [32, 37], // size of the icon
+      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+    })
+
+    $scope.gasMarkerRed = L.icon({
+      iconUrl: 'icon/gas_red.png',
       iconSize: [32, 37], // size of the icon
       iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
       popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor

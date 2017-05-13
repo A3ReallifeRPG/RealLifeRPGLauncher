@@ -16,7 +16,6 @@
     <link href="node_modules/tether/dist/css/tether.min.css" rel="stylesheet">
     <script src="node_modules/tether/dist/js/tether.min.js"></script>
 
-
     <!-- shepherd -->
     <link href="node_modules/tether-shepherd/dist/css/shepherd-theme-square-dark.css" rel="stylesheet">
 
@@ -163,7 +162,7 @@
                                                                 <div class="btn-group btn-group-sm">
                                                                     <button class="btn btn-success btn-sm" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
                                                                     <button class="btn btn-warning btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
-                                                                    <button class="btn btn-primary btn-sm" ng-show="mod.state[0] === 3 && mod.HasGameFiles && mod.Torrent !== ''" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
+                                                                    <button class="btn btn-primary btn-sm" ng-show="mod.state[0] === 3 && mod.HasGameFiles && mod.Torrent !== '' && mod.Torrent !== null" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
                                                                     <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="openModDir(mod)"><span class=" glyphicon glyphicon-folder-open"></span></button>
                                                                 </div>
                                                             </div>
