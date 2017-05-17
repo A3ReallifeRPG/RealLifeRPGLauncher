@@ -42,6 +42,8 @@
   },
   "devDependencies": {
     "devtron": "1.4.0",
+    "electron": "^1.6.8",
+    "electron-builder": "10.15.1",
     "standard": "*"
   },
   "contributors": [
