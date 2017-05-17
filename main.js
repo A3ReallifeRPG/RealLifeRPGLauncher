@@ -79,7 +79,7 @@ autoUpdater.addListener('error', function (error) { // eslint-disable-line
 
 })
 
-var version = app.getVersion()
+let version = app.getVersion()
 
 autoUpdater.setFeedURL('http://deploy.realliferpg.de/update/win/' + version)
 autoUpdater.checkForUpdates()
@@ -138,24 +138,23 @@ function createWindow () {
   win.loadURL(`file://${__dirname}/index.html`)
 
   autoUpdater.addListener('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateURL) {
-    var args = {
+    win.webContents.send('update-downloaded', {
       releaseNotes: releaseNotes,
       releaseName: releaseName,
       releaseDate: releaseDate,
       updateURL: updateURL
-    }
-    win.webContents.send('update-downloaded', args)
+    })
   })
 
-  autoUpdater.addListener('checking-for-update', function (event) {
+  autoUpdater.addListener('checking-for-update', function () {
     win.webContents.send('checking-for-update')
   })
 
-  autoUpdater.addListener('update-not-available', function (event) {
+  autoUpdater.addListener('update-not-available', function () {
     win.webContents.send('update-not-available')
   })
 
-  autoUpdater.addListener('update-available', function (event) {
+  autoUpdater.addListener('update-available', function () {
     win.webContents.send('update-available')
   })
 
@@ -256,7 +255,7 @@ function setUpIpcHandlers () {
   })
 }
 
-const shouldQuit = app.makeSingleInstance(function (commandLine, workingDirectory) {
+const shouldQuit = app.makeSingleInstance(function () {
   if (win) {
     if (win.isMinimized()) win.restore()
     if (!win.isVisible()) win.show()
@@ -283,16 +282,16 @@ ipcMain.on('winprogress-change', function (event, arg) {
   win.setProgressBar(arg.progress)
 })
 
-ipcMain.on('app-loaded', function (event) {
+ipcMain.on('app-loaded', function () {
   win.show()
   loadWin.destroy()
 })
 
-ipcMain.on('focus-window', function (event) {
+ipcMain.on('focus-window', function () {
   win.focus()
 })
 
-ipcMain.on('quitAndInstall', function (event) {
+ipcMain.on('quitAndInstall', function () {
   autoUpdater.quitAndInstall()
   app.quit()
 })

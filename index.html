@@ -94,8 +94,9 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <p class="navbar-text" ng-show="logged_in"><img ng-src="{{player_data.avatar}}" height="31" width="31"></p>
                     <li class="dropdown" ng-show="logged_in">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{player_data.name}} <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{player_data.profilename}} <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a ng-click="logout()">Logout</a></li>
                         </ul>

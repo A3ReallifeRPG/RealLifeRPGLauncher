@@ -17,7 +17,7 @@ const exec = require('child_process').exec
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
 
-var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
+const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   $rootScope.downloading = false
   $rootScope.AppLoaded = true
   $rootScope.ArmaPath = ''
@@ -116,7 +116,7 @@ var App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
   }
 
   $rootScope.getMods = function () {
-    var url = APIBaseURL + APIModsURL
+    let url = APIBaseURL + APIModsURL
     if ($rootScope.logged_in) {
       url += '/' + $rootScope.apiKey
     }
@@ -587,10 +587,10 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           fileName: '',
           fileProgress: ''
         })
-        var size = 0
-        for (var i = 0; i < args.list.length; i++) {
-          size += args.list[i].Size
-        }
+        let size = 0
+        args.list.forEach(function (cur) {
+          size += cur.Size
+        })
         if (size !== 0) {
           if (args.mod.Torrent !== '' && args.mod.Torrent !== null) {
             alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
@@ -648,17 +648,17 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         }
         break
       case 'update-quickcheck':
-        for (var j = 0; j < $scope.mods.length; j++) {
-          if ($scope.mods[j].Id === args.mod.Id) {
+        $scope.mods.forEach(function (mod) {
+          if (mod.Id === args.mod.Id) {
             if (args.update === 0) {
-              $scope.mods[j].state = [1, 'Downloaden']
+              mod.state = [1, 'Downloaden']
             } else if (args.update === 1) {
-              $scope.mods[j].state = [2, 'Update verfügbar']
+              mod.state = [2, 'Update verfügbar']
             } else {
-              $scope.mods[j].state = [3, 'Spielen']
+              mod.state = [3, 'Spielen']
             }
           }
-        }
+        })
         $scope.$apply()
         break
     }
@@ -756,8 +756,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.initGraph = function () {
-    var bgColor = ''
-    var graphColor = ''
+    let bgColor, graphColor
 
     if ($rootScope.theme === 'light') {
       bgColor = '#ffffff'
@@ -767,14 +766,14 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       graphColor = '#df691a'
     }
 
-    var graphOptions = {
+    let graphOptions = {
       millisPerPixel: 20,
       grid: {fillStyle: bgColor, strokeStyle: bgColor},
       labels: {fillStyle: '#000000', disabled: true}
     }
     $scope.chart = new SmoothieChart(graphOptions)
 
-    var canvas = document.getElementById('smoothie-chart')
+    let canvas = document.getElementById('smoothie-chart')
 
     $scope.graphTimeline = new TimeSeries()
     $scope.chart.addTimeSeries($scope.graphTimeline, {lineWidth: 2, strokeStyle: graphColor})
@@ -791,8 +790,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   $rootScope.$watch(
     'theme', function () {
       if ($scope.chart != null) {
-        var bgColor = ''
-        var graphColor = ''
+        let bgColor, graphColor
 
         if ($rootScope.theme === 'light') {
           bgColor = '#ffffff'
@@ -866,22 +864,22 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.checkUpdates = function () {
-    for (var i = 0; i < $scope.mods.length; i++) {
-      if ($scope.mods[i].HasGameFiles) {
+    $scope.mods.forEach(function (mod) {
+      if (mod.HasGameFiles) {
         if ($rootScope.ArmaPath !== '') {
-          $scope.mods[i].state = [0, 'Suche nach Updates...']
+          mod.state = [0, 'Suche nach Updates...']
           ipcRenderer.send('to-dwn', {
             type: 'start-mod-quickcheck',
-            mod: $scope.mods[i],
+            mod: mod,
             path: $rootScope.ArmaPath
           })
         } else {
-          $scope.mods[i].state = [0, 'Kein Pfad gesetzt']
+          mod.state = [0, 'Kein Pfad gesetzt']
         }
       } else {
-        $scope.mods[i].state = [3, 'Spielen']
+        mod.state = [3, 'Spielen']
       }
-    }
+    })
   }
 
   $scope.savePath = function (path) {
@@ -905,7 +903,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.checkregkey1 = function () {
-    var regKey = new Winreg({
+    let regKey = new Winreg({
       hive: Winreg.HKLM,
       key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410'
     })
@@ -928,7 +926,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.checkregkey2 = function () {
-    var regKey = new Winreg({
+    let regKey = new Winreg({
       hive: Winreg.HKLM,
       key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410'
     })
@@ -951,7 +949,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.checkregkey3 = function () {
-    var regKey = new Winreg({
+    let regKey = new Winreg({
       hive: Winreg.HKLM,
       key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3'
     })
@@ -977,29 +975,26 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
 
 App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
   $scope.redrawChart = function (server) {
-    var data = {
-      labels: [
-        ' Zivilisten',
-        ' Polizisten',
-        ' Medics',
-        ' ADAC'
-      ],
-      datasets: [
-        {
-          data: [server.Civilians, server.Cops, server.Medics, server.Adac],
-          backgroundColor: [
-            '#8B008B',
-            '#0000CD',
-            '#228B22',
-            '#C00100'
-          ]
-        }]
-    }
-
-    var xhx = $('#serverChart' + server.Id)
-    var chart = new Chart(xhx, { // eslint-disable-line
+    new Chart($('#serverChart' + server.Id), { // eslint-disable-line
       type: 'pie',
-      data: data,
+      data: {
+        labels: [
+          ' Zivilisten',
+          ' Polizisten',
+          ' Medics',
+          ' ADAC'
+        ],
+        datasets: [
+          {
+            data: [server.Civilians, server.Cops, server.Medics, server.Adac],
+            backgroundColor: [
+              '#8B008B',
+              '#0000CD',
+              '#228B22',
+              '#C00100'
+            ]
+          }]
+      },
       options: {
         responsive: false,
         legend: {
@@ -1029,11 +1024,11 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
         $scope.loading = false
         $scope.$apply()
         if (typeof $scope.servers !== 'undefined') {
-          for (var i = 0; i < $scope.servers.length; i++) {
-            $scope.servers[i].DescriptionHTML = $sce.trustAsHtml($scope.servers[i].Description)
-            $scope.redrawChart($scope.servers[i])
-            $('#playerScroll' + $scope.servers[i].Id).perfectScrollbar()
-          }
+          $scope.servers.forEach(function (server) {
+            server.DescriptionHTML = $sce.trustAsHtml(server.Description)
+            $scope.redrawChart(server)
+            $('#playerScroll' + server.Id).perfectScrollbar()
+          })
         }
         break
     }
@@ -1044,7 +1039,7 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
       storage.get('settings', function (err, data) {
         if (err) throw err
 
-        var params = []
+        let params = []
 
         params.push('-noLauncher')
         params.push('-useBE')
@@ -1254,15 +1249,14 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
   }
 
   $scope.chooseArmaPath = function () {
-    var options = {
+    let path = String(dialog.showOpenDialog({
       filters: [{
         name: 'Arma3.exe',
         extensions: ['exe']
       }],
       title: 'Bitte wähle deine Arma3.exe aus',
       properties: ['openFile']
-    }
-    var path = String(dialog.showOpenDialog(options))
+    }))
     if (path !== 'undefined' && path.indexOf('\\arma3.exe') > -1) {
       $rootScope.ArmaPath = path.replace('arma3.exe', '')
       $scope.saveSettings()
@@ -1285,54 +1279,51 @@ App.controller('mapController', ['$scope', function ($scope) {
   })
 
   $scope.updateFuels = function () {
-    for (var i = 0; i < $scope.fuelstations.length; i++) {
-      $scope.fuelstations[i].Markers = []
+    $scope.fuelstations.forEach(function (instance) {
+      instance.Markers = []
 
-      for (var j = 0; j < $scope.fuelstations[i].Fuelstations.length; j++) {
-        var tmpArr = $scope.fuelstations[i].Fuelstations[j].Pos.replace('[', '').replace(']', '').split(',')
-        var fuel = Math.round(($scope.fuelstations[i].Fuelstations[j].Fuel / 30000) * 100)
-        var m = {
-          x: (tmpArr[0] / 10240) * 16384,
-          y: ((10240 - tmpArr[1]) / 10240) * 16384
+      instance.Fuelstations.forEach(function (fuelstation) {
+        let fuel = Math.round((fuelstation.Fuel / 30000) * 100)
+        let m = {
+          x: (fuelstation.Pos.replace('[', '').replace(']', '').split(',')[0] / 10240) * 16384,
+          y: ((10240 - fuelstation.Pos.replace('[', '').replace(']', '').split(',')[1]) / 10240) * 16384
         }
 
         if (fuel > 70) {
-          $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
+          instance.Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
             icon: $scope.gasMarkerGreen
-          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-success" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + $scope.fuelstations[i].Fuelstations[j].Fuel + '/30000 Liter </span></div>', {
+          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-success" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + fuelstation.Fuel + '/30000 Liter </span></div>', {
             autoClose: false,
             minWidth: 150
           }))
         } else if (fuel > 30) {
-          $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
+          instance.Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
             icon: $scope.gasMarkerOrange
-          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-warning" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + $scope.fuelstations[i].Fuelstations[j].Fuel + '/30000 Liter </span></div>', {
+          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-warning" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + fuelstation.Fuel + '/30000 Liter </span></div>', {
             autoClose: false,
             minWidth: 150
           }))
         } else {
-          $scope.fuelstations[i].Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
+          instance.Markers.push(L.marker($scope.map.unproject([m.x, m.y], $scope.map.getMaxZoom()), {
             icon: $scope.gasMarkerRed
-          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-danger" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + $scope.fuelstations[i].Fuelstations[j].Fuel + '/30000 Liter </span></div>', {
+          }).bindPopup('<div class="progress progress-striped active" style="margin-bottom: 0"><div class="progress-bar progress-bar-danger" style="width: ' + fuel + '%"></div></div><div class="center"><span class="label label-info label-large">' + fuelstation.Fuel + '/30000 Liter </span></div>', {
             autoClose: false,
             minWidth: 150
           }))
         }
-      }
-    }
+      })
+    })
 
-    var overlayMaps = {
+    L.control.layers({
       'Server 1 Tankstellen': L.layerGroup($scope.fuelstations[0].Markers),
       'Server 2 Tankstellen': L.layerGroup($scope.fuelstations[1].Markers)
-    }
-
-    L.control.layers(overlayMaps).addTo($scope.map)
+    }).addTo($scope.map)
   }
 
   $scope.init = function () {
     getFuelstations()
 
-    var roads = L.tileLayer('https://tiles.realliferpg.de/1/{z}/{x}/{y}.png', {
+    let roads = L.tileLayer('https://tiles.realliferpg.de/1/{z}/{x}/{y}.png', {
       id: 'roads',
       minZoom: 1,
       maxZoom: 6,
@@ -1340,7 +1331,7 @@ App.controller('mapController', ['$scope', function ($scope) {
       tms: true
     })
 
-    var sat = L.tileLayer('https://tiles.realliferpg.de/2/{z}/{x}/{y}.png', {
+    let sat = L.tileLayer('https://tiles.realliferpg.de/2/{z}/{x}/{y}.png', {
       id: 'sat',
       minZoom: 1,
       maxZoom: 6,
@@ -1352,7 +1343,7 @@ App.controller('mapController', ['$scope', function ($scope) {
       layers: [roads]
     }).setView([0, 0], 1)
 
-    var baseLayers = {
+    let baseLayers = {
       'Straßen': roads,
       'Satellit': sat
     }
@@ -1387,8 +1378,8 @@ App.controller('mapController', ['$scope', function ($scope) {
 
     L.control.layers(baseLayers).addTo($scope.map)
 
-    var southWest = $scope.map.unproject([0, 16384], $scope.map.getMaxZoom())
-    var northEast = $scope.map.unproject([16384, 0], $scope.map.getMaxZoom())
+    let southWest = $scope.map.unproject([0, 16384], $scope.map.getMaxZoom())
+    let northEast = $scope.map.unproject([16384, 0], $scope.map.getMaxZoom())
     $scope.map.setMaxBounds(new L.LatLngBounds(southWest, northEast))
   }
 }])
@@ -1439,7 +1430,7 @@ App.controller('tfarController', ['$scope', '$rootScope', function ($scope) {
         alertify.log('Wird ausgeführt...', 'primary')
         if (!shell.openItem(args.filePath)) {
           alertify.log('Fehlgeschlagen', 'danger')
-          var stream = fs.createReadStream(args.filePath).pipe(unzip.Extract({path: app.getPath('downloads') + '\\ReallifeRPG'}))
+          let stream = fs.createReadStream(args.filePath).pipe(unzip.Extract({path: app.getPath('downloads') + '\\ReallifeRPG'}))
           stream.on('close', function () {
             try {
               fs.unlinkSync(app.getPath('downloads') + '\\ReallifeRPG\\package.ini')
@@ -1458,9 +1449,9 @@ App.controller('twitchController', ['$scope', function ($scope) {
   ipcRenderer.on('to-app', function (event, args) {
     switch (args.type) {
       case 'twitch-callback':
-        for (var i = 0; i < args.data.data.length; i++) {
-          args.data.data[i].sliced = args.data.data[i].status.slice(0, 25)
-        }
+        args.data.data.forEach(function (cur) {
+          cur.sliced = cur.status.slice(0, 25)
+        })
         $scope.twitchers = args.data.data
         $('#twitchScroll').perfectScrollbar({
           suppressScrollX: true
