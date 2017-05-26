@@ -1,25 +1,25 @@
-var fs = require('fs')
-var request = require('request')
-var progress = require('request-progress')
-var mkpath = require('mkpath')
-var WebTorrent = require('webtorrent')
-var hasha = require('hasha')
+const fs = require('fs')
+const request = require('request')
+const progress = require('request-progress')
+const mkpath = require('mkpath')
+const WebTorrent = require('webtorrent')
+const hasha = require('hasha')
 require('events').EventEmitter.defaultMaxListeners = Infinity
 const {ipcRenderer} = require('electron')
 
-var cancel = false
-var downloaded = 0
-var update = null
+let cancel = false
+let downloaded = 0
+let update = null
 
 let client = window.client = new WebTorrent({
   maxConns: 150
 })
 
-var path = ''
+let path = ''
 
 /* global APIBaseURL APIModHashlistURL */
 
-ipcRenderer.on('to-dwn', function (event, args) {
+ipcRenderer.on('to-dwn', (event, args) => {
   switch (args.type) {
     case 'start-mod-dwn':
       cancel = false
@@ -75,7 +75,7 @@ ipcRenderer.on('to-dwn', function (event, args) {
   }
 })
 
-function dwnMod (args) {
+const dwnMod = (args) => {
   downloaded = 0
   if (args.args.mod.Torrent !== '') {
     downloadFileRecursive(args.data.data, 0, path, args.args.mod.DownloadUrl, true, args.args.mod.Torrent)
@@ -84,17 +84,16 @@ function dwnMod (args) {
   }
 }
 
-function dwnlist (args) {
+const dwnlist = (args) => {
   downloaded = 0
   downloadFileRecursive(args.list, 0, path, args.mod.DownloadUrl, args.torrent, args.mod.Torrent)
 }
 
-function updateMod (args) {
-  var dllist = []
-  cleanFileRecursive(listDiff(args.data.data, path, args.args.mod), 0, path, quickCheckRecursiveList, args.data.data, 0, path, dllist, args.args.mod)
+const updateMod = (args) => {
+  cleanFileRecursive(listDiff(args.data.data, path, args.args.mod), 0, path, quickCheckRecursiveList, args.data.data, 0, path, [], args.args.mod)
 }
 
-function quickchecklist (args) {
+const quickchecklist = (args) => {
   try {
     fs.lstatSync(path + args.args.mod.Directories)
     quickCheckRecursive(args.data.data, 0, path, args.args.mod)
@@ -108,12 +107,11 @@ function quickchecklist (args) {
   }
 }
 
-function hashMod (args) {
-  var dllist = []
-  cleanFileRecursive(listDiff(args.data.data, path, args.args.mod), 0, path, hashFileRecursive, args.data.data, 0, path, dllist, args.args.mod)
+const hashMod = (args) => {
+  cleanFileRecursive(listDiff(args.data.data, path, args.args.mod), 0, path, hashFileRecursive, args.data.data, 0, path, [], args.args.mod)
 }
 
-function getHashlist (mod, callback) {
+const getHashlist = (mod, callback) => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: callback,
@@ -123,9 +121,9 @@ function getHashlist (mod, callback) {
   })
 }
 
-function findFileInList (list, path, basepath) {
-  var found = false
-  list.forEach(function (listvalue) {
+const findFileInList = (list, path, basepath) => {
+  let found = false
+  list.forEach((listvalue) => {
     if (basepath.replace(/\\/g, '/') + listvalue.RelativPath.replace(/\\/g, '/') === path.replace(/\\/g, '/')) {
       found = true
     }
@@ -133,11 +131,11 @@ function findFileInList (list, path, basepath) {
   return [found, path]
 }
 
-function listDiff (list, basepath, mod) {
-  var files = walkFolder(basepath + mod.Directories)
-  var toDelete = []
-  files.forEach(function (filesvalue) {
-    var search = findFileInList(list, filesvalue, basepath)
+const listDiff = (list, basepath, mod) => {
+  let files = walkFolder(basepath + mod.Directories)
+  let toDelete = []
+  files.forEach((filesvalue) => {
+    let search = findFileInList(list, filesvalue, basepath)
     if (!search[0]) {
       toDelete.push(search[1])
     }
@@ -145,11 +143,9 @@ function listDiff (list, basepath, mod) {
   return toDelete
 }
 
-function cleanFileRecursive (list, index, basepath, callback, hashlist, hashIndex, path, dllist, mod) {
-  var dest = list[index]
-
+const cleanFileRecursive = (list, index, basepath, callback, hashlist, hashIndex, path, dllist, mod) => {
   try {
-    fs.unlink(dest)
+    fs.unlink(list[index])
     if (list.length > index + 1) {
       cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod)
     } else {
@@ -164,44 +160,45 @@ function cleanFileRecursive (list, index, basepath, callback, hashlist, hashInde
   }
 }
 
-function initSeeding (dirPath, TorrentURL) {
-  update = setInterval(function () {
-    var state = {
+const initSeeding = (dirPath, TorrentURL) => {
+  update = setInterval(() => {
+    updateProgressTorrentInit({
       torrentUploadSpeedState: client.progress
-    }
-    updateProgressTorrentInit(state)
-  }, 1000)
+    })
+  },
+    1000
+  )
   client.add(TorrentURL, {
     path: dirPath
-  }, function (torrent) {
+  }, (torrent) => {
     clearInterval(update)
-    update = setInterval(function () {
+    update = setInterval(() => {
       if (!cancel) {
-        var state = {
+        updateProgressSeeding({
           torrentUploadSpeedState: client.uploadSpeed,
           torrentMaxConnsState: client.maxConns,
           torrentRationState: torrent.ratio,
           torrentUploadedState: torrent.uploaded,
           torrentNumPeersState: torrent.numPeers
-        }
-        updateProgressSeeding(state)
+        })
       } else {
-        torrent.destroy(function () {
+        torrent.destroy(() => {
           clearInterval(update)
           cancelled()
         })
       }
-    }, 1000)
+    },
+      1000
+    )
   })
 }
 
-function downloadFileRecursive (list, index, basepath, dlserver, torrent, torrentURL) {
-  var dest = basepath + list[index].RelativPath
-  var folder = dest.replace(list[index].FileName, '')
-  var stats
+const downloadFileRecursive = (list, index, basepath, dlserver, torrent, torrentURL) => {
+  let dest = basepath + list[index].RelativPath
+  let folder = dest.replace(list[index].FileName, '')
 
   try {
-    stats = fs.lstatSync(folder)
+    let stats = fs.lstatSync(folder)
     if (!(stats.isDirectory() && folder.includes('addons'))) {
       dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
     } else {
@@ -212,7 +209,7 @@ function downloadFileRecursive (list, index, basepath, dlserver, torrent, torren
       }
     }
   } catch (e) {
-    mkpath(folder, function () {
+    mkpath(folder, () => {
       if (!folder.includes('addons') && torrent) {
         dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
       } else {
@@ -226,13 +223,13 @@ function downloadFileRecursive (list, index, basepath, dlserver, torrent, torren
   }
 }
 
-function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrentURL) {
-  var size = 0
-  for (var i = 0; i < list.length; i++) {
-    size += list[i].Size
-  }
-  var requestobj = null
-  progress(requestobj = request(dlserver + list[index].RelativPath), {}).on('progress', function (state) {
+const dlFileCallback = (list, index, dest, basepath, dlserver, torrent, torrentURL) => {
+  let size = 0
+  let requestobj = null
+  list.forEach((cur) => {
+    size += cur.Size
+  })
+  progress(requestobj = request(dlserver + list[index].RelativPath), {}).on('progress', (state) => {
     if (cancel) {
       requestobj.abort()
     }
@@ -241,9 +238,9 @@ function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrent
     state.fileName = list[index].FileName
     state.fileSize = list[index].Size
     updateProgressServer(state)
-  }).on('error', function (err) {
+  }).on('error', (err) => {
     console.log(err)
-  }).on('end', function () {
+  }).on('end', () => {
     if (list[index].RelativPath.includes('.bisign')) {
       updateProgressServerBisign({
         totalSize: size,
@@ -266,9 +263,8 @@ function dlFileCallback (list, index, dest, basepath, dlserver, torrent, torrent
   }).pipe(fs.createWriteStream(dest))
 }
 
-function hashFileRecursive (list, index, basepath, dllist, mod) {
-  var dest = basepath + list[index].RelativPath
-  var folder = dest.replace(list[index].FileName, '')
+const hashFileRecursive = (list, index, basepath, dllist, mod) => {
+  let dest = basepath + list[index].RelativPath
 
   if (cancel) {
     cancel = false
@@ -280,9 +276,11 @@ function hashFileRecursive (list, index, basepath, dllist, mod) {
     }, list[index].FileName, mod)
 
     try {
-      fs.lstatSync(folder)
+      fs.lstatSync(dest.replace(list[index].FileName, ''))
       fs.lstatSync(dest)
-      hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
+      hasha.fromFile(dest, {
+        algorithm: 'md5'
+      }).then((hash) => {
         if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
           dllist.push(list[index])
         }
@@ -303,28 +301,28 @@ function hashFileRecursive (list, index, basepath, dllist, mod) {
   }
 }
 
-function downloadFinished () {
+const downloadFinished = () => {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-done'
   })
 }
 
-function initTorrent (folder, torrentURL) {
+const initTorrent = (folder, torrentURL) => {
   path = folder.replace('addons', '')
-  var opts = {
-    path: path
-  }
-  update = setInterval(function () {
-    var state = {
+  update = setInterval(() => {
+    updateProgressTorrentInit({
       torrentUploadSpeedState: client.progress
-    }
-    updateProgressTorrentInit(state)
-  }, 1000)
-  client.add(torrentURL, opts, function (torrent) {
+    })
+  },
+    1000
+  )
+  client.add(torrentURL, {
+    path: path
+  }, (torrent) => {
     clearInterval(update)
-    update = setInterval(function () {
+    update = setInterval(() => {
       if (!cancel) {
-        var state = {
+        updateProgressTorrent({
           torrentDownloadSpeedState: client.downloadSpeed,
           torrentUploadSpeedState: client.uploadSpeed,
           torrentMaxConnsState: client.maxConns,
@@ -335,66 +333,67 @@ function initTorrent (folder, torrentURL) {
           torrentUploadedState: torrent.uploaded,
           torrentNumPeersState: torrent.numPeers,
           torrentSizeState: torrent.length
-        }
-        updateProgressTorrent(state)
+        })
       } else {
-        torrent.destroy(function () {
+        torrent.destroy(() => {
           clearInterval(update)
           cancelled()
         })
       }
-    }, 1000)
-    torrent.on('done', function () {
-      torrent.destroy(function () {
+    },
+      1000
+    )
+    torrent.on('done', () => {
+      torrent.destroy(() => {
         clearInterval(update)
         cancelled()
       })
-      changeStatus(false, 'Abgeschlossen - Prüfung austehend', 'Inaktiv')
+      changeStatus(false, 'Abgeschlossen - Prüfung ausstehend', 'Inaktiv')
     })
   })
 
-  client.on('error', function (err) {
+  client.on('error', (err) => {
     changeStatus(false, 'Torrent - Fehler', 'Fataler Fehler')
     console.log(err)
   })
 }
 
-function updateProgressServer (state) {
+const updateProgressServer = (state) => {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-server',
     state: state
   })
 }
 
-function updateProgressServerBisign (state) {
+const updateProgressServerBisign = (state) => {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-server-bisign',
     state: state
   })
 }
 
-function updateProgressTorrent (state) {
+const updateProgressTorrent = (state) => {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-torrent',
     state: state
   })
 }
 
-function updateProgressSeeding (state) {
+const updateProgressSeeding = (state) => {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-seeding',
     state: state
   })
 }
 
-function updateProgressTorrentInit (state) {
+const updateProgressTorrentInit = (state) => {
   ipcRenderer.send('to-app', {
     type: 'update-torrent-progress-init',
     state: state
   })
 }
 
-function changeStatus (downloading, status, hint) {
+const changeStatus = (downloading, status, hint) => {
   ipcRenderer.send('to-app', {
     type: 'status-change',
     status: status,
@@ -403,13 +402,13 @@ function changeStatus (downloading, status, hint) {
   })
 }
 
-function cancelled () {
+const cancelled = () => {
   ipcRenderer.send('to-app', {
     type: 'cancelled'
   })
 }
 
-function updateProgressHash (state, filename, mod) {
+const updateProgressHash = (state, filename, mod) => {
   ipcRenderer.send('to-app', {
     type: 'update-hash-progress',
     state: state,
@@ -418,7 +417,7 @@ function updateProgressHash (state, filename, mod) {
   })
 }
 
-function finishProgressHash (list, mod) {
+const finishProgressHash = (list, mod) => {
   ipcRenderer.send('to-app', {
     type: 'update-hash-progress-done',
     list: list,
@@ -426,13 +425,14 @@ function finishProgressHash (list, mod) {
   })
 }
 
-function quickCheckRecursive (list, index, basepath, mod) {
+const quickCheckRecursive = (list, index, basepath, mod) => {
   try {
-    var dest = basepath + list[index].RelativPath
-    var stats
-    stats = fs.lstatSync(dest)
+    let dest = basepath + list[index].RelativPath
+    let stats = fs.lstatSync(dest)
     if (dest.includes('.bisign')) {
-      hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
+      hasha.fromFile(dest, {
+        algorithm: 'md5'
+      }).then((hash) => {
         if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
           ipcRenderer.send('to-app', {
             type: 'update-quickcheck',
@@ -477,13 +477,14 @@ function quickCheckRecursive (list, index, basepath, mod) {
   }
 }
 
-function quickCheckRecursiveList (list, index, basepath, dllist, mod) {
+const quickCheckRecursiveList = (list, index, basepath, dllist, mod) => {
   try {
-    var dest = basepath + list[index].RelativPath
-    var stats
-    stats = fs.lstatSync(dest)
+    let dest = basepath + list[index].RelativPath
+    let stats = fs.lstatSync(dest)
     if (dest.includes('.bisign')) {
-      hasha.fromFile(dest, {algorithm: 'md5'}).then(function (hash) {
+      hasha.fromFile(dest, {
+        algorithm: 'md5'
+      }).then((hash) => {
         if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
           dllist.push(list[index])
         }
@@ -517,12 +518,12 @@ function quickCheckRecursiveList (list, index, basepath, dllist, mod) {
   }
 }
 
-function walkFolder (dir) {
-  var results = []
-  var list = fs.readdirSync(dir)
-  list.forEach(function (file) {
+const walkFolder = (dir) => {
+  let results = []
+  let list = fs.readdirSync(dir)
+  list.forEach((file) => {
     file = dir + '/' + file
-    var stat = fs.statSync(file)
+    let stat = fs.statSync(file)
     if (stat && stat.isDirectory()) results = results.concat(walkFolder(file))
     else results.push(file)
   })

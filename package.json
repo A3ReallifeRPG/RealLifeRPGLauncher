@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.3.9",
+  "version": "2.4.0",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "devtron": "1.4.0",
-    "electron": "^1.6.8",
+    "electron": "^1.6.10",
     "electron-builder": "10.15.1",
     "standard": "*"
   },

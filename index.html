@@ -233,12 +233,12 @@
                                         <img src="resources/loading/cube.svg"/>
                                     </div>
                                     <ul class="nav nav-tabs">
-                                        <li  ng-class={active:(0==$index)} class="serverTab" id="serverTab{{server.Id}}" ng-repeat="server in servers">
+                                        <li ng-class={active:(0==$index)} class="serverTab" id="serverTab{{server.Id}}" ng-repeat="server in servers">
                                             <a ng-click="showTab(server.Id)">{{server.Servername}} <span class="label label-success">{{server.Playercount}}/{{server.Slots}}</span></a>
                                         </li>
                                     </ul>
                                     <div class="tab-content">
-                                        <div  ng-class={active:(0==$index)} id="serverPane{{server.Id}}" class="tab-pane fade in serverPane" ng-repeat="server in servers">
+                                        <div ng-class={active:(0==$index)} id="serverPane{{server.Id}}" class="tab-pane fade in serverPane" ng-repeat="server in servers">
                                             <br>
                                             <br>
                                             <div class="row">
@@ -291,10 +291,15 @@
                                                             <a>{{server.StartParameters}}</a>
                                                         </li>
                                                     </ul>
-                                                    <span class="pull-right">
-                                                        <button class="btn btn-success pull-right btn-sm" tooltips tooltip-template="Behebt Probleme beim Verbinden" style="margin-top: 10px" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
-                                                        <button class="btn btn-success pull-right btn-sm" tooltips tooltip-template="Dem Server beitreten" style="margin-top: 10px" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
-                                                    </span>
+                                                    <form class="form-inline pull-right">
+                                                        <div class="form-group-sm">
+                                                            <button type="button" class="btn btn-success btn-sm" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
+                                                            <label ng-if="profiles">
+                                                                <select class="form-control" ng-model="profiles.selected" ng-change="setProfile()" ng-options="profile for profile in profiles.available"></select>
+                                                            </label>
+                                                            <button type="button" class="btn btn-success btn-sm" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -658,21 +663,23 @@
         </div>
     </div>
 </div>
-</body>
 <script>
-  $(document).on('click', 'a[href^="htt"]', function (event) {
-    if (this.href != "") {
-      event.preventDefault();
-      shell.openExternal(this.href);
-    }
-  });
+  $(document).on('click', 'a[href^="http"]', function(event) {
+    event.preventDefault();
+    shell.openExternal(this.href);
+  })
 
-  $(document).ready(function () {
+  $(document).ready(() => {
     $('.icheck').iCheck({
       checkboxClass: 'icheckbox_minimal',
       radioClass: 'iradio_minimal',
-      increaseArea: '20%' // optional
-    });
-  });
+      increaseArea: '20%'
+    })
+  })
+
+  $(window).load(() => {
+    appLoaded()
+  })
 </script>
+</body>
 </html>

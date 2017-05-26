@@ -1,5 +1,5 @@
 const {ipcRenderer} = require('electron')
-const {shell} = require('electron') // eslint-disable-line
+const {shell} = require('electron')
 const humanizeDuration = require('humanize-duration')
 const fs = require('fs')
 const {dialog} = require('electron').remote
@@ -12,12 +12,11 @@ const $ = window.jQuery = require('./resources/jquery/jquery-1.12.3.min.js')
 const child = require('child_process')
 const L = require('leaflet')
 const Shepherd = require('tether-shepherd')
-const ps = require('ps-node')
-const exec = require('child_process').exec
+const path = require('path')
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
 
-const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) {
+const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.downloading = false
   $rootScope.AppLoaded = true
   $rootScope.ArmaPath = ''
@@ -31,10 +30,10 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
   $rootScope.logged_in = false
   $rootScope.logging_in = false
 
-  storage.get('settings', function (error, data) {
-    if (error) {
+  storage.get('settings', (err, data) => {
+    if (err) {
       $rootScope.theme = 'dark'
-      throw error
+      throw err
     }
 
     if (typeof data.theme !== 'undefined') {
@@ -42,28 +41,28 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
     }
   })
 
-  storage.get('player', function (error, data) {
-    if (error) throw error
+  storage.get('player', (err, data) => {
+    if (err) throw err
 
     if (typeof data.apikey !== 'undefined') {
       $rootScope.apiKey = data.apikey
       $rootScope.logging_in = true
       getPlayerData($rootScope.apiKey)
     } else {
-      storage.get('settings', function (error, data) {
-        if (error) throw error
+      storage.get('settings', (err, data) => {
+        if (err) throw err
         $rootScope.ArmaPath = data.armapath
         $rootScope.getMods()
       })
     }
   })
 
-  $rootScope.relaunchUpdate = function () {
+  $rootScope.relaunchUpdate = () => {
     ipcRenderer.send('quitAndInstall')
   }
 
-  $rootScope.refresh = function () {
-    storage.get('settings', function (err) {
+  $rootScope.refresh = () => {
+    storage.get('settings', (err) => {
       if (err) throw err
       $rootScope.getMods()
     })
@@ -75,18 +74,18 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
     }
   }
 
-  $rootScope.login = function () {
+  $rootScope.login = () => {
     alertify.set({labels: {ok: 'Ok'}})
-    alertify.prompt('Bitte füge deinen Login-Schlüssel ein', function (e, str) {
+    alertify.prompt('Bitte füge deinen Login-Schlüssel ein', (e, str) => {
       if (e) {
         $.ajax({
           url: APIBaseURL + APIValidatePlayerURL + str,
           type: 'GET',
-          success: function (data) {
+          success: (data) => {
             if (data.status === 'Success') {
               alertify.success('Willkommen ' + data.name)
-              storage.set('player', {apikey: str}, function (error) {
-                if (error) throw error
+              storage.set('player', {apikey: str}, (err) => {
+                if (err) throw err
               })
               $rootScope.apiKey = str
               $rootScope.logging_in = true
@@ -102,20 +101,20 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
     }, '')
   }
 
-  $rootScope.logout = function () {
-    storage.remove('player', function (error) {
-      if (error) throw error
+  $rootScope.logout = () => {
+    storage.remove('player', (err) => {
+      if (err) throw err
     })
     $rootScope.ApiKey = ''
     $rootScope.player_data = null
     $rootScope.logged_in = false
-    storage.get('settings', function (err) {
+    storage.get('settings', (err) => {
       if (err) throw err
       $rootScope.getMods()
     })
   }
 
-  $rootScope.getMods = function () {
+  $rootScope.getMods = () => {
     let url = APIBaseURL + APIModsURL
     if ($rootScope.logged_in) {
       url += '/' + $rootScope.apiKey
@@ -128,14 +127,14 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
     })
   }
 
-  ipcRenderer.on('to-app', function (event, args) {
+  ipcRenderer.on('to-app', (event, args) => {
     if (typeof args.args !== 'undefined') {
       if (args.args.callback === 'player-callback') {
         $rootScope.player_data = args.data.data[0]
         $rootScope.logged_in = true
         $rootScope.logging_in = false
-        storage.get('settings', function (error, data) {
-          if (error) throw error
+        storage.get('settings', (err, data) => {
+          if (err) throw err
           $rootScope.ArmaPath = data.armapath
           $rootScope.getMods()
         })
@@ -144,33 +143,33 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
     }
   })
 
-  ipcRenderer.on('checking-for-update', function (event) {
+  ipcRenderer.on('checking-for-update', () => {
     alertify.log('Suche nach Updates...', 'primary')
     $rootScope.updating = true
     $rootScope.$apply()
   })
 
-  ipcRenderer.on('update-not-available', function (event) {
+  ipcRenderer.on('update-not-available', () => {
     alertify.log('Launcher ist aktuell', 'primary')
     $rootScope.updating = false
     $rootScope.$apply()
   })
 
-  ipcRenderer.on('update-available', function (event) {
+  ipcRenderer.on('update-available', () => {
     spawnNotification('Update verfügbar, wird geladen...')
     alertify.log('Update verfügbar, wird geladen...', 'primary')
     $rootScope.updating = true
     $rootScope.$apply()
   })
 
-  ipcRenderer.on('update-downloaded', function (event, args) {
+  ipcRenderer.on('update-downloaded', (event, args) => {
     spawnNotification('Update zur Version ' + args.releaseName + ' bereit.')
     $rootScope.updating = false
     $rootScope.update_ready = true
     $rootScope.$apply()
   })
 
-  $rootScope.$on('ngRepeatFinished', function () {
+  $rootScope.$on('ngRepeatFinished', () => {
     $rootScope.tour = new Shepherd.Tour({
       defaults: {
         classes: 'shepherd-theme-square-dark'
@@ -199,7 +198,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 0
           $rootScope.$apply()
         }
@@ -215,7 +214,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 1
           $rootScope.$apply()
         }
@@ -231,7 +230,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 2
           $rootScope.$apply()
         }
@@ -247,7 +246,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 3
           $rootScope.$apply()
         }
@@ -263,7 +262,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 4
           $rootScope.$apply()
         }
@@ -279,7 +278,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 5
           $rootScope.$apply()
         }
@@ -295,7 +294,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 6
           $rootScope.$apply()
         }
@@ -311,7 +310,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 7
           $rootScope.$apply()
         }
@@ -327,7 +326,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.tour.next
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 8
           $rootScope.$apply()
         }
@@ -342,14 +341,14 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
         action: $rootScope.endTour
       },
       when: {
-        show: function () {
+        show: () => {
           $rootScope.slide = 0
           $rootScope.$apply()
         }
       }
     })
 
-    storage.get('tour', function (err, data) {
+    storage.get('tour', (err, data) => {
       if (err) {
         throw err
       }
@@ -359,15 +358,15 @@ const App = angular.module('App', ['720kb.tooltips']).run(function ($rootScope) 
     })
   })
 
-  $rootScope.endTour = function () {
+  $rootScope.endTour = () => {
     $rootScope.tour.cancel()
-    storage.set('tour', {tour: true}, function (error) {
-      if (error) throw error
+    storage.set('tour', {tour: true}, (err) => {
+      if (err) throw err
     })
   }
 })
 
-App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
+App.controller('navbarController', ['$scope', '$rootScope', ($scope, $rootScope) => {
   $scope.tabs = [
     {
       icon: 'glyphicon glyphicon-home', slide: 0, title: 'Mods', tag: 'modsTabBtn'
@@ -389,27 +388,30 @@ App.controller('navbarController', ['$scope', '$rootScope', function ($scope, $r
       icon: 'glyphicon glyphicon-book', slide: 8, title: 'Über', tag: 'aboutTabBtn'
     }]
 
-  $scope.switchSlide = function (tab) {
+  $scope.switchSlide = (tab) => {
     $rootScope.slide = tab.slide
   }
 
   $rootScope.$watch(
-    'slide', function () {
+    'slide', () => {
       $('#carousel-main').carousel($rootScope.slide)
       $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + $scope.tabs[$rootScope.slide].title
-    }, true)
+    }
+    ,
+    true
+  )
 
   $scope.$watch(
-    'AppTitle', function () {
+    'AppTitle', () => {
       document.title = $rootScope.AppTitle
     }, true)
 
-  $scope.tourApp = function () {
+  $scope.tourApp = () => {
     $rootScope.tour.start()
   }
 }])
 
-App.controller('modController', ['$scope', '$rootScope', function ($scope, $rootScope) {
+App.controller('modController', ['$scope', '$rootScope', ($scope, $rootScope) => {
   $scope.state = 'Gestoppt'
   $scope.hint = 'Inaktiv'
   $rootScope.downloading = false
@@ -425,7 +427,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   $scope.fileName = ''
   $scope.fileProgress = ''
 
-  ipcRenderer.on('to-app', function (event, args) {
+  ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
       case 'mod-callback':
         $scope.mods = args.data.data
@@ -588,13 +590,13 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
           fileProgress: ''
         })
         let size = 0
-        args.list.forEach(function (cur) {
+        args.list.forEach((cur) => {
           size += cur.Size
         })
         if (size !== 0) {
           if (args.mod.Torrent !== '' && args.mod.Torrent !== null) {
             alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
-            alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + toGB(size) + ' GB)', function (e) {
+            alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + toGB(size) + ' GB)', (e) => {
               if (e) {
                 $scope.reset()
                 $scope.initListDownload(args.list, true, args.mod)
@@ -648,7 +650,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
         }
         break
       case 'update-quickcheck':
-        $scope.mods.forEach(function (mod) {
+        $scope.mods.forEach((mod) => {
           if (mod.Id === args.mod.Id) {
             if (args.update === 0) {
               mod.state = [1, 'Downloaden']
@@ -664,7 +666,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     }
   })
 
-  $scope.reset = function () {
+  $scope.reset = () => {
     $scope.update({
       state: 'Gestoppt',
       hint: '',
@@ -683,7 +685,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.init = function () {
+  $scope.init = () => {
     $scope.loading = true
     try {
       fs.lstatSync(app.getPath('userData') + '\\settings.json')
@@ -693,7 +695,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     }
   }
 
-  $scope.initTorrent = function (mod) {
+  $scope.initTorrent = (mod) => {
     alertify.log('Seeding wird gestartet', 'primary')
     ipcRenderer.send('to-dwn', {
       type: 'start-mod-seed',
@@ -702,7 +704,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.initDownload = function (mod) {
+  $scope.initDownload = (mod) => {
     alertify.log('Download wird gestartet', 'primary')
     ipcRenderer.send('to-dwn', {
       type: 'start-mod-dwn',
@@ -711,7 +713,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.initHash = function (mod) {
+  $scope.initHash = (mod) => {
     alertify.log('Überprüfung wird gestartet', 'primary')
     ipcRenderer.send('to-dwn', {
       type: 'start-mod-hash',
@@ -720,7 +722,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.initUpdate = function (mod) {
+  $scope.initUpdate = (mod) => {
     alertify.log('Update wird gestartet', 'primary')
     ipcRenderer.send('to-dwn', {
       type: 'start-mod-update',
@@ -729,7 +731,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.initListDownload = function (list, torrent, mod) {
+  $scope.initListDownload = (list, torrent, mod) => {
     $scope.update({
       state: 'Download wird gestarted...',
       hint: '',
@@ -755,7 +757,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.initGraph = function () {
+  $scope.initGraph = () => {
     let bgColor, graphColor
 
     if ($rootScope.theme === 'light') {
@@ -780,7 +782,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     $scope.chart.streamTo(canvas, 2000)
   }
 
-  $scope.cancel = function () {
+  $scope.cancel = () => {
     alertify.log('Wird abgebrochen...', 'primary')
     ipcRenderer.send('to-dwn', {
       type: 'cancel'
@@ -788,7 +790,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $rootScope.$watch(
-    'theme', function () {
+    'theme', () => {
       if ($scope.chart != null) {
         let bgColor, graphColor
 
@@ -807,7 +809,7 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
       }
     }, true)
 
-  $scope.update = function (update) {
+  $scope.update = (update) => {
     $scope.state = update.state
     $scope.hint = update.hint
     $rootScope.downloading = update.downloading
@@ -830,20 +832,20 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
   }
 
   $scope.$watch(
-    'totalProgress', function () {
+    'totalProgress', () => {
       ipcRenderer.send('winprogress-change', {
         progress: $scope.totalProgress / 100
       })
     }, true)
 
   $rootScope.$watch(
-    'ArmaPath', function () {
+    'ArmaPath', () => {
       if ($scope.mods !== undefined) {
         $scope.checkUpdates()
       }
     }, true)
 
-  $scope.action = function (mod) {
+  $scope.action = (mod) => {
     switch (mod.state[0]) {
       case 1:
         $scope.initDownload(mod)
@@ -859,12 +861,12 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     }
   }
 
-  $scope.openModDir = function (mod) {
-    shell.showItemInFolder($rootScope.ArmaPath + '\\' + mod.Directories + '\\addons')
+  $scope.openModDir = (mod) => {
+    shell.showItemInFolder(path.join($rootScope.ArmaPath, mod.Directories, 'addons'))
   }
 
-  $scope.checkUpdates = function () {
-    $scope.mods.forEach(function (mod) {
+  $scope.checkUpdates = () => {
+    $scope.mods.forEach((mod) => {
       if (mod.HasGameFiles) {
         if ($rootScope.ArmaPath !== '') {
           mod.state = [0, 'Suche nach Updates...']
@@ -882,14 +884,14 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.savePath = function (path) {
+  $scope.savePath = (path) => {
     if (path !== false) {
       alertify.set({labels: {ok: 'Richtig', cancel: 'Falsch'}})
-      alertify.confirm('Möglicher Arma Pfad gefunden: ' + path, function (e) {
+      alertify.confirm('Möglicher Arma Pfad gefunden: ' + path, (e) => {
         if (e) {
           $rootScope.ArmaPath = path + '\\'
-          storage.set('settings', {armapath: $rootScope.ArmaPath}, function (error) {
-            if (error) throw error
+          storage.set('settings', {armapath: $rootScope.ArmaPath}, (err) => {
+            if (err) throw err
           })
           $rootScope.getMods()
         } else {
@@ -902,16 +904,16 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     }
   }
 
-  $scope.checkregkey1 = function () {
+  $scope.checkregkey1 = () => {
     let regKey = new Winreg({
       hive: Winreg.HKLM,
       key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410'
     })
 
-    regKey.keyExists(function (err, exists) {
+    regKey.keyExists((err, exists) => {
       if (err) throw err
       if (exists) {
-        regKey.values(function (err, items) {
+        regKey.values((err, items) => {
           if (err) throw err
           if (fs.existsSync(items[3].value + '\\arma3.exe')) {
             $scope.savePath(items[3].value)
@@ -925,16 +927,16 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.checkregkey2 = function () {
+  $scope.checkregkey2 = () => {
     let regKey = new Winreg({
       hive: Winreg.HKLM,
       key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410'
     })
 
-    regKey.keyExists(function (err, exists) {
+    regKey.keyExists((err, exists) => {
       if (err) throw err
       if (exists) {
-        regKey.values(function (err, items) {
+        regKey.values((err, items) => {
           if (err) throw err
           if (fs.existsSync(items[3].value + '\\arma3.exe')) {
             $scope.savePath(items[3].value)
@@ -948,16 +950,16 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
     })
   }
 
-  $scope.checkregkey3 = function () {
+  $scope.checkregkey3 = () => {
     let regKey = new Winreg({
       hive: Winreg.HKLM,
       key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3'
     })
 
-    regKey.keyExists(function (err, exists) {
+    regKey.keyExists((err, exists) => {
       if (err) throw err
       if (exists) {
-        regKey.values(function (err, items) {
+        regKey.values((err, items) => {
           if (err) throw err
           if (fs.existsSync(items[0].value + '\\arma3.exe')) {
             $scope.savePath(items[0].value)
@@ -973,8 +975,8 @@ App.controller('modController', ['$scope', '$rootScope', function ($scope, $root
 }
 ])
 
-App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
-  $scope.redrawChart = function (server) {
+App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
+  $scope.redrawChart = (server) => {
     new Chart($('#serverChart' + server.Id), { // eslint-disable-line
       type: 'pie',
       data: {
@@ -1004,27 +1006,61 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
     })
   }
 
-  $scope.init = function () {
+  $scope.init = () => {
     $scope.loading = true
     getServers()
     getNotification()
+    $scope.getProfiles()
   }
 
-  $scope.showTab = function (tabindex) {
+  $scope.showTab = (tabindex) => {
     $('.serverTab').removeClass('active')
     $('.serverPane').removeClass('active')
     $('#serverTab' + tabindex).addClass('active')
     $('#serverPane' + tabindex).addClass('active')
   }
 
-  ipcRenderer.on('to-app', function (event, args) {
+  $scope.getProfiles = () => {
+    $scope.profiles = {
+      'available': []
+    }
+
+    storage.get('profile', (err, data) => {
+      if (err) throw err
+
+      $scope.profiles.selected = data.profile
+    })
+
+    let profileDir = app.getPath('documents') + '\\Arma 3 - Other Profiles'
+
+    try {
+      fs.lstatSync(profileDir).isDirectory()
+      let profiles = fs.readdirSync(profileDir).filter(file => fs.statSync(path.join(profileDir, file)).isDirectory())
+      profiles.forEach((profile, i) => {
+        $scope.profiles.available.push(decodeURIComponent(profile))
+      })
+    } catch (e) {
+      console.log(e)
+      $scope.profiles = false
+    }
+  }
+
+  $scope.setProfile = () => {
+    storage.set('profile', {
+      profile: $scope.profiles.selected
+    }, (err) => {
+      if (err) throw err
+    })
+  }
+
+  ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
       case 'servers-callback':
         $scope.servers = args.data.data
         $scope.loading = false
         $scope.$apply()
         if (typeof $scope.servers !== 'undefined') {
-          $scope.servers.forEach(function (server) {
+          $scope.servers.forEach((server) => {
             server.DescriptionHTML = $sce.trustAsHtml(server.Description)
             $scope.redrawChart(server)
             $('#playerScroll' + server.Id).perfectScrollbar()
@@ -1034,9 +1070,9 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
     }
   })
 
-  $scope.joinServer = function (server) {
+  $scope.joinServer = (server) => {
     if (server.appId === 107410) {
-      storage.get('settings', function (err, data) {
+      storage.get('settings', (err, data) => {
         if (err) throw err
 
         let params = []
@@ -1047,6 +1083,10 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
         params.push('-port=' + server.Port)
         params.push('-mod=' + server.StartParameters)
         params.push('-password=' + server.ServerPassword)
+
+        if ($scope.profiles && typeof $scope.profiles.selected !== 'undefined') {
+          params.push('-name=' + $scope.profiles.selected)
+        }
 
         if (data.splash) {
           params.push('-nosplash')
@@ -1061,55 +1101,43 @@ App.controller('serverController', ['$scope', '$sce', function ($scope, $sce) {
           params.push('-window')
         }
 
-        if (data.mem != null && data.mem !== '' && typeof data.mem !== 'undefined') {
+        if (data.mem && typeof data.mem !== 'undefined') {
           params.push('-maxMem=' + data.mem)
         }
-        if (data.vram != null && data.vram !== '' && typeof data.vram !== 'undefined') {
+        if (data.vram && typeof data.vram !== 'undefined') {
           params.push('-maxVRAM=' + data.vram)
         }
-        if (data.cpu != null && data.cpu !== '' && typeof data.cpu !== 'undefined') {
+        if (data.cpu && typeof data.cpu !== 'undefined') {
           params.push('-cpuCount=' + data.cpu)
         }
-        if (data.thread != null && data.thread !== '' && typeof data.thread !== 'undefined') {
+        if (data.thread && typeof data.thread !== 'undefined') {
           params.push('-exThreads=' + data.thread)
         }
-        if (data.add_params != null && data.add_params !== '' && typeof data.add_params !== 'undefined') {
+        if (data.add_params && typeof data.add_params !== 'undefined') {
           params.push(data.add_params)
         }
 
         spawnNotification('Arma wird gestartet...')
+        alertify.log('Arma wird gestartet...', 'success')
         child.spawn((data.armapath + '\\arma3launcher.exe'), params, [])
+        console.log(params)
       })
     } else {
-      spawnNotification('Das Spiel wird gestartet...')
+      alertify.log('Das Spiel wird gestartet...', 'success')
       shell.openExternal('steam://connect/' + server.IpAddress + ':' + server.Port)
     }
   }
 
-  $scope.pingServer = function (server) {
-    exec('mstsc /v ' + server.IpAddress, function () {
-    })
-    ps.lookup({
-      command: 'mstsc'
-    }, function (err, resultList) {
-      if (err) throw err
-      resultList.forEach(function (process) {
-        if (process) {
-          ps.kill(process.pid, function (err) {
-            if (err) {
-              throw err
-            } else {
-              console.log('Process %s has been killed!', process.pid)
-            }
-          })
-        }
-      })
+  $scope.pingServer = (server) => {
+    ipcRenderer.send('to-web', {
+      type: 'ping-server-via-rdp',
+      server: server
     })
   }
 }])
 
-App.controller('changelogController', ['$scope', function ($scope) {
-  ipcRenderer.on('to-app', function (event, args) {
+App.controller('changelogController', ['$scope', ($scope) => {
+  ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
       case 'changelog-callback':
         $scope.changelogs = args.data.data
@@ -1120,19 +1148,19 @@ App.controller('changelogController', ['$scope', function ($scope) {
     }
   })
 
-  $scope.init = function () {
+  $scope.init = () => {
     $scope.loading = true
     getChangelog()
   }
 }])
 
-App.controller('settingsController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-  $scope.init = function () {
-    storage.get('settings', function (error, data) {
-      if (error) {
+App.controller('settingsController', ['$scope', '$rootScope', ($scope, $rootScope) => {
+  $scope.init = () => {
+    storage.get('settings', (err, data) => {
+      if (err) {
         $scope.loaded = true
         $rootScope.theme = 'dark'
-        throw error
+        throw err
       }
       if (typeof data.theme !== 'undefined') {
         $rootScope.theme = data.theme
@@ -1168,61 +1196,61 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
     })
   }
 
-  $('#splashCheck').on('ifChecked', function (event) {
+  $('#splashCheck').on('ifChecked', () => {
     if ($scope.loaded) {
       $scope.splash = true
       $scope.saveSettings()
     }
-  }).on('ifUnchecked', function (event) {
+  }).on('ifUnchecked', () => {
     if ($scope.loaded) {
       $scope.splash = false
       $scope.saveSettings()
     }
   })
 
-  $('#introCheck').on('ifChecked', function (event) {
+  $('#introCheck').on('ifChecked', () => {
     if ($scope.loaded) {
       $scope.intro = true
       $scope.saveSettings()
     }
-  }).on('ifUnchecked', function (event) {
+  }).on('ifUnchecked', () => {
     if ($scope.loaded) {
       $scope.intro = false
       $scope.saveSettings()
     }
   })
 
-  $('#htCheck').on('ifChecked', function (event) {
+  $('#htCheck').on('ifChecked', () => {
     if ($scope.loaded) {
       $scope.ht = true
       $scope.saveSettings()
     }
-  }).on('ifUnchecked', function (event) {
+  }).on('ifUnchecked', () => {
     if ($scope.loaded) {
       $scope.ht = false
       $scope.saveSettings()
     }
   })
 
-  $('#windowedCheck').on('ifChecked', function (event) {
+  $('#windowedCheck').on('ifChecked', () => {
     if ($scope.loaded) {
       $scope.windowed = true
       $scope.saveSettings()
     }
-  }).on('ifUnchecked', function (event) {
+  }).on('ifUnchecked', () => {
     if ($scope.loaded) {
       $scope.windowed = false
       $scope.saveSettings()
     }
   })
 
-  $('#lightSwitch').on('ifChecked', function (event) {
+  $('#lightSwitch').on('ifChecked', () => {
     if ($scope.loaded) {
       $rootScope.theme = 'light'
       $rootScope.$apply()
       $scope.saveSettings()
     }
-  }).on('ifUnchecked', function (event) {
+  }).on('ifUnchecked', () => {
     if ($scope.loaded) {
       $rootScope.theme = 'dark'
       $rootScope.$apply()
@@ -1230,7 +1258,7 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
     }
   })
 
-  $scope.saveSettings = function () {
+  $scope.saveSettings = () => {
     storage.set('settings', {
       armapath: $rootScope.ArmaPath,
       splash: $scope.splash,
@@ -1243,22 +1271,22 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
       thread: $scope.thread,
       add_params: $scope.add_params,
       theme: $rootScope.theme
-    }, function (error) {
-      if (error) throw error
+    }, (err) => {
+      if (err) throw err
     })
   }
 
-  $scope.chooseArmaPath = function () {
-    let path = String(dialog.showOpenDialog({
+  $scope.chooseArmaPath = () => {
+    let dpath = String(dialog.showOpenDialog({
       filters: [{
-        name: 'Arma3.exe',
+        name: 'Arma 3 exe',
         extensions: ['exe']
       }],
-      title: 'Bitte wähle deine Arma3.exe aus',
+      title: 'Bitte wähle eine der Arma 3 exen aus',
       properties: ['openFile']
     }))
-    if (path !== 'undefined' && path.indexOf('\\arma3.exe') > -1) {
-      $rootScope.ArmaPath = path.replace('arma3.exe', '')
+    if (dpath !== 'undefined' && dpath.includes('arma3') && dpath.includes('.exe')) {
+      $rootScope.ArmaPath = dpath.substring(0, dpath.lastIndexOf('\\'))
       $scope.saveSettings()
       $rootScope.refresh()
     } else {
@@ -1268,8 +1296,8 @@ App.controller('settingsController', ['$scope', '$rootScope', function ($scope, 
   }
 }])
 
-App.controller('mapController', ['$scope', function ($scope) {
-  ipcRenderer.on('to-app', function (event, args) {
+App.controller('mapController', ['$scope', ($scope) => {
+  ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
       case 'fuelstations-callback':
         $scope.fuelstations = args.data.data
@@ -1278,11 +1306,11 @@ App.controller('mapController', ['$scope', function ($scope) {
     }
   })
 
-  $scope.updateFuels = function () {
-    $scope.fuelstations.forEach(function (instance) {
+  $scope.updateFuels = () => {
+    $scope.fuelstations.forEach((instance) => {
       instance.Markers = []
 
-      instance.Fuelstations.forEach(function (fuelstation) {
+      instance.Fuelstations.forEach((fuelstation) => {
         let fuel = Math.round((fuelstation.Fuel / 30000) * 100)
         let m = {
           x: (fuelstation.Pos.replace('[', '').replace(']', '').split(',')[0] / 10240) * 16384,
@@ -1320,7 +1348,7 @@ App.controller('mapController', ['$scope', function ($scope) {
     }).addTo($scope.map)
   }
 
-  $scope.init = function () {
+  $scope.init = () => {
     getFuelstations()
 
     let roads = L.tileLayer('https://tiles.realliferpg.de/1/{z}/{x}/{y}.png', {
@@ -1350,30 +1378,30 @@ App.controller('mapController', ['$scope', function ($scope) {
 
     $scope.gasMarker = L.icon({
       iconUrl: 'icon/gas.png',
-      iconSize: [32, 37], // size of the icon
-      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
-      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+      iconSize: [32, 37],
+      iconAnchor: [16, 37],
+      popupAnchor: [0, -34]
     })
 
     $scope.gasMarkerGreen = L.icon({
       iconUrl: 'icon/gas_green.png',
-      iconSize: [32, 37], // size of the icon
-      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
-      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+      iconSize: [32, 37],
+      iconAnchor: [16, 37],
+      popupAnchor: [0, -34]
     })
 
     $scope.gasMarkerOrange = L.icon({
       iconUrl: 'icon/gas_orange.png',
-      iconSize: [32, 37], // size of the icon
-      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
-      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+      iconSize: [32, 37],
+      iconAnchor: [16, 37],
+      popupAnchor: [0, -34]
     })
 
     $scope.gasMarkerRed = L.icon({
       iconUrl: 'icon/gas_red.png',
-      iconSize: [32, 37], // size of the icon
-      iconAnchor: [16, 37], // point of the icon which will correspond to marker's location
-      popupAnchor: [0, -34] // point from which the popup should open relative to the iconAnchor
+      iconSize: [32, 37],
+      iconAnchor: [16, 37],
+      popupAnchor: [0, -34]
     })
 
     L.control.layers(baseLayers).addTo($scope.map)
@@ -1384,9 +1412,9 @@ App.controller('mapController', ['$scope', function ($scope) {
   }
 }])
 
-App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
-  $scope.init = function () {
-    fs.readFile('README.md', 'utf8', function (err, data) {
+App.controller('aboutController', ['$scope', '$sce', ($scope, $sce) => {
+  $scope.init = () => {
+    fs.readFile('README.md', 'utf8', (err, data) => {
       if (!err) {
         $scope.aboutContent = $sce.trustAsHtml(marked(data))
         $scope.$apply()
@@ -1398,8 +1426,8 @@ App.controller('aboutController', ['$scope', '$sce', function ($scope, $sce) {
   }
 }])
 
-App.controller('tfarController', ['$scope', '$rootScope', function ($scope) {
-  $scope.initFileDownload = function (file) {
+App.controller('tfarController', ['$scope', '$rootScope', ($scope) => {
+  $scope.initFileDownload = (file) => {
     if (!$scope.fileDownloading) {
       $scope.fileDownloading = true
       ipcRenderer.send('to-web', {
@@ -1411,11 +1439,7 @@ App.controller('tfarController', ['$scope', '$rootScope', function ($scope) {
     }
   }
 
-  $scope.fileProgress = 0
-  $scope.fileSpeed = 0
-  $scope.fileDownloading = false
-
-  ipcRenderer.on('to-app', function (event, args) {
+  ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
       case 'update-dl-progress-file':
         $scope.fileProgress = toProgress(args.state.percent)
@@ -1431,7 +1455,7 @@ App.controller('tfarController', ['$scope', '$rootScope', function ($scope) {
         if (!shell.openItem(args.filePath)) {
           alertify.log('Fehlgeschlagen', 'danger')
           let stream = fs.createReadStream(args.filePath).pipe(unzip.Extract({path: app.getPath('downloads') + '\\ReallifeRPG'}))
-          stream.on('close', function () {
+          stream.on('close', () => {
             try {
               fs.unlinkSync(app.getPath('downloads') + '\\ReallifeRPG\\package.ini')
             } catch (err) {
@@ -1445,11 +1469,11 @@ App.controller('tfarController', ['$scope', '$rootScope', function ($scope) {
   })
 }])
 
-App.controller('twitchController', ['$scope', function ($scope) {
-  ipcRenderer.on('to-app', function (event, args) {
+App.controller('twitchController', ['$scope', ($scope) => {
+  ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
       case 'twitch-callback':
-        args.data.data.forEach(function (cur) {
+        args.data.data.forEach((cur) => {
           cur.sliced = cur.status.slice(0, 25)
         })
         $scope.twitchers = args.data.data
@@ -1460,17 +1484,17 @@ App.controller('twitchController', ['$scope', function ($scope) {
     }
   })
 
-  $scope.init = function () {
+  $scope.init = () => {
     getTwitch()
   }
 }])
 
-App.directive('onFinishRender', function ($timeout) {
+App.directive('onFinishRender', ($timeout) => {
   return {
     restrict: 'A',
-    link: function (scope, element, attr) {
+    link: (scope, element, attr) => {
       if (scope.$last === true) {
-        $timeout(function () {
+        $timeout(() => {
           scope.$emit(attr.onFinishRender)
           appLoaded()
         })
@@ -1479,7 +1503,7 @@ App.directive('onFinishRender', function ($timeout) {
   }
 })
 
-function getChangelog () {
+const getChangelog = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'changelog-callback',
@@ -1488,7 +1512,7 @@ function getChangelog () {
   })
 }
 
-function getServers () {
+const getServers = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'servers-callback',
@@ -1497,7 +1521,7 @@ function getServers () {
   })
 }
 
-function getNotification () {
+const getNotification = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'notification-callback',
@@ -1506,7 +1530,7 @@ function getNotification () {
   })
 }
 
-function getFuelstations () {
+const getFuelstations = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'fuelstations-callback',
@@ -1515,7 +1539,7 @@ function getFuelstations () {
   })
 }
 
-function getTwitch () {
+const getTwitch = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'twitch-callback',
@@ -1524,23 +1548,23 @@ function getTwitch () {
   })
 }
 
-function toGB (val) {
+const toGB = (val) => {
   return (val / 1000000000).toFixed(3)
 }
 
-function toMB (val) {
+const toMB = (val) => {
   return (val / 1000000).toFixed(3)
 }
 
-function toProgress (val) {
+const toProgress = (val) => {
   return (val * 100).toFixed(3)
 }
 
-function toFileProgress (filesize, downloaded) {
+const toFileProgress = (filesize, downloaded) => {
   return (100 / filesize * downloaded).toFixed(2)
 }
 
-function cutName (name) {
+const cutName = (name) => {
   if (name.length > 30) {
     return name.substring(0, 30) + '...'
   } else {
@@ -1548,17 +1572,17 @@ function cutName (name) {
   }
 }
 
-function spawnNotification (message) {
+const spawnNotification = (message) => {
   new Notification('ReallifeRPG', { // eslint-disable-line
     body: message
   })
 }
 
-function appLoaded () { // eslint-disable-line
+const appLoaded = () => {
   ipcRenderer.send('app-loaded')
 }
 
-function getPlayerData (ApiKey) {
+const getPlayerData = (ApiKey) => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'player-callback',

@@ -1,6 +1,4 @@
 /node_modules/*
 /dist/*
-app/node_modules/*
 Thumbs.db
-/TFAR/*
 .idea

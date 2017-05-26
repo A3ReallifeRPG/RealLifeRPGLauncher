@@ -9,7 +9,7 @@ const {Menu, Tray} = require('electron')
 
 let tray = null
 
-// ------------------------------------------- squirrel stuff (for updating) ----------------------------------------------------------------
+// squirrel
 
 if (handleSquirrelEvent()) app.quit()
 
@@ -25,7 +25,7 @@ function handleSquirrelEvent () {
   const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'))
   const exeName = path.basename(process.execPath)
 
-  const spawn = function (command, args) {
+  const spawn = (command, args) => {
     let spawnedProcess
 
     try {
@@ -36,7 +36,7 @@ function handleSquirrelEvent () {
     return spawnedProcess
   }
 
-  const spawnUpdate = function (args) {
+  const spawnUpdate = (args) => {
     return spawn(updateDotExe, args)
   }
 
@@ -44,39 +44,20 @@ function handleSquirrelEvent () {
   switch (squirrelEvent) {
     case '--squirrel-install':
     case '--squirrel-updated':
-      // Optionally do things such as:
-      // - Add your .exe to the PATH
-      // - Write to the registry for things like file associations and
-      //   explorer context menus
-
-      // Install desktop and start menu shortcuts
       spawnUpdate(['--createShortcut', exeName])
-
       setTimeout(app.quit, 1000)
       return true
-
     case '--squirrel-uninstall':
-      // Undo anything you did in the --squirrel-install and
-      // --squirrel-updated handlers
-
-      // Remove desktop and start menu shortcuts
       spawnUpdate(['--removeShortcut', exeName])
-
       setTimeout(app.quit, 1000)
       return true
-
     case '--squirrel-obsolete':
-      // This is called on the outgoing version of your app before
-      // we update to the new version - it's the opposite of
-      // --squirrel-updated
-
       app.quit()
       return true
   }
 }
 
-autoUpdater.addListener('error', function (error) { // eslint-disable-line
-
+autoUpdater.addListener('error', (err) => { // eslint-disable-line
 })
 
 let version = app.getVersion()
@@ -84,14 +65,14 @@ let version = app.getVersion()
 autoUpdater.setFeedURL('http://deploy.realliferpg.de/update/win/' + version)
 autoUpdater.checkForUpdates()
 
-// ------------------------------------------- real stuff that does something ----------------------------------------------------------------
+// real stuff that does something
 
 let win
 let downWin
 let webWin
 let loadWin
 
-function createWindow () {
+const createWindows = () => {
   // web process
   webWin = new BrowserWindow({
     icon: 'icon/workericon.ico',
@@ -101,6 +82,8 @@ function createWindow () {
     webPreferences: {
       webSecurity: false
     }
+  }).on('close', () => {
+    app.quit()
   })
   webWin.loadURL(`file://${__dirname}/app/web.html`)
   webWin.webContents.openDevTools({
@@ -116,6 +99,8 @@ function createWindow () {
     webPreferences: {
       webSecurity: false
     }
+  }).on('close', () => {
+    app.quit()
   })
   downWin.loadURL(`file://${__dirname}/app/dwn.html`)
   downWin.webContents.openDevTools({
@@ -133,11 +118,13 @@ function createWindow () {
     webPreferences: {
       webSecurity: false
     }
+  }).on('close', () => {
+    app.quit()
   })
 
   win.loadURL(`file://${__dirname}/index.html`)
 
-  autoUpdater.addListener('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateURL) {
+  autoUpdater.addListener('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
     win.webContents.send('update-downloaded', {
       releaseNotes: releaseNotes,
       releaseName: releaseName,
@@ -146,15 +133,15 @@ function createWindow () {
     })
   })
 
-  autoUpdater.addListener('checking-for-update', function () {
+  autoUpdater.addListener('checking-for-update', () => {
     win.webContents.send('checking-for-update')
   })
 
-  autoUpdater.addListener('update-not-available', function () {
+  autoUpdater.addListener('update-not-available', () => {
     win.webContents.send('update-not-available')
   })
 
-  autoUpdater.addListener('update-available', function () {
+  autoUpdater.addListener('update-available', () => {
     win.webContents.send('update-available')
   })
 
@@ -166,47 +153,34 @@ function createWindow () {
     webPreferences: {
       webSecurity: false
     }
+  }).on('close', () => {
+    app.quit()
   })
 
   loadWin.loadURL(`file://${__dirname}/app/loading.html`)
 
-  win.on('close', function (e) {
-    app.quit()
-  })
-
-  webWin.on('close', function (e) {
-    app.quit()
-  })
-
-  downWin.on('close', function (e) {
-    app.quit()
-  })
-
-  loadWin.on('close', function (e) {
-    app.quit()
-  })
-
   setUpIpcHandlers()
+  createTray()
 }
 
-function createTray () {
+const createTray = () => {
   tray = new Tray(app.getAppPath() + '\\icon\\tray.ico')
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Auf Updates prüfen',
-      click: function () {
+      click: () => {
         autoUpdater.checkForUpdates()
       }
     },
     {
       label: 'Dev-Tools',
-      click: function () {
+      click: () => {
         toggleDevTools()
       }
     },
     {
       label: 'Restart',
-      click: function () {
+      click: () => {
         app.relaunch()
         app.quit()
       }
@@ -216,19 +190,19 @@ function createTray () {
     },
     {
       label: 'Beenden',
-      click: function () {
+      click: () => {
         app.quit()
       }
     }
   ])
   tray.setToolTip('RealLifeRPG Launcher')
   tray.setContextMenu(contextMenu)
-  tray.on('click', function () {
+  tray.on('click', () => {
     win.isMinimized() ? win.restore() : win.minimize()
   })
 }
 
-function toggleDevTools () {
+const toggleDevTools = () => {
   if (!win || !webWin || !downWin) return
   if (win.webContents.isDevToolsOpened()) {
     win.webContents.closeDevTools()
@@ -241,21 +215,22 @@ function toggleDevTools () {
   }
 }
 
-function setUpIpcHandlers () {
-  ipcMain.on('to-dwn', function (event, arg) {
+const setUpIpcHandlers = () => {
+  if (!win || !webWin || !downWin) return
+  ipcMain.on('to-dwn', (event, arg) => {
     downWin.webContents.send('to-dwn', arg)
   })
 
-  ipcMain.on('to-web', function (event, arg) {
+  ipcMain.on('to-web', (event, arg) => {
     webWin.webContents.send('to-web', arg)
   })
 
-  ipcMain.on('to-app', function (event, arg) {
+  ipcMain.on('to-app', (event, arg) => {
     win.webContents.send('to-app', arg)
   })
 }
 
-const shouldQuit = app.makeSingleInstance(function () {
+const shouldQuit = app.makeSingleInstance(() => {
   if (win) {
     if (win.isMinimized()) win.restore()
     if (!win.isVisible()) win.show()
@@ -267,31 +242,34 @@ if (shouldQuit) {
   app.quit()
 }
 
-app.on('ready', function () {
-  createWindow()
-  createTray()
+app.on('ready', () => {
+  createWindows()
 })
 
-app.on('activate', function () {
+app.on('activate', () => {
   if (win === null) {
-    createWindow()
+    createWindows()
   }
 })
 
-ipcMain.on('winprogress-change', function (event, arg) {
+app.on('before-quit', () => {
+  ipcMain.removeAllListeners()
+})
+
+ipcMain.on('winprogress-change', (event, arg) => {
   win.setProgressBar(arg.progress)
 })
 
-ipcMain.on('app-loaded', function () {
+ipcMain.on('app-loaded', () => {
   win.show()
   loadWin.destroy()
 })
 
-ipcMain.on('focus-window', function () {
+ipcMain.on('focus-window', () => {
   win.focus()
 })
 
-ipcMain.on('quitAndInstall', function () {
+ipcMain.on('quitAndInstall', () => {
   autoUpdater.quitAndInstall()
   app.quit()
 })

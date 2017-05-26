@@ -2,22 +2,22 @@
     Web request URL's
 */
 
-var APIBaseURL = 'https://api.realliferpg.de/v1/'
+const APIBaseURL = 'https://api.realliferpg.de/v1/'
 
-var APIServersURL = 'servers/'
+const APIServersURL = 'servers/'
 
-var APIModsURL = 'mods'
-var APIModHashlistURL = 'mod/hashlist/'
+const APIModsURL = 'mods'
+const APIModHashlistURL = 'mod/hashlist/'
 
-var APIFuelStationURL = 'fuelstations'
+const APIFuelStationURL = 'fuelstations'
 
-var APINotificationURL = 'notification'
+const APINotificationURL = 'notification'
 
-var APIChangelogURL = 'changelog'
+const APIChangelogURL = 'changelog'
 
-var APIPlayerURL = 'player/'
-var APIValidatePlayerURL = 'player/validate/'
+const APIPlayerURL = 'player/'
+const APIValidatePlayerURL = 'player/validate/'
 
-var APITwitchURL = 'twitch'
+const APITwitchURL = 'twitch'
 
-var STATICFILESERVE = 'http://static.realliferpg.de/arma/'
+const STATICFILESERVE = 'http://static.realliferpg.de/arma/'
