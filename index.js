@@ -1286,7 +1286,7 @@ App.controller('settingsController', ['$scope', '$rootScope', ($scope, $rootScop
       properties: ['openFile']
     }))
     if (dpath !== 'undefined' && dpath.includes('arma3') && dpath.includes('.exe')) {
-      $rootScope.ArmaPath = dpath.substring(0, dpath.lastIndexOf('\\'))
+      $rootScope.ArmaPath = dpath.substring(0, dpath.lastIndexOf('\\')) + '\\'
       $scope.saveSettings()
       $rootScope.refresh()
     } else {
