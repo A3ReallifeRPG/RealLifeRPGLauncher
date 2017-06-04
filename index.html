@@ -243,13 +243,13 @@
                                             <br>
                                             <div class="row">
                                                 <div class="col-md-4">
-                                                    <canvas ng-show="{{server.appId === 107410 && server.Gamemode === 1}}" id="serverChart{{server.Id}}" width="387" height="387"/>
+                                                    <canvas ng-show="server.appId === 107410 && server.Gamemode === 1" id="serverChart{{server.Id}}" width="387" height="387"/>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <div ng-show="{{server.Playercount != 0}}">
-                                                        <h5>Spieler <span class="pull-right">{{server.Playercount}}/{{server.Slots}}</span></h5>
+                                                    <div ng-show="server.Playercount != 0">
+                                                        <h5>{{server.ListSide}} <span class="pull-right">{{server.PlayercountShow}}/{{server.Slots}}</span></h5>
                                                         <ul id="playerScroll{{server.Id}}" class="list-group list-group-unbordered margin-none" style="height: 350px;position: relative;">
-                                                            <li class="list-group-item" ng-repeat="player in server.Players">
+                                                            <li class="list-group-item" ng-repeat="player in server.PlayersShow">
                                                                 <b>{{player}}</b>
                                                             </li>
                                                         </ul>
@@ -258,28 +258,31 @@
                                                 <div class="col-md-4">
                                                     <h5>Daten</h5>
                                                     <ul class="list-group list-group-unbordered margin-none">
-                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
-                                                            <b>Zivilisten</b> <a class="pull-right"><span class="label label-civ">{{server.Civilians}}</span></a>
+                                                        <li class="list-group-item" ng-show="server.appId === 107410 && server.Gamemode === 1">
+                                                            <b ng-class="server.ListSide === 'Zivilisten' ? 'underline' : ''" class="hover-underline cursor-pointer" ng-click="changePlayersList(server, 'Zivilisten')" tooltips tooltip-template="Nur Zivilisten zeigen">Zivilisten</b> <a class="pull-right"><span class="label label-civ">{{server.Civilians}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
-                                                            <b>Polizisten</b> <a class="pull-right"><span class="label label-cop">{{server.Cops}}</span></a>
+                                                        <li class="list-group-item" ng-show="server.appId === 107410 && server.Gamemode === 1">
+                                                            <b ng-class="server.ListSide === 'Polizisten' ? 'underline' : ''" class="hover-underline cursor-pointer" ng-click="changePlayersList(server, 'Polizisten')" tooltips tooltip-template="Nur Polizisten zeigen">Polizisten</b> <a class="pull-right"><span class="label label-cop">{{server.Cops}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
-                                                            <b>Medics</b> <a class="pull-right"><span class="label label-medic">{{server.Medics}}</span></a>
+                                                        <li class="list-group-item" ng-show="server.appId === 107410 && server.Gamemode === 1">
+                                                            <b ng-class="server.ListSide === 'Medics' ? 'underline' : ''" class="hover-underline cursor-pointer" ng-click="changePlayersList(server, 'Medics')" tooltips tooltip-template="Nur Medics zeigen">Medics</b> <a class="pull-right"><span class="label label-medic">{{server.Medics}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item" ng-show="{{server.appId === 107410 && server.Gamemode === 1}}">
-                                                            <b>Adac</b> <a class="pull-right"><span class="label label-adac">{{server.Adac}}</span></a>
+                                                        <li class="list-group-item" ng-show="server.appId === 107410 && server.Gamemode === 1">
+                                                            <b ng-class="server.ListSide === 'RAC' ? 'underline' : ''" class="hover-underline cursor-pointer" ng-click="changePlayersList(server, 'RAC')" tooltips tooltip-template="Nur RAC zeigen">RAC</b> <a class="pull-right"><span class="label label-adac">{{server.Adac}}</span></a>
                                                         </li>
-                                                        <li class="list-group-item" ng-show="{{server.appId === 107410}}">
-                                                            <b>IP:Port</b> <a class="pull-right">{{server.IpAddress}}:{{server.Port}}</a>
+                                                        <li class="list-group-item" ng-show="server.appId === 107410">
+                                                            <b>IP:Port</b> <a tooltips tooltip-template="IP und Port des Servers" tooltip-class="pull-right" class="pull-right">{{server.IpAddress}}:{{server.Port}}</a>
                                                         </li>
                                                         <li class="list-group-item" ng-show="server.StartParameters !== '' && server.StartParameters.length < 20">
-                                                            <b>Parameter</b> <a class="pull-right">{{server.StartParameters}}</a>
+                                                            <b>Parameter</b> <a tooltips tooltip-template="Arma 3 Startparameter" tooltip-class="pull-right" class="pull-right">{{server.StartParameters}}</a>
                                                         </li>
                                                         <li class="list-group-item" ng-show="server.ServerPassword !== ''">
-                                                            <b>Passwort</b> <a class="pull-right">{{server.ServerPassword}}</a>
+                                                            <b>Passwort</b> <a tooltips tooltip-template="Arma 3 Server Passwort" tooltip-class="pull-right" class="pull-right">{{server.ServerPassword}}</a>
                                                         </li>
-                                                        <li class="list-group-item" >
+                                                        <li class="list-group-item" ng-show="server.ServerPassword !== ''">
+                                                            <b>Letztes Update</b> <a ng-click="refresh()" tooltips tooltip-template="Updaten" tooltip-class="pull-right" class="pull-right cursor-pointer">{{server.last_update}}</a>
+                                                        </li>
+                                                        <li class="list-group-item" ng-show="server.Description !== '' && server.Description !== null">
                                                         </li>
                                                         <b ng-show="server.Description !== '' && server.Description !== null">Informationen</b>
                                                         <li class="list-group-item" ng-show="server.Description !== '' && server.Description !== null" ng-bind-html="server.DescriptionHTML">
@@ -291,17 +294,18 @@
                                                             <a>{{server.StartParameters}}</a>
                                                         </li>
                                                     </ul>
-                                                    <form class="form-inline pull-right">
-                                                        <div class="form-group-sm">
-                                                            <button type="button" class="btn btn-success btn-sm" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
-                                                            <label ng-if="profiles">
-                                                                <select class="form-control" ng-model="profiles.selected" ng-change="setProfile()" ng-options="profile for profile in profiles.available"></select>
-                                                            </label>
-                                                            <button type="button" class="btn btn-success btn-sm" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
-                                                        </div>
-                                                    </form>
                                                 </div>
                                             </div>
+                                            <form class="form-inline pull-right">
+                                                <div class="form-group-sm">
+                                                    <button type="button" class="btn btn-success btn-sm" ng-click="refresh()"><i class="fa fa-refresh" aria-hidden="true"></i> Aktualisieren</button>
+                                                    <button ng-if="profiles && server.appId === 107410 && server.Gamemode === 1" type="button" class="btn btn-success btn-sm" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
+                                                    <label ng-if="profiles && server.appId === 107410 && server.Gamemode === 1">
+                                                        <select class="form-control" ng-model="profiles.selected" ng-change="setProfile()" ng-options="profile for profile in profiles.available"></select>
+                                                    </label>
+                                                    <button type="button" class="btn btn-success btn-sm" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>

@@ -976,15 +976,62 @@ App.controller('modController', ['$scope', '$rootScope', ($scope, $rootScope) =>
 ])
 
 App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
+  $scope.changePlayersList = (server, side) => {
+    switch (side) {
+      case 'Zivilisten':
+        if (server.ListSide === 'Zivilisten') {
+          $scope.resetPlayerList(server)
+        } else {
+          server.PlayersShow = server.Side.Civs
+          server.PlayercountShow = server.Side.Civs.length
+          server.ListSide = 'Zivilisten'
+        }
+        break
+      case 'Polizisten':
+        if (server.ListSide === 'Polizisten') {
+          $scope.resetPlayerList(server)
+        } else {
+          server.PlayersShow = server.Side.Cops
+          server.PlayercountShow = server.Side.Cops.length
+          server.ListSide = 'Polizisten'
+        }
+        break
+      case 'Medics':
+        if (server.ListSide === 'Medics') {
+          $scope.resetPlayerList(server)
+        } else {
+          server.PlayersShow = server.Side.Medics
+          server.PlayercountShow = server.Side.Medics.length
+          server.ListSide = 'Medics'
+        }
+        break
+      case 'RAC':
+        if (server.ListSide === 'RAC') {
+          $scope.resetPlayerList(server)
+        } else {
+          server.PlayersShow = server.Side.RAC
+          server.PlayercountShow = server.Side.RAC.length
+          server.ListSide = 'RAC'
+        }
+        break
+    }
+  }
+
+  $scope.resetPlayerList = (server) => {
+    server.PlayersShow = server.Players
+    server.PlayercountShow = server.Playercount
+    server.ListSide = 'Spieler'
+  }
+
   $scope.redrawChart = (server) => {
-    new Chart($('#serverChart' + server.Id), { // eslint-disable-line
-      type: 'pie',
+    server.chart = new Chart($('#serverChart' + server.Id), { // eslint-disable-line
+      type: 'doughnut',
       data: {
         labels: [
-          ' Zivilisten',
-          ' Polizisten',
-          ' Medics',
-          ' ADAC'
+          'Zivilisten',
+          'Polizisten',
+          'Medics',
+          'RAC'
         ],
         datasets: [
           {
@@ -1001,6 +1048,12 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
         responsive: false,
         legend: {
           position: 'bottom'
+        },
+        animation: {
+          animateScale: true
+        },
+        tooltips: {
+          displayColors: false
         }
       }
     })
@@ -1062,6 +1115,10 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
         if (typeof $scope.servers !== 'undefined') {
           $scope.servers.forEach((server) => {
             server.DescriptionHTML = $sce.trustAsHtml(server.Description)
+            server.last_update = getRefreshTime(server.updated_at.date)
+            server.PlayersShow = server.Players
+            server.PlayercountShow = server.Playercount
+            server.ListSide = 'Spieler'
             $scope.redrawChart(server)
             $('#playerScroll' + server.Id).perfectScrollbar()
           })
@@ -1589,4 +1646,14 @@ const getPlayerData = (ApiKey) => {
     url: APIBaseURL + APIPlayerURL + ApiKey,
     callBackTarget: 'to-app'
   })
+}
+
+const getRefreshTime = (date) => {
+  let d = new Date(date)
+  let hours = d.getHours()
+  let minutes = d.getMinutes()
+  if (hours < 10) hours = '0' + hours
+  if (minutes < 10) minutes = '0' + minutes
+
+  return hours + ':' + minutes
 }

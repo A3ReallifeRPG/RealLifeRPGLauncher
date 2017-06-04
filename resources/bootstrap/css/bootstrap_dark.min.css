@@ -8665,3 +8665,22 @@ a.white:hover {
 .panel-head-nomargin {
     margin-bottom: 0;
 }
+
+tooltip[tooltip-class="pull-right"] {
+    float: right !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.hover-underline:hover,
+.hover-underline:focus {
+    color: #df691a;
+    text-decoration: underline;
+}
+
+.underline {
+    color: #df691a;
+    text-decoration: underline;
+}
