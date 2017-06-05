@@ -1026,8 +1026,8 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
   }
 
   $scope.copyToClip = (server) => {
-    let copied = copyToClipboard(server.IpAddress + ':' + server.Port)
-    alertify.log('Kopiert: ' + copied, 'success')
+    copyToClipboard(server.IpAddress + ':' + server.Port)
+    alertify.log('Kopiert', 'success')
   }
 
   $scope.redrawChart = (server) => {
@@ -1672,5 +1672,5 @@ const getRefreshTime = (date) => {
 
 const copyToClipboard = (text) => {
   clipboard.writeText(text)
-  return text;
+  return text
 }
