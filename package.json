@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -78,6 +78,7 @@
     "marked": "^0.3.6",
     "mkpath": "1.0.0",
     "perfect-scrollbar": "^0.7.0",
+    "ping": "^0.2.2",
     "ps-node": "^0.1.6",
     "request": "^2.81.0",
     "request-progress": "^3.0.0",

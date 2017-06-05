@@ -1,4 +1,4 @@
-![Banner](img/banner.png)
+![Banner](resources/img/banner.png)
 
 # RealLifeRPGLauncher
 

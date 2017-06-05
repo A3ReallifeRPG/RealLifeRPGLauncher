@@ -75,7 +75,7 @@ let loadWin
 const createWindows = () => {
   // web process
   webWin = new BrowserWindow({
-    icon: 'icon/workericon.ico',
+    icon: 'resources/icon/workericon.ico',
     width: 1000,
     height: 500,
     show: false,
@@ -92,7 +92,7 @@ const createWindows = () => {
 
   // download process
   downWin = new BrowserWindow({
-    icon: 'icon/workericon.ico',
+    icon: 'resources/icon/workericon.ico',
     width: 1000,
     height: 500,
     show: false,
@@ -109,7 +109,7 @@ const createWindows = () => {
 
   // Create the browser window.
   win = new BrowserWindow({
-    icon: 'icon/appicon.ico',
+    icon: 'resources/icon/appicon.ico',
     width: 1320,
     height: 730,
     minWidth: 1320,
@@ -146,7 +146,7 @@ const createWindows = () => {
   })
 
   loadWin = new BrowserWindow({
-    icon: 'icon/appicon.ico',
+    icon: 'resources/icon/appicon.ico',
     width: 200,
     height: 210,
     frame: false,
@@ -164,7 +164,7 @@ const createWindows = () => {
 }
 
 const createTray = () => {
-  tray = new Tray(app.getAppPath() + '\\icon\\tray.ico')
+  tray = new Tray(app.getAppPath() + '\\resources\\icon\\tray.ico')
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Auf Updates prüfen',

@@ -1,5 +1,6 @@
 const {ipcRenderer} = require('electron')
 const {shell} = require('electron')
+const {clipboard} = require('electron')
 const humanizeDuration = require('humanize-duration')
 const fs = require('fs')
 const {dialog} = require('electron').remote
@@ -13,6 +14,7 @@ const child = require('child_process')
 const L = require('leaflet')
 const Shepherd = require('tether-shepherd')
 const path = require('path')
+const ping = require('ping')
 
 /* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
 
@@ -1023,6 +1025,11 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
     server.ListSide = 'Spieler'
   }
 
+  $scope.copyToClip = (server) => {
+    let copied = copyToClipboard(server.IpAddress + ':' + server.Port)
+    alertify.log('Kopiert: ' + copied, 'success')
+  }
+
   $scope.redrawChart = (server) => {
     server.chart = new Chart($('#serverChart' + server.Id), { // eslint-disable-line
       type: 'doughnut',
@@ -1119,8 +1126,13 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
             server.PlayersShow = server.Players
             server.PlayercountShow = server.Playercount
             server.ListSide = 'Spieler'
+            server.ping = false
             $scope.redrawChart(server)
             $('#playerScroll' + server.Id).perfectScrollbar()
+            ping.promise.probe(server.IpAddress)
+              .then(function (res) {
+                server.ping = res.time
+              })
           })
         }
         break
@@ -1434,28 +1446,28 @@ App.controller('mapController', ['$scope', ($scope) => {
     }
 
     $scope.gasMarker = L.icon({
-      iconUrl: 'icon/gas.png',
+      iconUrl: 'resources/icon/gas.png',
       iconSize: [32, 37],
       iconAnchor: [16, 37],
       popupAnchor: [0, -34]
     })
 
     $scope.gasMarkerGreen = L.icon({
-      iconUrl: 'icon/gas_green.png',
+      iconUrl: 'resources/icon/gas_green.png',
       iconSize: [32, 37],
       iconAnchor: [16, 37],
       popupAnchor: [0, -34]
     })
 
     $scope.gasMarkerOrange = L.icon({
-      iconUrl: 'icon/gas_orange.png',
+      iconUrl: 'resources/icon/gas_orange.png',
       iconSize: [32, 37],
       iconAnchor: [16, 37],
       popupAnchor: [0, -34]
     })
 
     $scope.gasMarkerRed = L.icon({
-      iconUrl: 'icon/gas_red.png',
+      iconUrl: 'resources/icon/gas_red.png',
       iconSize: [32, 37],
       iconAnchor: [16, 37],
       popupAnchor: [0, -34]
@@ -1656,4 +1668,9 @@ const getRefreshTime = (date) => {
   if (minutes < 10) minutes = '0' + minutes
 
   return hours + ':' + minutes
+}
+
+const copyToClipboard = (text) => {
+  clipboard.writeText(text)
+  return text;
 }
