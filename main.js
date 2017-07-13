@@ -2,10 +2,7 @@ const {app} = require('electron')
 if (require('electron-squirrel-startup')) app.quit()
 
 const path = require('path')
-const autoUpdater = require('electron').autoUpdater
-const BrowserWindow = require('electron').BrowserWindow
-const {ipcMain} = require('electron')
-const {Menu, Tray} = require('electron')
+const {Menu, Tray, BrowserWindow, ipcMain, autoUpdater, shell} = require('electron')
 
 let tray = null
 
@@ -67,6 +64,17 @@ autoUpdater.checkForUpdates()
 
 // real stuff that does something
 
+switch (process.argv[1]) {
+  case '--open-website':
+    shell.openExternal('https://realliferpg.de')
+    app.quit()
+    break
+  case '--open-teamspeak':
+    shell.openExternal('ts3server://ts.realliferpg.de?port=9987')
+    app.quit()
+    break
+}
+
 let win
 let downWin
 let webWin
@@ -121,6 +129,24 @@ const createWindows = () => {
   }).on('close', () => {
     app.quit()
   })
+
+  app.setUserTasks([
+    {
+      program: process.execPath,
+      arguments: '--open-website',
+      iconPath: process.execPath,
+      iconIndex: 0,
+      title: 'Website',
+      description: 'ReallifeRPG Website'
+    }, {
+      program: process.execPath,
+      arguments: '--open-teamspeak',
+      iconPath: process.execPath,
+      iconIndex: 0,
+      title: 'Teamspeak',
+      description: 'ReallifeRPG Teamspeak'
+    }
+  ])
 
   win.loadURL(`file://${__dirname}/index.html`)
 

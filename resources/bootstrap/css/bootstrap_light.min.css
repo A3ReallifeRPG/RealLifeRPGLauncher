@@ -7496,3 +7496,7 @@ tooltip[tooltip-class="pull-right"] {
 #app {
     display: inherit;
 }
+
+.modScroll {
+    max-height: 371px;
+}

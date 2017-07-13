@@ -1,10 +1,7 @@
-const {ipcRenderer} = require('electron')
-const {shell} = require('electron')
-const {clipboard} = require('electron')
+const {ipcRenderer, shell, clipboard} = require('electron')
 const humanizeDuration = require('humanize-duration')
 const fs = require('fs')
-const {dialog} = require('electron').remote
-const {app} = require('electron').remote
+const {dialog, app} = require('electron').remote
 const storage = require('electron-json-storage')
 const Winreg = require('winreg')
 const unzip = require('unzip')
@@ -15,8 +12,11 @@ const L = require('leaflet')
 const Shepherd = require('tether-shepherd')
 const path = require('path')
 const ping = require('ping')
+const moment = require('moment')
+const Chart = require('chart.js')
+const iCheck =  require('icheck') // eslint-disable-line
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL alertify angular SmoothieChart TimeSeries Chart Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
+/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIServersLogURL alertify angular SmoothieChart TimeSeries Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
 
 const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.downloading = false
@@ -77,28 +77,33 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   }
 
   $rootScope.login = () => {
-    alertify.set({labels: {ok: 'Ok'}})
+    alertify.set({labels: {ok: 'Ok', cancel: 'Abbrechen'}})
     alertify.prompt('Bitte füge deinen Login-Schlüssel ein', (e, str) => {
       if (e) {
-        $.ajax({
-          url: APIBaseURL + APIValidatePlayerURL + str,
-          type: 'GET',
-          success: (data) => {
-            if (data.status === 'Success') {
-              alertify.success('Willkommen ' + data.name)
-              storage.set('player', {apikey: str}, (err) => {
-                if (err) throw err
-              })
-              $rootScope.apiKey = str
-              $rootScope.logging_in = true
-              getPlayerData(str)
-              $rootScope.$apply()
-            } else {
-              alertify.log('Falscher Schlüssel', 'danger')
-              $rootScope.login()
+        if (str) {
+          $.ajax({
+            url: APIBaseURL + APIValidatePlayerURL + str,
+            type: 'GET',
+            success: (data) => {
+              if (data.status === 'Success') {
+                alertify.success('Willkommen ' + data.name)
+                storage.set('player', {apikey: str}, (err) => {
+                  if (err) throw err
+                })
+                $rootScope.apiKey = str
+                $rootScope.logging_in = true
+                getPlayerData(str)
+                $rootScope.$apply()
+              } else {
+                $rootScope.login()
+                alertify.log('Falscher Schlüssel', 'danger')
+                $rootScope.login()
+              }
             }
-          }
-        })
+          })
+        } else {
+          $rootScope.login()
+        }
       }
     }, '')
   }
@@ -398,9 +403,7 @@ App.controller('navbarController', ['$scope', '$rootScope', ($scope, $rootScope)
     'slide', () => {
       $('#carousel-main').carousel($rootScope.slide)
       $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + $scope.tabs[$rootScope.slide].title
-    }
-    ,
-    true
+    }, true
   )
 
   $scope.$watch(
@@ -978,6 +981,16 @@ App.controller('modController', ['$scope', '$rootScope', ($scope, $rootScope) =>
 ])
 
 App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
+  $scope.statisticsData = []
+
+  ipcRenderer.on('to-app', (event, args) => {
+    switch (args.type) {
+      case 'statistics-callback':
+        $scope.statisticsData = args.data.data
+        break
+    }
+  })
+
   $scope.changePlayersList = (server, side) => {
     switch (side) {
       case 'Zivilisten':
@@ -1031,7 +1044,7 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
   }
 
   $scope.redrawChart = (server) => {
-    server.chart = new Chart($('#serverChart' + server.Id), { // eslint-disable-line
+    server.chart = new Chart($('#serverChart' + server.Id), {
       type: 'doughnut',
       data: {
         labels: [
@@ -1066,6 +1079,123 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
     })
   }
 
+  $scope.redrawStatistics = (data) => {
+    if ($scope.statisticsGraph) {
+      $scope.statisticsGraph.destroy()
+    }
+
+    let graphData = {}
+    graphData.players = []
+    graphData.civ = []
+    graphData.cop = []
+    graphData.medic = []
+    graphData.rac = []
+    graphData.labels = []
+    data.reverse()
+
+    data.forEach(function (cur, i) {
+      graphData.players.push({
+        x: new Date(cur.created_at).getTime(),
+        y: cur.players
+      })
+      graphData.civ.push({
+        x: new Date(cur.created_at).getTime(),
+        y: cur.civ
+      })
+      graphData.cop.push({
+        x: new Date(cur.created_at).getTime(),
+        y: cur.cop
+      })
+      graphData.medic.push({
+        x: new Date(cur.created_at).getTime(),
+        y: cur.medic
+      })
+      graphData.rac.push({
+        x: new Date(cur.created_at).getTime(),
+        y: cur.rac
+      })
+      graphData.labels.push(moment(new Date(cur.created_at)).format('H:mm, DD.MM.YYYY'))
+    })
+
+    $scope.statisticsGraph = new Chart($('#statisticsGraph'), {
+      type: 'line',
+      data: {
+        labels: graphData.labels,
+        datasets: [{
+          label: 'Spieler',
+          data: graphData.players,
+          fill: false,
+          borderColor: '#DF691A'
+        }, {
+          label: 'Zivs',
+          data: graphData.civ,
+          fill: false,
+          borderColor: '#8B008B'
+        }, {
+          label: 'Cops',
+          data: graphData.cop,
+          fill: false,
+          borderColor: '#0000CD'
+        }, {
+          label: 'Medic',
+          data: graphData.medic,
+          fill: false,
+          borderColor: '#228B22'
+        }, {
+          label: 'RAC',
+          data: graphData.rac,
+          fill: false,
+          borderColor: '#C00100'
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        legend: {
+          display: false
+        },
+        responsive: true,
+        title: {
+          display: false
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          xAxes: [{
+            display: false
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Spieler',
+              color: '#fff'
+            },
+            gridLines: {
+              color: '#fff'
+            },
+            ticks: {
+              fontColor: '#fff'
+            }
+          }]
+        },
+        elements: {
+          point: {
+            radius: 0
+          },
+          line: {
+            borderWidth: 2
+          }
+        }
+      }
+    })
+  }
+
   $scope.init = () => {
     $scope.loading = true
     getServers()
@@ -1078,6 +1208,15 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
     $('.serverPane').removeClass('active')
     $('#serverTab' + tabindex).addClass('active')
     $('#serverPane' + tabindex).addClass('active')
+  }
+
+  $scope.showStatistics = () => {
+    $('.serverTab').removeClass('active')
+    $('.serverPane').removeClass('active')
+    $('#statisticsTab').addClass('active')
+    $('#statisticsPane').addClass('active')
+
+    $scope.redrawStatistics($scope.statisticsData)
   }
 
   $scope.getProfiles = () => {
@@ -1133,6 +1272,9 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
               .then(function (res) {
                 server.ping = res.time
               })
+            getStatisticsData()
+            $('#statisticsTab').removeClass('active')
+            $('#statisticsPane').removeClass('active')
           })
         }
         break
@@ -1656,6 +1798,15 @@ const getPlayerData = (ApiKey) => {
     type: 'get-url',
     callback: 'player-callback',
     url: APIBaseURL + APIPlayerURL + ApiKey,
+    callBackTarget: 'to-app'
+  })
+}
+
+const getStatisticsData = () => {
+  ipcRenderer.send('to-web', {
+    type: 'get-url',
+    callback: 'statistics-callback',
+    url: APIBaseURL + APIServersLogURL,
     callBackTarget: 'to-app'
   })
 }

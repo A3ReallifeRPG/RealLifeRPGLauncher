@@ -58,7 +58,6 @@
     <link rel="stylesheet" href="node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.min.css">
 
     <link href="node_modules/icheck/skins/minimal/minimal.css" rel="stylesheet">
-    <script src="node_modules/icheck/icheck.min.js"></script>
 
     <!-- leaflet -->
     <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
@@ -73,20 +72,13 @@
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#bs-navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
                 <a class="navbar-brand" href="https://realliferpg.de/">ReallifeRPG Launcher</a>
             </div>
 
             <div ng-controller="navbarController" class="collapse navbar-collapse" id="bs-navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li ng-repeat="tab in tabs" ng-class={'active':(slide==$index)} class="{{tab.tag}}" on-finish-render="ngRepeatFinished">
-                        <a ng-click="switchSlide(tab)"><span class="{{tab.icon}}"></span></a>
+                        <a ng-click="switchSlide(tab)" title="{{tab.title}}"><span class="{{tab.icon}}"></span></a>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">ReallifeRPG <span class="caret"></span></a>
@@ -114,16 +106,19 @@
                         <a ng-click="login()" ng-if="!logged_in && !logging_in"><span class="glyphicon glyphicon-log-in"></span></a>
                     </li>
                     <li>
-                        <a href="https://donate.realliferpg.de/"><i class="fa fa-heart" aria-hidden="true"></i></a>
+                        <a href="ts3server://ts.realliferpg.de?port=9987" title="Teamspeak"><i class="fa fa-microphone" aria-hidden="true"></i></a>
                     </li>
                     <li>
-                        <a ng-click="tourApp()"><i class="fa fa-list-ul" aria-hidden="true"></i></a>
+                        <a href="https://donate.realliferpg.de/" title="Spenden"><i class="fa fa-heart" aria-hidden="true"></i></a>
+                    </li>
+                    <li>
+                        <a ng-click="tourApp()" title="Tutorial"><i class="fa fa-list-ul" aria-hidden="true"></i></a>
                     </li>
                     <li ng-show="update_ready">
-                        <a ng-click="relaunchUpdate()"><span class="glyphicon glyphicon-repeat"></span></a>
+                        <a ng-click="relaunchUpdate()" title="Launcher neustarten"><span class="glyphicon glyphicon-repeat"></span></a>
                     </li>
                     <li ng-show="updating">
-                        <a class="updating"><img src="resources/loading/ring-alt.svg"></a>
+                        <a class="updating" title="Update wird geladen"><img src="resources/loading/ring-alt.svg"></a>
                     </li>
                     <li ng-show="downloading && downSpeed > 0">
                         <a><i class="fa fa-download" aria-hidden="true"></i> {{downSpeed}} Mb/s</a>
@@ -132,7 +127,7 @@
                         <a><i class="fa fa-upload" aria-hidden="true"></i> {{upSpeed}} Mb/s</a>
                     </li>
                     <li class="reloadTabBtn">
-                        <a ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span></a>
+                        <a ng-click="refresh()" title="Inhalte neu laden"><span class="glyphicon glyphicon-refresh"></span></a>
                     </li>
                 </ul>
             </div>
@@ -242,6 +237,9 @@
                                         <li ng-class={active:(0==$index)} class="serverTab" id="serverTab{{server.Id}}" ng-repeat="server in servers">
                                             <a ng-click="showTab(server.Id)">{{server.Servername}} <span class="label label-success">{{server.Playercount}}/{{server.Slots}}</span></a>
                                         </li>
+                                        <li class="serverTab pull-right" id="statisticsTab">
+                                            <a ng-click="showStatistics()">Statistiken</a>
+                                        </li>
                                     </ul>
                                     <br>
                                     <div class="tab-content">
@@ -312,6 +310,9 @@
                                                     <button type="button" class="btn btn-success btn-sm" ng-click="joinServer(server)"><i class="fa fa-play" aria-hidden="true"></i> Joinen</button>
                                                 </div>
                                             </form>
+                                        </div>
+                                        <div id="statisticsPane" class="tab-pane fade in serverPane">
+                                            <canvas id="statisticsGraph" height="450"></canvas>
                                         </div>
                                     </div>
                                 </div>

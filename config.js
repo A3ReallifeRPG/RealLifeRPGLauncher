@@ -5,6 +5,7 @@
 const APIBaseURL = 'https://api.realliferpg.de/v1/'
 
 const APIServersURL = 'servers/'
+const APIServersLogURL = 'servers/log'
 
 const APIModsURL = 'mods'
 const APIModHashlistURL = 'mod/hashlist/'
