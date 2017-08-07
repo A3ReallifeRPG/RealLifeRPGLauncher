@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Datenschutzerklärung</title>
+    <script src="../config.js"></script>
+    <link href="../resources/bootstrap/css/bootstrap_dark.min.css" rel="stylesheet">
+
+    <script type="text/javascript">
+      window.$ = window.jQuery = require('../resources/jquery/jquery-1.12.3.min.js');
+    </script>
+
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../resources/css/custom.css">
+
+    <style>
+        .bottom-fix {
+            position: relative;
+            margin-top: -65px; /* negative value of footer height */
+            height: 65px;
+            clear: both;
+            padding-top: 20px;
+        }
+
+        .container {
+            min-height: 100%;
+            overflow: auto;
+            padding-bottom: 70px;
+            position: relative;
+        }
+
+        #agreement {
+            margin-top: 10px;
+        }
+
+        *::-webkit-scrollbar {
+            width: 14px !important;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            min-height: 35px !important;
+            background: #fff !important;
+            border: none !important;
+            border-radius: 0px !important;
+        }
+
+        *::-webkit-scrollbar-track-piece {
+            background-color: #2b3e50 !important;
+            border: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="agreement">
+    </div>
+    <hr>
+</div>
+<div class="bottom-fix center">
+    <button class="btn btn-success accept">Annehmen</button>
+    <button class="btn btn-danger decline">Deinstallieren</button>
+</div>
+</body>
+    <script src="agreement.js"></script>
+</html>

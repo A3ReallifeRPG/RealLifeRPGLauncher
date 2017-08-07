@@ -22,3 +22,5 @@ const APIValidatePlayerURL = 'player/validate/'
 const APITwitchURL = 'twitch'
 
 const STATICFILESERVE = 'http://static.realliferpg.de/arma/'
+
+const PRIVACY_POLICY_VERSION = '1.0.0'

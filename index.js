@@ -16,7 +16,7 @@ const moment = require('moment')
 const Chart = require('chart.js')
 const iCheck =  require('icheck') // eslint-disable-line
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIServersLogURL alertify angular SmoothieChart TimeSeries Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
+/* global PRIVACY_POLICY_VERSION APIBaseURL APIModsURL APIChangelogURL APIServersURL APIServersLogURL alertify angular SmoothieChart TimeSeries Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
 
 const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.downloading = false
@@ -43,6 +43,17 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     }
   })
 
+  storage.get('agreement', (err, data) => {
+    if (err) {
+      ipcRenderer.send('open-agreement')
+      throw err
+    }
+
+    if (data.version !== PRIVACY_POLICY_VERSION) {
+      ipcRenderer.send('open-agreement')
+    }
+  })
+
   storage.get('player', (err, data) => {
     if (err) throw err
 
@@ -64,6 +75,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   }
 
   $rootScope.refresh = () => {
+    ipcRenderer.send('open-agreement')
     storage.get('settings', (err) => {
       if (err) throw err
       $rootScope.getMods()
