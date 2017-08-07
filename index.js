@@ -650,7 +650,7 @@ App.controller('modController', ['$scope', '$rootScope', ($scope, $rootScope) =>
         break
       case 'notification-callback':
         if (args.data.Active) {
-          alertify.set({labels: {ok: 'Ok'}})
+          alertify.set({labels: {ok: 'Schließen'}})
           alertify.alert(args.data.Notification)
         }
         break
@@ -796,7 +796,7 @@ App.controller('modController', ['$scope', '$rootScope', ($scope, $rootScope) =>
 
   $rootScope.$watch(
     'theme', () => {
-      if ($scope.chart != null) {
+      if ($scope.chart !== null) {
         let bgColor, graphColor
 
         if ($rootScope.theme === 'light') {

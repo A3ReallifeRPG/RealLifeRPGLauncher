@@ -303,7 +303,7 @@
                                             <form class="form-inline pull-right">
                                                 <div class="form-group-sm">
                                                     <button type="button" class="btn btn-success btn-sm" ng-click="refresh()"><i class="fa fa-refresh" aria-hidden="true"></i> Aktualisieren</button>
-                                                    <button ng-if="profiles && server.appId === 107410" type="button" class="btn btn-success btn-sm" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
+                                                    <button ng-if="server.appId === 107410" type="button" class="btn btn-success btn-sm" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
                                                     <label ng-if="profiles && server.appId === 107410">
                                                         <select class="form-control" ng-model="profiles.selected" ng-change="setProfile()" ng-options="profile for profile in profiles.available"></select>
                                                     </label>
