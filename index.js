@@ -14,9 +14,10 @@ const path = require('path')
 const ping = require('ping')
 const moment = require('moment')
 const Chart = require('chart.js')
-const iCheck =  require('icheck') // eslint-disable-line
+const iCheck = require('icheck') // eslint-disable-line
+const config = require('./config')
 
-/* global APIBaseURL APIModsURL APIChangelogURL APIServersURL APIServersLogURL alertify angular SmoothieChart TimeSeries Notification APINotificationURL APIFuelStationURL APIPlayerURL APIValidatePlayerURL APITwitchURL */
+/* global alertify angular SmoothieChart TimeSeries Notification */
 
 const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.downloading = false
@@ -82,7 +83,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       if (e) {
         if (str) {
           $.ajax({
-            url: APIBaseURL + APIValidatePlayerURL + str,
+            url: config.APIBaseURL + config.APIValidatePlayerURL + str,
             type: 'GET',
             success: (data) => {
               if (data.status === 'Success') {
@@ -122,7 +123,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   }
 
   $rootScope.getMods = () => {
-    let url = APIBaseURL + APIModsURL
+    let url = config.APIBaseURL + config.APIModsURL
     if ($rootScope.logged_in) {
       url += '/' + $rootScope.apiKey
     }
@@ -138,6 +139,16 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     if (typeof args.args !== 'undefined') {
       if (args.args.callback === 'player-callback') {
         $rootScope.player_data = args.data.data[0]
+        $rootScope.player_data.last_change = moment(new Date($rootScope.player_data.last_change)).format('H:mm, DD.MM.YYYY')
+        $rootScope.player_data.cash_readable = $rootScope.player_data.cash.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.')
+        $rootScope.player_data.bankacc_readable = $rootScope.player_data.bankacc.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.')
+        $rootScope.player_data.exp_readable = $rootScope.player_data.exp.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.')
+        if ($rootScope.player_data.level !== 30) {
+          $rootScope.player_data.exp_progress = Math.round(($rootScope.player_data.exp - (($rootScope.player_data.level - 1) * ($rootScope.player_data.level - 1) * 1000)) / (($rootScope.player_data.level * $rootScope.player_data.level * 1000) - (($rootScope.player_data.level - 1) * ($rootScope.player_data.level - 1) * 1000)) * 100)
+        } else {
+          $rootScope.player_data.exp_progress = 100
+        }
+
         $rootScope.logged_in = true
         $rootScope.logging_in = false
         storage.get('settings', (err, data) => {
@@ -228,6 +239,22 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       }
     })
 
+    $rootScope.tour.addStep('player', {
+      title: 'Spieler',
+      text: 'Nachdem du dich eingeloggt hast findest du hier deine Spielerdaten.',
+      attachTo: '.playerTabBtn bottom',
+      buttons: {
+        text: 'Weiter',
+        action: $rootScope.tour.next
+      },
+      when: {
+        show: () => {
+          $rootScope.slide = 2
+          $rootScope.$apply()
+        }
+      }
+    })
+
     $rootScope.tour.addStep('changelog', {
       title: 'Changelog',
       text: 'Hier findest du immer alle Änderungen an der Mission, der Map und den Mods.',
@@ -238,7 +265,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       },
       when: {
         show: () => {
-          $rootScope.slide = 2
+          $rootScope.slide = 3
           $rootScope.$apply()
         }
       }
@@ -254,7 +281,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       },
       when: {
         show: () => {
-          $rootScope.slide = 3
+          $rootScope.slide = 4
           $rootScope.$apply()
         }
       }
@@ -270,7 +297,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       },
       when: {
         show: () => {
-          $rootScope.slide = 4
+          $rootScope.slide = 5
           $rootScope.$apply()
         }
       }
@@ -286,7 +313,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       },
       when: {
         show: () => {
-          $rootScope.slide = 5
+          $rootScope.slide = 6
           $rootScope.$apply()
         }
       }
@@ -302,7 +329,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       },
       when: {
         show: () => {
-          $rootScope.slide = 6
+          $rootScope.slide = 7
           $rootScope.$apply()
         }
       }
@@ -318,7 +345,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       },
       when: {
         show: () => {
-          $rootScope.slide = 7
+          $rootScope.slide = 8
           $rootScope.$apply()
         }
       }
@@ -334,7 +361,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       },
       when: {
         show: () => {
-          $rootScope.slide = 8
+          $rootScope.slide = 9
           $rootScope.$apply()
         }
       }
@@ -376,27 +403,29 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 App.controller('navbarController', ['$scope', '$rootScope', ($scope, $rootScope) => {
   $scope.tabs = [
     {
-      icon: 'glyphicon glyphicon-home', slide: 0, title: 'Mods', tag: 'modsTabBtn'
+      icon: 'glyphicon glyphicon-home', title: 'Mods', tag: 'modsTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-tasks', slide: 1, title: 'Server', tag: 'serversTabBtn'
+      icon: 'glyphicon glyphicon-tasks', title: 'Server', tag: 'serversTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-list-alt', slide: 2, title: 'Changelog', tag: 'changelogTabBtn'
+      icon: 'fa fa-user-circle-o', title: 'Spieler', tag: 'playerTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-headphones', slide: 3, title: 'TFAR', tag: 'tfarTabBtn'
+      icon: 'glyphicon glyphicon-list-alt', title: 'Changelog', tag: 'changelogTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-cog', slide: 4, title: 'Einstellungen', tag: 'settingsTabBtn'
+      icon: 'glyphicon glyphicon-headphones', title: 'TFAR', tag: 'tfarTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-question-sign', slide: 5, title: 'FAQ', tag: 'faqTabBtn'
+      icon: 'glyphicon glyphicon-cog', title: 'Einstellungen', tag: 'settingsTabBtn'
     }, {
-      icon: 'fa fa-twitch', slide: 6, title: 'Twitch', tag: 'twitchTabBtn'
+      icon: 'glyphicon glyphicon-question-sign', title: 'FAQ', tag: 'faqTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-map-marker', slide: 7, title: 'Map', tag: 'mapTabBtn'
+      icon: 'fa fa-twitch', title: 'Twitch', tag: 'twitchTabBtn'
     }, {
-      icon: 'glyphicon glyphicon-book', slide: 8, title: 'Über', tag: 'aboutTabBtn'
+      icon: 'glyphicon glyphicon-map-marker', title: 'Map', tag: 'mapTabBtn'
+    }, {
+      icon: 'glyphicon glyphicon-book', title: 'Über', tag: 'aboutTabBtn'
     }]
 
   $scope.switchSlide = (tab) => {
-    $rootScope.slide = tab.slide
+    $rootScope.slide = $scope.tabs.indexOf(tab)
   }
 
   $rootScope.$watch(
@@ -900,7 +929,7 @@ App.controller('modController', ['$scope', '$rootScope', ($scope, $rootScope) =>
           })
           $rootScope.getMods()
         } else {
-          $rootScope.slide = 4
+          $rootScope.slide = 5
           alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')
         }
       })
@@ -1347,6 +1376,12 @@ App.controller('serverController', ['$scope', '$sce', ($scope, $sce) => {
   }
 }])
 
+App.controller('playerController', ['$scope', '$rootScope', ($scope, $rootScope) => {
+  $scope.init = () => {
+    $('#playerScroll').perfectScrollbar({wheelSpeed: 0.5, suppressScrollX: true})
+  }
+}])
+
 App.controller('changelogController', ['$scope', ($scope) => {
   ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
@@ -1718,7 +1753,7 @@ const getChangelog = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'changelog-callback',
-    url: APIBaseURL + APIChangelogURL,
+    url: config.APIBaseURL + config.APIChangelogURL,
     callBackTarget: 'to-app'
   })
 }
@@ -1727,7 +1762,7 @@ const getServers = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'servers-callback',
-    url: APIBaseURL + APIServersURL,
+    url: config.APIBaseURL + config.APIServersURL,
     callBackTarget: 'to-app'
   })
 }
@@ -1736,7 +1771,7 @@ const getNotification = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'notification-callback',
-    url: APIBaseURL + APINotificationURL,
+    url: config.APIBaseURL + config.APINotificationURL,
     callBackTarget: 'to-app'
   })
 }
@@ -1745,7 +1780,7 @@ const getFuelstations = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'fuelstations-callback',
-    url: APIBaseURL + APIFuelStationURL,
+    url: config.APIBaseURL + config.APIFuelStationURL,
     callBackTarget: 'to-app'
   })
 }
@@ -1754,7 +1789,7 @@ const getTwitch = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'twitch-callback',
-    url: APIBaseURL + APITwitchURL,
+    url: config.APIBaseURL + config.APITwitchURL,
     callBackTarget: 'to-app'
   })
 }
@@ -1797,7 +1832,7 @@ const getPlayerData = (ApiKey) => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'player-callback',
-    url: APIBaseURL + APIPlayerURL + ApiKey,
+    url: config.APIBaseURL + config.APIPlayerURL + ApiKey,
     callBackTarget: 'to-app'
   })
 }
@@ -1806,7 +1841,7 @@ const getStatisticsData = () => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: 'statistics-callback',
-    url: APIBaseURL + APIServersLogURL,
+    url: config.APIBaseURL + config.APIServersLogURL,
     callBackTarget: 'to-app'
   })
 }

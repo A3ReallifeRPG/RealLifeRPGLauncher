@@ -321,6 +321,134 @@
                     </div>
                 </div>
                 <div class="item">
+                    <div id="player">
+                        <div class="container" ng-controller="playerController" data-ng-init="init()">
+                            <div class="page" style="height: 570px;">
+                                <br>
+                                <div style="text-align: center" ng-if="!logged_in">
+                                    <div class="jumbotron">
+                                        <h4><a href="" ng-click="login()">Logge</a> dich oben Rechts im Launcher mit deinem API Schlüssel aus dem <a href="https://info.realliferpg.de/">Infopanel</a> ein.</h4>
+                                    </div>
+                                    <img src="resources/img/api_key_showcase.png">
+                                </div>
+                                <div id="playerScroll" style="height: 550px;position: relative;">
+                                    <div ng-if="logged_in">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        <span data-hover="tooltip" title="" tooltips tooltip-template="Dein Ingame Name" tooltip-side="bottom">{{player_data.name}}</span>#<span tooltips tooltip-template="Deine ID" tooltip-side="bottom">{{player_data.uid}}</span>
+                                                        <span class="pull-right" tooltips tooltip-template="Dein Name auf Steam" tooltip-side="bottom" tooltip-class="pull-right">{{player_data.profilename}}</span>
+                                                    </div>
+                                                </div>
+                                                <div style="text-align: center;">
+                                                    <div class="progress active" style="margin: auto;">
+                                                        <div class="progress-bar progress-bar-striped progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: {{player_data.exp_progress}}%"></div>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <ul class="list-group list-group-unbordered margin-none">
+                                                    <li class="list-group-item">
+                                                        <b>PlayerID</b> <a class="pull-right" tooltips tooltip-template="Deine SteamID64" tooltip-class="pull-right">{{player_data.playerid}}</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>BE GUID</b> <a class="pull-right" tooltips tooltip-template="Deine Battleye GUID" tooltip-class="pull-right">{{player_data.guid}}</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>Zuletzt gesehen</b> <a class="pull-right" tooltips tooltip-template="Zu diesem Zeitpunkt warst du zuletzt Online" tooltip-class="pull-right">{{player_data.last_change}}</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>Bargeld</b> <a class="pull-right" tooltips tooltip-template="Dein Bargeld" tooltip-class="pull-right">${{player_data.cash_readable}}</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>Bankaccount</b> <a class="pull-right" tooltips tooltip-template="Dein Bankaccount" tooltip-class="pull-right">${{player_data.bankacc_readable}}</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>XP</b> <a class="pull-right" tooltips tooltip-template="Deine XP" tooltip-class="pull-right">{{player_data.exp_readable}} XP</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>Skillpunkte</b> <a class="pull-right" tooltips tooltip-template="Deine verfügbaren Skillpunkte" tooltip-class="pull-right">{{player_data.skillpoint}}</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>Jail Time</b> <a class="pull-right" tooltips tooltip-template="Deine Restliche Zeit im Gefängnis" tooltip-class="pull-right">{{player_data.jail_time}}</a>
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <b>Position</b> <a class="pull-right">
+                                                        <span ng-if="player_data.pos_free" class="label label-success" tooltips tooltip-template="Du kannst deine Position frei wählen!" tooltip-class="pull-right"><i class="fa fa-check" aria-hidden="true"></i> Frei</span>
+                                                        <span ng-if="!player_data.pos_free" class="label label-info" tooltips tooltip-template="Du kannst deine Position nicht frei wählen!" tooltip-class="pull-right"><i class="fa fa-times" aria-hidden="true"></i> Gesperrt</span>
+                                                    </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <ul class="nav nav-tabs">
+                                                    <li class="active"><a href="#vehicles" data-toggle="tab" aria-expanded="false">Fahrzeuge</a></li>
+                                                </ul>
+                                                <div class="tab-pane fade in active" id="vehicles">
+                                                    <table class="table table-striped table-hover">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <th>Typ</th>
+                                                            <th>Seite</th>
+                                                            <th>Intakt</th>
+                                                            <th>Aktiv</th>
+                                                            <th>Sprit</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr role="row" class="odd" ng-repeat="vehicle in player_data.vehicles">
+                                                            <td>{{vehicle.classname}}</td>
+                                                            <td>
+                                                                <i ng-if="vehicle.type === 'Car'" class="fa fa-car" aria-hidden="true"></i>
+                                                                <i ng-if="vehicle.type === 'Air'" class="fa fa-plane" aria-hidden="true"></i>
+                                                                <i ng-if="vehicle.type === 'Ship'" class="fa fa-ship" aria-hidden="true"></i>
+                                                            </td>
+                                                            <td>
+                                                                <span ng-if="vehicle.side === 'cop'" class="label label-info label-cop">Polizei</span>
+                                                                <span ng-if="vehicle.side === 'civ'" class="label label-info label-civ">Zivil</span>
+                                                                <span ng-if="vehicle.side === 'adac'" class="label label-info label-adac">RAC</span>
+                                                                <span ng-if="vehicle.side === 'med'" class="label label-info label-medic">Medic</span>
+                                                            </td>
+                                                            <td>
+                                                                <span ng-if="vehicle.alive" class="label label-success"><i class="fa fa-check" aria-hidden="true"></i></span>
+                                                                <span ng-if="!vehicle.alive" class="label label-danger"><i class="fa fa-check" aria-hidden="true"></i></span>
+                                                            </td>
+                                                            <td>
+                                                                <span ng-if="vehicle.impound" class="label label-warning"><i class="fa fa-times" aria-hidden="true"></i> Impounded</span>
+                                                                <span ng-if="vehicle.active" class="label label-success"><i class="fa fa-check" aria-hidden="true"></i> Aktiv</span>
+                                                                <span ng-if="!vehicle.active" class="label label-info"><i class="fa fa-times" aria-hidden="true"></i> Garage</span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="progress active" style="margin: auto;">
+                                                                    <div ng-if="vehicle.fuel < 0.25" class="progress-bar progress-bar-striped  progress-bar-danger" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: {{vehicle.fuel * 100}}%"></div>
+                                                                    <div ng-if="vehicle.fuel > 0.25 && vehicle.fuel < 0.75" class="progress-bar progress-bar-striped  progress-bar-warning" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: {{vehicle.fuel * 100}}%"></div>
+                                                                    <div ng-if="vehicle.fuel > 0.75" class="progress-bar progress-bar-striped  progress-bar-success" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: {{vehicle.fuel * 100}}%"></div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <th>Typ</th>
+                                                            <th>Seite</th>
+                                                            <th>Intakt</th>
+                                                            <th>Aktiv</th>
+                                                            <th>Sprit</th>
+                                                        </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
                     <div id="changelog">
                         <div class="container" ng-controller="changelogController" data-ng-init="init()">
                             <h3>ReallifeRPG Changelog</h3>
@@ -407,6 +535,18 @@
                                     </div>
                                     <div class="col-md-2">
                                         <button class="btn btn-success pull-right" tooltips tooltip-template="Skin by Kaibu" ng-click="initFileDownload('ReallifeRPGSkin.ts3_addon')">Skin Download</button>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        Ein Teamspeak 3 Soundpack das unwichtige Sounds entfernt.
+                                        <br>
+                                        Tipp! Ihr könnt für einzelne Lesezeichen in Teamspeak einzelne Soundpacks zuweisen, so hört ihr auf anderen Teamspeaks weiterhin alles.
+                                        <br>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-success pull-right" tooltips tooltip-template="Download" ng-click="initFileDownload('ReallifeRPG.ts3_soundpack')">Soundpack Download</button>
                                     </div>
                                 </div>
                                 <hr>
