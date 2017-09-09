@@ -278,10 +278,6 @@ app.on('activate', () => {
   }
 })
 
-app.on('before-quit', () => {
-  ipcMain.removeAllListeners()
-})
-
 ipcMain.on('winprogress-change', (event, arg) => {
   win.setProgressBar(arg.progress)
 })
