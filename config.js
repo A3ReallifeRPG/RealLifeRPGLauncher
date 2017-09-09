@@ -10,5 +10,19 @@ module.exports = {
   'APIPlayerURL': 'player/',
   'APIValidatePlayerURL': 'player/validate/',
   'APITwitchURL': 'twitch',
-  'STATICFILESERVE': 'http://static.realliferpg.de/arma/'
+  'STATICFILESERVE': 'http://static.realliferpg.de/arma/',
+  'regKeys': [
+    {
+      key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410',
+      index: 3
+    },
+    {
+      key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410',
+      index: 3
+    },
+    {
+      key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3',
+      index: 0
+    }
+  ]
 }

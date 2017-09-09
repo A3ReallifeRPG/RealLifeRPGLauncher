@@ -9,10 +9,6 @@
             display: none;
         }
     </style>
-
-    <!-- config -->
-    <script src="config.js"></script>
-
     <!-- angular -->
     <script src="node_modules/angular/angular.js"></script>
     <script src="node_modules/angular-tooltips/dist/angular-tooltips.min.js"></script>
@@ -36,9 +32,6 @@
 
     <!-- fa icons-->
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
-
-    <!-- smoothiecharts -->
-    <script src="node_modules/smoothie/smoothie.js"></script>
 
     <!-- chartjs -->
     <script src="node_modules/chart.js/dist/Chart.min.js"></script>
@@ -65,7 +58,19 @@
     <!-- custom css/js -->
     <link rel="stylesheet" href="resources/css/custom.css">
 
+    <script type="text/javascript" src="app/require.js"></script>
+
     <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="app/controllers/aboutCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/changelogCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/mapCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/modCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/navbarCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/playerCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/serverCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/settingsCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/tfarCtrl.js"></script>
+    <script type="text/javascript" src="app/controllers/twitchCtrl.js"></script>
 </head>
 <body>
 <div id="app">
@@ -75,7 +80,7 @@
                 <a class="navbar-brand" href="https://realliferpg.de/">ReallifeRPG Launcher</a>
             </div>
 
-            <div ng-controller="navbarController" class="collapse navbar-collapse" id="bs-navbar-collapse">
+            <div ng-controller="navbarCtrl" class="collapse navbar-collapse" id="bs-navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li ng-repeat="tab in tabs" ng-class={'active':(slide==$index)} class="{{tab.tag}}" on-finish-render="ngRepeatFinished">
                         <a ng-click="switchSlide(tab)" title="{{tab.title}}"><span class="{{tab.icon}}"></span></a>
@@ -141,7 +146,7 @@
                 <div class="item active">
                     <div id="mods">
                         <div class="container">
-                            <div ng-controller="modController" data-ng-init="init()">
+                            <div ng-controller="modCtrl" data-ng-init="init()">
                                 <h3>ReallifeRPG Mods</h3>
                                 <hr>
                                 <div class="page">
@@ -162,7 +167,7 @@
                                                                 <h4 tooltips tooltip-template="{{mod.Description}}">{{mod.Name}}</h4>
                                                                 <hr>
                                                                 <div class="btn-group btn-group-sm">
-                                                                    <button class="btn btn-success btn-sm" ng-click="action(mod)" ng-disabled="downloading || mod.state[0] == 0">{{mod.state[1]}}</button>
+                                                                    <button class="btn btn-success btn-sm" ng-click="action(mod)" ng-disabled="downloading">{{mod.state[1]}}</button>
                                                                     <button class="btn btn-warning btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
                                                                     <button class="btn btn-primary btn-sm" ng-show="mod.state[0] === 3 && mod.HasGameFiles && mod.Torrent !== '' && mod.Torrent !== null" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
                                                                     <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="openModDir(mod)"><span class=" glyphicon glyphicon-folder-open"></span></button>
@@ -211,7 +216,9 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <canvas ng-show="downloading && !loading" id="smoothie-chart" width="1140" height="70"></canvas>
+                                            <div ng-show="downloading">
+                                                <canvas ng-show="downloading" id="bar-chart" width="1140" height="70"></canvas>
+                                            </div>
                                             <hr>
                                             <div class="progress progress-striped active">
                                                 <div class="progress-bar" style="width: {{totalProgress}}%"></div>
@@ -226,7 +233,7 @@
                 <div class="item">
                     <div id="servers">
                         <div class="container">
-                            <div class="row" ng-controller="serverController" data-ng-init="init()">
+                            <div class="row" ng-controller="serverCtrl" data-ng-init="init()">
                                 <h3>ReallifeRPG Server</h3>
                                 <hr>
                                 <div class="page">
@@ -322,8 +329,8 @@
                 </div>
                 <div class="item">
                     <div id="player">
-                        <div class="container" ng-controller="playerController" data-ng-init="init()">
-                            <div class="page" style="height: 570px;">
+                        <div class="container" ng-controller="playerCtrl" data-ng-init="init()">
+                            <div class="page" style="height: 600px;">
                                 <br>
                                 <div style="text-align: center" ng-if="!logged_in">
                                     <div class="jumbotron">
@@ -450,7 +457,7 @@
                 </div>
                 <div class="item">
                     <div id="changelog">
-                        <div class="container" ng-controller="changelogController" data-ng-init="init()">
+                        <div class="container" ng-controller="changelogCtrl" data-ng-init="init()">
                             <h3>ReallifeRPG Changelog</h3>
                             <hr>
                             <div class="page">
@@ -504,7 +511,7 @@
                 </div>
                 <div class="item">
                     <div id="tfar">
-                        <div class="container" ng-controller="tfarController" data-ng-init="init()">
+                        <div class="container" ng-controller="tfarCtrl" data-ng-init="init()">
                             <h3>Task Force Arma Radio</h3>
                             <hr>
                             <div class="page">
@@ -564,7 +571,7 @@
                 </div>
                 <div class="item">
                     <div id="settings">
-                        <div class="container" ng-controller="settingsController" data-ng-init="init()">
+                        <div class="container" ng-controller="settingsCtrl" data-ng-init="init()">
                             <h3>Einstellungen</h3>
                             <hr>
                             <div class="page">
@@ -762,7 +769,7 @@
                 </div>
                 <div class="item">
                     <div id="twitch">
-                        <div class="container" ng-controller="twitchController" data-ng-init="init()">
+                        <div class="container" ng-controller="twitchCtrl" data-ng-init="init()">
                             <h3>Twitch</h3>
                             <hr>
                             <div class="page" style="position: relative;" id="twitchScroll">
@@ -809,7 +816,7 @@
                 </div>
                 <div class="item">
                     <div id="map">
-                        <div class="container" ng-controller="mapController" data-ng-init="init()">
+                        <div class="container" ng-controller="mapCtrl" data-ng-init="init()">
                             <h3>Map</h3>
                             <hr>
                             <div class="page">
@@ -820,7 +827,7 @@
                 </div>
                 <div class="item">
                     <div id="about">
-                        <div class="container" ng-controller="aboutController" data-ng-init="init()">
+                        <div class="container" ng-controller="aboutCtrl" data-ng-init="init()">
                             <h3>Über</h3>
                             <hr>
                             <div class="page" style="position: relative;" id="aboutScroll">
@@ -852,7 +859,7 @@
   })
 
   $(window).load(() => {
-    appLoaded()
+    helpers.appLoaded()
   })
 </script>
 </body>

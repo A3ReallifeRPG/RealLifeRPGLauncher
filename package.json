@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -21,6 +21,36 @@
     "test": "standard",
     "lint": "standard",
     "lint-fix": "standard --fix"
+  },
+  "standard": {
+    "globals": [
+      "angular",
+      "ipcRenderer",
+      "$",
+      "alertify",
+      "helpers",
+      "Chart",
+      "path",
+      "shell",
+      "config",
+      "app",
+      "fs",
+      "storage",
+      "dialog",
+      "iCheck",
+      "Shepherd",
+      "marked",
+      "moment",
+      "ping",
+      "child",
+      "unzip",
+      "Winreg",
+      "humanizeDuration",
+      "L"
+    ],
+    "ignore": [
+      "app/require.js"
+    ]
   },
   "build": {
     "appId": "realliferpg.de",
