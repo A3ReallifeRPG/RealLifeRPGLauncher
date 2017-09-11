@@ -23,6 +23,17 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     }
   })
 
+  storage.get('agreement', (err, data) => {
+    if (err) {
+      ipcRenderer.send('open-agreement')
+      throw err
+    }
+
+    if (data.version !== PRIVACY_POLICY_VERSION) {
+      ipcRenderer.send('open-agreement')
+    }
+  })
+
   storage.get('player', (err, data) => {
     if (err) throw err
 
@@ -44,6 +55,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   }
 
   $rootScope.refresh = () => {
+    ipcRenderer.send('open-agreement')
     storage.get('settings', (err) => {
       if (err) throw err
       $rootScope.getMods()

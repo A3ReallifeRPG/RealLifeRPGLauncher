@@ -54,6 +54,10 @@ function handleSquirrelEvent () {
   }
 }
 
+function deinstallApp () {
+
+}
+
 autoUpdater.addListener('error', (err) => { // eslint-disable-line
 })
 
@@ -75,10 +79,7 @@ switch (process.argv[1]) {
     break
 }
 
-let win
-let downWin
-let webWin
-let loadWin
+let win, downWin, webWin, loadWin, child
 
 const createWindows = () => {
   // web process
@@ -236,6 +237,9 @@ const toggleDevTools = () => {
     downWin.hide()
   } else {
     win.webContents.openDevTools({detach: true})
+    if (child) {
+      child.webContents.openDevTools()
+    }
     webWin.show()
     downWin.show()
   }
@@ -285,6 +289,37 @@ ipcMain.on('winprogress-change', (event, arg) => {
 ipcMain.on('app-loaded', () => {
   win.show()
   loadWin.destroy()
+})
+
+ipcMain.on('open-agreement', () => {
+  if (!child) {
+    child = new BrowserWindow({
+      icon: 'resources/icon/workericon.ico',
+      parent: win,
+      modal: true,
+      show: false,
+      reziable: false,
+      closable: false,
+      maximizable: false,
+      center: true,
+      width: 640,
+      height: 700,
+      minWidth: 640,
+      minHeight: 700,
+      maxWidth: 640,
+      maxHeight: 700
+    })
+    child.loadURL(`file://${__dirname}/app/agreement.html`)
+    child.once('ready-to-show', () => {
+      child.show()
+    })
+  }
+})
+
+ipcMain.on('close-agreement', () => {
+  if (child) {
+    child.destroy()
+  }
 })
 
 ipcMain.on('focus-window', () => {
