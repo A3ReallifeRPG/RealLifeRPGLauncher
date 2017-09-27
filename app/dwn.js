@@ -4,6 +4,7 @@ const progress = require('request-progress')
 const mkpath = require('mkpath')
 const WebTorrent = require('webtorrent')
 const hasha = require('hasha')
+const config = require('../config')
 require('events').EventEmitter.defaultMaxListeners = Infinity
 const {ipcRenderer} = require('electron')
 
@@ -16,8 +17,6 @@ let client = window.client = new WebTorrent({
 })
 
 let path = ''
-
-/* global APIBaseURL APIModHashlistURL */
 
 ipcRenderer.on('to-dwn', (event, args) => {
   switch (args.type) {
@@ -115,7 +114,7 @@ const getHashlist = (mod, callback) => {
   ipcRenderer.send('to-web', {
     type: 'get-url',
     callback: callback,
-    url: APIBaseURL + APIModHashlistURL + mod.Id,
+    url: config.APIBaseURL + config.APIModHashlistURL + mod.Id,
     callBackTarget: 'to-dwn',
     mod: mod
   })

@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.4.5",
+  "version": "2.5.1",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -23,8 +23,33 @@
     "lint-fix": "standard --fix"
   },
   "standard": {
+    "globals": [
+      "angular",
+      "ipcRenderer",
+      "$",
+      "alertify",
+      "helpers",
+      "Chart",
+      "path",
+      "shell",
+      "config",
+      "app",
+      "fs",
+      "storage",
+      "dialog",
+      "iCheck",
+      "Shepherd",
+      "marked",
+      "moment",
+      "ping",
+      "child",
+      "unzip",
+      "Winreg",
+      "humanizeDuration",
+      "L"
+    ],
     "ignore": [
-      "config.js"
+      "app/require.js"
     ]
   },
   "build": {
@@ -44,7 +69,7 @@
   },
   "devDependencies": {
     "devtron": "1.4.0",
-    "electron": "^1.6.10",
+    "electron": "^1.7.6",
     "electron-builder": "10.15.1",
     "standard": "*"
   },
@@ -62,10 +87,10 @@
   ],
   "dependencies": {
     "alertify": "^0.3.0",
-    "angular": "^1.6.4",
+    "angular": "^1.6.6",
     "angular-tooltips": "^1.1.10",
     "bootstrap": "^3.3.7",
-    "chart.js": "^2.5.0",
+    "chart.js": "^2.6.0",
     "electron-json-storage": "^2.1.0",
     "electron-squirrel-startup": "1.0.0",
     "font-awesome": "^4.7.0",
@@ -87,7 +112,7 @@
     "tether": "^1.4.0",
     "tether-shepherd": "^1.8.1",
     "unzip": "^0.1.11",
-    "webtorrent": "^0.98.18",
+    "webtorrent": "^0.98.19",
     "winreg": "^1.2.4"
   }
 }

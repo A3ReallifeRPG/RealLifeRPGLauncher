@@ -1,24 +1,28 @@
-/*
-    Web request URL's
-*/
-
-const APIBaseURL = 'https://api.realliferpg.de/v1/'
-
-const APIServersURL = 'servers/'
-const APIServersLogURL = 'servers/log'
-
-const APIModsURL = 'mods'
-const APIModHashlistURL = 'mod/hashlist/'
-
-const APIFuelStationURL = 'fuelstations'
-
-const APINotificationURL = 'notification'
-
-const APIChangelogURL = 'changelog'
-
-const APIPlayerURL = 'player/'
-const APIValidatePlayerURL = 'player/validate/'
-
-const APITwitchURL = 'twitch'
-
-const STATICFILESERVE = 'http://static.realliferpg.de/arma/'
+module.exports = {
+  'APIBaseURL': 'https://api.realliferpg.de/v1/',
+  'APIServersURL': 'servers/',
+  'APIServersLogURL': 'servers/log',
+  'APIModsURL': 'mods',
+  'APIModHashlistURL': 'mod/hashlist/',
+  'APIFuelStationURL': 'fuelstations',
+  'APINotificationURL': 'notification',
+  'APIChangelogURL': 'changelog',
+  'APIPlayerURL': 'player/',
+  'APIValidatePlayerURL': 'player/validate/',
+  'APITwitchURL': 'twitch',
+  'STATICFILESERVE': 'http://static.realliferpg.de/arma/',
+  'regKeys': [
+    {
+      key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410',
+      index: 3
+    },
+    {
+      key: '\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410',
+      index: 3
+    },
+    {
+      key: '\\SOFTWARE\\WOW6432Node\\bohemia interactive studio\\ArmA 3',
+      index: 0
+    }
+  ]
+}
