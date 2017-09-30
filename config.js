@@ -11,6 +11,8 @@ module.exports = {
   'APIValidatePlayerURL': 'player/validate/',
   'APITwitchURL': 'twitch',
   'STATICFILESERVE': 'http://static.realliferpg.de/arma/',
+  'PRIVACY_POLICY_VERSION': '1.0.0',
+  'PRIVACY_POLICY_URL': 'https://realliferpg.de/pp.json',
   'regKeys': [
     {
       key: '\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 107410',

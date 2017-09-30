@@ -54,10 +54,6 @@ function handleSquirrelEvent () {
   }
 }
 
-function deinstallApp () {
-
-}
-
 autoUpdater.addListener('error', (err) => { // eslint-disable-line
 })
 
@@ -301,6 +297,7 @@ ipcMain.on('open-agreement', () => {
       reziable: false,
       closable: false,
       maximizable: false,
+      minimizable: false,
       center: true,
       width: 640,
       height: 700,
@@ -320,6 +317,10 @@ ipcMain.on('close-agreement', () => {
   if (child) {
     child.destroy()
   }
+})
+
+ipcMain.on('close-app', () => {
+  app.quit()
 })
 
 ipcMain.on('focus-window', () => {

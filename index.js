@@ -29,7 +29,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       throw err
     }
 
-    if (data.version !== PRIVACY_POLICY_VERSION) {
+    if (data.version !== config.PRIVACY_POLICY_VERSION) {
       ipcRenderer.send('open-agreement')
     }
   })
