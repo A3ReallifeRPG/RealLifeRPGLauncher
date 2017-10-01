@@ -55,7 +55,6 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   }
 
   $rootScope.refresh = () => {
-    ipcRenderer.send('open-agreement')
     storage.get('settings', (err) => {
       if (err) throw err
       $rootScope.getMods()

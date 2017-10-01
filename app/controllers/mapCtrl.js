@@ -1,4 +1,6 @@
 angular.module('App').controller('mapCtrl', ['$scope', ($scope) => {
+
+  /*
   ipcRenderer.on('to-app', (event, args) => {
     switch (args.type) {
       case 'fuelstations-callback':
@@ -112,4 +114,6 @@ angular.module('App').controller('mapCtrl', ['$scope', ($scope) => {
     let northEast = $scope.map.unproject([16384, 0], $scope.map.getMaxZoom())
     $scope.map.setMaxBounds(new L.LatLngBounds(southWest, northEast))
   }
+
+  */
 }])
