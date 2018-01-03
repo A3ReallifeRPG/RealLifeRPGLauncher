@@ -143,19 +143,19 @@ const listDiff = (list, basepath, mod) => {
 }
 
 const cleanFileRecursive = (list, index, basepath, callback, hashlist, hashIndex, path, dllist, mod) => {
-  try {
-    fs.unlink(list[index])
-    if (list.length > index + 1) {
-      cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod)
-    } else {
-      callback(hashlist, hashIndex, path, dllist, mod)
-    }
-  } catch (e) {
-    if (list.length > index + 1) {
-      cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod)
-    } else {
-      callback(hashlist, hashIndex, path, dllist, mod)
-    }
+  if (list.length) {
+    fs.unlink(list[index], (err) => {
+      if (err) {
+        console.log(err)
+      }
+      if (list.length > index + 1) {
+        cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod)
+      } else {
+        callback(hashlist, hashIndex, path, dllist, mod)
+      }
+    })
+  } else {
+    callback(hashlist, hashIndex, path, dllist, mod)
   }
 }
 
@@ -195,6 +195,8 @@ const initSeeding = (dirPath, TorrentURL) => {
 const downloadFileRecursive = (list, index, basepath, dlserver, torrent, torrentURL) => {
   let dest = basepath + list[index].RelativPath
   let folder = dest.replace(list[index].FileName, '')
+
+  console.log('Downloading file' + basepath)
 
   try {
     let stats = fs.lstatSync(folder)

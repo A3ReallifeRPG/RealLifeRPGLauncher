@@ -11,6 +11,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.apiKey = ''
   $rootScope.logged_in = false
   $rootScope.logging_in = false
+  $rootScope.map = null
 
   storage.get('settings', (err, data) => {
     if (err) {

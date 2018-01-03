@@ -30,6 +30,9 @@ angular.module('App').controller('navbarCtrl', ['$scope', '$rootScope', ($scope,
     'slide', () => {
       $('#carousel-main').carousel($rootScope.slide)
       $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + $scope.tabs[$rootScope.slide].title
+      if ($rootScope.map) {
+        $rootScope.map.invalidateSize(false)
+      }
     }, true
   )
 
