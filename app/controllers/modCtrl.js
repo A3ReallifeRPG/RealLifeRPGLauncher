@@ -29,11 +29,11 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           hint: 'Download via Server läuft',
           downloading: true,
           canCancel: true,
-          downSpeed: helpers.toMB(args.state.speed),
+          downSpeed: prettyBytes(args.state.speed),
           upSpeed: 0,
           totalProgress: helpers.toFileProgress(args.state.totalSize, args.state.totalDownloaded + args.state.size.transferred),
-          totalSize: helpers.toGB(args.state.totalSize),
-          totalDownloaded: helpers.toGB(args.state.totalDownloaded + args.state.size.transferred),
+          totalSize: prettyBytes(args.state.totalSize),
+          totalDownloaded: prettyBytes(args.state.totalDownloaded + args.state.size.transferred),
           totalETA: humanizeDuration(Math.round(((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)) / args.state.speed) * 1000), {
             language: 'de',
             round: true
@@ -55,8 +55,8 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           downSpeed: 0,
           upSpeed: 0,
           totalProgress: helpers.toFileProgress(args.state.totalSize, args.state.totalDownloaded),
-          totalSize: helpers.toGB(args.state.totalSize),
-          totalDownloaded: helpers.toGB(args.state.totalDownloaded),
+          totalSize: prettyBytes(args.state.totalSize),
+          totalDownloaded: prettyBytes(args.state.totalDownloaded),
           totalETA: 'Lade .bisign Dateien',
           totalPeers: 0,
           maxConns: 0,
@@ -72,11 +72,11 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           hint: 'Download via Torrent läuft',
           downloading: true,
           canCancel: true,
-          downSpeed: helpers.toMB(args.state.torrentDownloadSpeedState),
-          upSpeed: helpers.toMB(args.state.torrentUploadSpeedState),
+          downSpeed: prettyBytes(args.state.torrentDownloadSpeedState),
+          upSpeed: prettyBytes(args.state.torrentUploadSpeedState),
           totalProgress: helpers.toProgress(args.state.torrentProgressState),
-          totalSize: helpers.toGB(args.state.torrentSizeState),
-          totalDownloaded: helpers.toGB(args.state.torrentDownloadedState),
+          totalSize: prettyBytes(args.state.torrentSizeState),
+          totalDownloaded: prettyBytes(args.state.torrentDownloadedState),
           totalETA: humanizeDuration(Math.round(args.state.torrentETAState), {language: 'de', round: true}),
           totalPeers: args.state.torrentNumPeersState,
           maxConns: args.state.torrentMaxConnsState,
@@ -86,6 +86,24 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
         $scope.pushToChart(new Date().getTime(), args.state.torrentDownloadSpeedState, args.state.torrentUploadSpeedState)
         $scope.$apply()
         break
+      case 'update-chickcheck-progress':
+        $scope.update({
+          state: 'Versionsunterschiede werden bestimmt...',
+          hint: 'Prüfe Dateien',
+          downloading: true,
+          canCancel: false,
+          downSpeed: 0,
+          upSpeed: 0,
+          totalProgress: helpers.toProgress(args.state.index / args.state.size),
+          totalSize: 0,
+          totalDownloaded: 0,
+          totalETA: '',
+          totalPeers: 0,
+          maxConns: 0,
+          fileName: helpers.cutName(args.fileName),
+          fileProgress: ''
+        })
+        break
       case 'update-dl-progress-seeding':
         $scope.update({
           state: 'Torrent - Seeding',
@@ -93,7 +111,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           downloading: true,
           canCancel: true,
           downSpeed: 0,
-          upSpeed: helpers.toMB(args.state.torrentUploadSpeedState),
+          upSpeed: prettyBytes(args.state.torrentUploadSpeedState),
           totalProgress: '',
           totalDownloaded: 0,
           totalETA: '',
@@ -102,8 +120,6 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           fileName: '',
           fileProgress: ''
         })
-        $scope.pushToChart(new Date().getTime(), args.state.torrentDownloadSpeedState, args.state.torrentUploadSpeedState)
-        $scope.$apply()
         break
       case 'torrent-init':
         $scope.update({
@@ -149,9 +165,9 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           canCancel: true,
           downSpeed: 0,
           upSpeed: 0,
-          totalProgress: helpers.toProgress(args.state.index / args.state.size),
-          totalSize: 0,
-          totalDownloaded: 0,
+          totalProgress: helpers.toProgress(args.state.totalChecked / args.state.totalFileSize),
+          totalSize: prettyBytes(args.state.totalFileSize),
+          totalDownloaded: prettyBytes(args.state.totalChecked),
           totalETA: '',
           totalPeers: 0,
           maxConns: 0,
@@ -181,21 +197,25 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           size += cur.Size
         })
         if (size !== 0) {
-          if (args.mod.Torrent !== '' && args.mod.Torrent !== null) {
-            alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
-            alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + helpers.toGB(size) + ' GB)', (e) => {
-              if (e) {
-                $scope.reset()
-                $scope.initListDownload(args.list, true, args.mod)
-              } else {
-                $scope.reset()
-                $scope.initListDownload(args.list, false, args.mod)
-              }
-            })
+          if (size > 100000000) {
+            if (args.mod.Torrent !== '' && args.mod.Torrent !== null) {
+              alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
+              alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + prettyBytes(size) + ')', (e) => {
+                if (e) {
+                  $scope.reset()
+                  $scope.initListDownload(args.list, true, args.mod)
+                } else {
+                  $scope.reset()
+                  $scope.initListDownload(args.list, false, args.mod)
+                }
+              })
+            } else {
+              $scope.initListDownload(args.list, false, args.mod)
+            }
           } else {
             $scope.initListDownload(args.list, false, args.mod)
           }
-          helpers.spawnNotification(args.list.length + ' Dateien müssen heruntergelanden werden (' + helpers.toGB(size) + ' GB)')
+          helpers.spawnNotification(args.list.length + ' Dateien müssen heruntergelanden werden (' + prettyBytes(size) + ')')
           $scope.$apply()
         } else {
           helpers.spawnNotification('Überprüfung abgeschlossen - Mod ist aktuell.')
@@ -207,7 +227,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           state: 'Torrent - Verbinden',
           hint: '5 - 10 Minuten',
           downloading: true,
-          canCancel: false,
+          canCancel: true,
           downSpeed: 0,
           upSpeed: 0,
           totalProgress: helpers.toProgress(args.state.torrentUploadSpeedState),
@@ -229,6 +249,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
         break
       case 'cancelled':
         $scope.reset()
+        $scope.checkUpdates()
         break
       case 'notification-callback':
         if (args.data.Active) {

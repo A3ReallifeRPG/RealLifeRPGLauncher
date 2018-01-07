@@ -125,11 +125,11 @@
                     <li ng-show="updating">
                         <a class="updating" title="Update wird geladen"><img src="resources/loading/ring-alt.svg"></a>
                     </li>
-                    <li ng-show="downloading && downSpeed > 0">
-                        <a><i class="fa fa-download" aria-hidden="true"></i> {{downSpeed}} Mb/s</a>
+                    <li ng-show="downloading && downSpeed">
+                        <a><i class="fa fa-download" aria-hidden="true"></i> {{downSpeed}}/s</a>
                     </li>
-                    <li ng-show="downloading && upSpeed > 0">
-                        <a><i class="fa fa-upload" aria-hidden="true"></i> {{upSpeed}} Mb/s</a>
+                    <li ng-show="downloading && upSpeed">
+                        <a><i class="fa fa-upload" aria-hidden="true"></i> {{upSpeed}}/s</a>
                     </li>
                     <li class="reloadTabBtn">
                         <a ng-click="refresh()" title="Inhalte neu laden"><span class="glyphicon glyphicon-refresh"></span></a>
@@ -183,14 +183,14 @@
                                                 <li class="list-group-item">
                                                     <b>Status</b> <a class="pull-right"><span tooltips tooltip-template="{{hint}}">{{state}}</span></a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="downloading && downSpeed > 0">
-                                                    <b>Geschwindigkeit</b> <a class="pull-right"><span tooltips tooltip-template="Download Geschwindigkeit">{{downSpeed}} Mb/s</span></a>
+                                                <li class="list-group-item" ng-if="downloading && downSpeed">
+                                                    <b>Geschwindigkeit</b> <a class="pull-right"><span tooltips tooltip-template="Download Geschwindigkeit">{{downSpeed}}/s</span></a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="totalProgress !== ''">
                                                     <b>Fortschritt</b> <a class="pull-right"><span tooltips tooltip-template="Gesamtfortschritt">{{totalProgress}} %</span></a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="totalSize > 0">
-                                                    <b>Heruntergeladen</b> <a class="pull-right">{{totalDownloaded}} GB/{{totalSize}} GB</a>
+                                                <li class="list-group-item" ng-if="totalSize">
+                                                    <b>Dateifortschritt</b> <a class="pull-right">{{totalDownloaded}}/{{totalSize}}</a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="totalETA !== ''">
                                                     <b>Verbleibend</b> <a class="pull-right"><span tooltips tooltip-template="Zeit verbleibend">{{totalETA}}</span></a>
@@ -198,7 +198,7 @@
                                                 <li class="list-group-item" ng-if="maxConns > 0">
                                                     <b>Peers</b> <a class="pull-right">{{totalPeers}}/{{maxConns}}</a>
                                                 </li>
-                                                <li class="list-group-item" ng-if="fileSpeed > 0">
+                                                <li class="list-group-item" ng-if="fileSpeed">
                                                     <b>Datei</b> <a class="pull-right">{{fileSpeed}} Mb/s</a>
                                                 </li>
                                                 <li class="list-group-item" ng-if="fileName !== ''">
@@ -562,7 +562,7 @@
                                         <div class="progress progress-striped active">
                                             <div class="progress-bar" style="width: {{fileProgress}}%"></div>
                                         </div>
-                                        <span class="pull-right" ng-if="fileSpeed !== 0">{{fileSpeed}} Mb/s</span>
+                                        <span class="pull-right" ng-if="fileSpeed">{{fileSpeed}}/s</span>
                                     </div>
                                 </div>
                             </div>

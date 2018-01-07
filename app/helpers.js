@@ -55,14 +55,11 @@ module.exports = {
       callBackTarget: 'to-app'
     })
   },
-  toGB: (val) => {
-    return (val / 1000000000).toFixed(3)
-  },
   toMB: (val) => {
     return (val / 1000000).toFixed(3)
   },
   toProgress: (val) => {
-    return (val * 100).toFixed(3)
+    return (val * 100).toFixed(2)
   },
   toFileProgress: (filesize, downloaded) => {
     return (100 / filesize * downloaded).toFixed(2)
