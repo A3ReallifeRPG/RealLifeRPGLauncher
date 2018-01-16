@@ -17,7 +17,7 @@
   "scripts": {
     "start": "electron .",
     "pack": "build --target dir",
-    "dist": "build",
+    "dist": "build && build -w portable",
     "test": "standard",
     "lint": "standard",
     "lint-fix": "standard --fix"
@@ -55,7 +55,7 @@
   },
   "build": {
     "appId": "realliferpg.de",
-    "productName": "RealLifeRPG Launcher",
+    "productName": "RealLifeRPG",
     "copyright": "Copyright ©2018 ${author}",
     "win": {
       "target": "squirrel"

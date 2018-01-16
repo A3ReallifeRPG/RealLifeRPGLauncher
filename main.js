@@ -1,11 +1,7 @@
-const {app} = require('electron')
-if (require('electron-squirrel-startup')) app.quit()
-
+const {app, dialog} = require('electron')
 const path = require('path')
-const {Menu, Tray, BrowserWindow, ipcMain, autoUpdater, shell} = require('electron')
 
-let tray = null
-
+if (require('electron-squirrel-startup')) process.exit(0)
 // squirrel
 
 if (handleSquirrelEvent()) app.quit()
@@ -53,6 +49,10 @@ function handleSquirrelEvent () {
       return true
   }
 }
+
+const {Menu, Tray, BrowserWindow, ipcMain, autoUpdater, shell} = require('electron')
+
+let tray = null
 
 autoUpdater.addListener('error', (err) => { // eslint-disable-line
 })
@@ -192,7 +192,25 @@ const createTray = () => {
     {
       label: 'Auf Updates prüfen',
       click: () => {
-        autoUpdater.checkForUpdates()
+        if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
+          dialog.showMessageBox({
+            'type': 'info',
+            'title': 'ReallifeRPG Launcher Portable',
+            'message': 'Du verwendest die Portable Version des ReallifeRPG Launchers, automatische Updates werden nicht unterstützt.',
+            'buttons': [
+              'Portable Update manuell downloaden',
+              'Normale Version downloaden'
+            ]
+          }, (button) => {
+            if (button === 0) {
+              shell.openExternal('https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/releases/latest')
+            } else if (button === 1) {
+              shell.openExternal('https://realliferpg.de/download/')
+            }
+          })
+        } else {
+          autoUpdater.checkForUpdates()
+        }
       }
     },
     {

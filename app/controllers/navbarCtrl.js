@@ -29,7 +29,13 @@ angular.module('App').controller('navbarCtrl', ['$scope', '$rootScope', ($scope,
   $rootScope.$watch(
     'slide', () => {
       $('#carousel-main').carousel($rootScope.slide)
-      $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + $scope.tabs[$rootScope.slide].title
+      if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
+        $rootScope.portable = true
+        $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' Portable - ' + $scope.tabs[$rootScope.slide].title
+      } else {
+        $rootScope.portable = false
+        $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + $scope.tabs[$rootScope.slide].title
+      }
       if ($rootScope.map) {
         $rootScope.map.invalidateSize(false)
       }
