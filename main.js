@@ -54,10 +54,6 @@ function handleSquirrelEvent () {
   }
 }
 
-function deinstallApp () {
-
-}
-
 autoUpdater.addListener('error', (err) => { // eslint-disable-line
 })
 
@@ -174,8 +170,8 @@ const createWindows = () => {
 
   loadWin = new BrowserWindow({
     icon: 'resources/icon/appicon.ico',
-    width: 200,
-    height: 210,
+    width: 300,
+    height: 310,
     frame: false,
     webPreferences: {
       webSecurity: false
@@ -248,17 +244,30 @@ const toggleDevTools = () => {
 const setUpIpcHandlers = () => {
   if (!win || !webWin || !downWin) return
   ipcMain.on('to-dwn', (event, arg) => {
-    downWin.webContents.send('to-dwn', arg)
+    try {
+      downWin.webContents.send('to-dwn', arg)
+    } catch (e) {
+    }
   })
 
   ipcMain.on('to-web', (event, arg) => {
-    webWin.webContents.send('to-web', arg)
+    try {
+      webWin.webContents.send('to-web', arg)
+    } catch (e) {
+    }
   })
 
   ipcMain.on('to-app', (event, arg) => {
-    win.webContents.send('to-app', arg)
+    try {
+      win.webContents.send('to-app', arg)
+    } catch (e) {
+    }
   })
 }
+
+app.on('window-all-closed', () => {
+  ipcMain.removeAllListeners()
+})
 
 const shouldQuit = app.makeSingleInstance(() => {
   if (win) {
@@ -282,10 +291,6 @@ app.on('activate', () => {
   }
 })
 
-app.on('before-quit', () => {
-  ipcMain.removeAllListeners()
-})
-
 ipcMain.on('winprogress-change', (event, arg) => {
   win.setProgressBar(arg.progress)
 })
@@ -305,6 +310,7 @@ ipcMain.on('open-agreement', () => {
       reziable: false,
       closable: false,
       maximizable: false,
+      minimizable: false,
       center: true,
       width: 640,
       height: 700,
@@ -324,6 +330,10 @@ ipcMain.on('close-agreement', () => {
   if (child) {
     child.destroy()
   }
+})
+
+ipcMain.on('close-app', () => {
+  app.quit()
 })
 
 ipcMain.on('focus-window', () => {

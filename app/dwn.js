@@ -4,8 +4,12 @@ const progress = require('request-progress')
 const mkpath = require('mkpath')
 const WebTorrent = require('webtorrent')
 const hasha = require('hasha')
+const config = require('../config')
 require('events').EventEmitter.defaultMaxListeners = Infinity
 const {ipcRenderer} = require('electron')
+const async = require('async')
+const recursive = require('recursive-readdir')
+const pathf = require('path')
 
 let cancel = false
 let downloaded = 0
@@ -16,8 +20,6 @@ let client = window.client = new WebTorrent({
 })
 
 let path = ''
-
-/* global APIBaseURL APIModHashlistURL */
 
 ipcRenderer.on('to-dwn', (event, args) => {
   switch (args.type) {
@@ -30,11 +32,11 @@ ipcRenderer.on('to-dwn', (event, args) => {
       cancel = false
       path = args.path
       initSeeding(args.path + args.mod.Directories + '\\', args.mod.Torrent)
-      console.log(args.mod.Torrent)
       break
     case 'start-mod-hash':
       cancel = false
       path = args.path
+      changeStatus(true, 'Frage Modinformationen ab...', 'Warte auf Server...')
       getHashlist(args.mod, 'hashlist-callback-hash')
       break
     case 'start-mod-quickcheck':
@@ -45,11 +47,12 @@ ipcRenderer.on('to-dwn', (event, args) => {
     case 'start-mod-update':
       cancel = false
       path = args.path
+      changeStatus(true, 'Frage Modinformationen ab...', 'Warte auf Server...')
       getHashlist(args.mod, 'hashlist-callback-update')
       break
     case 'hashlist-callback-dwn':
       cancel = false
-      dwnMod(args)
+      downloadMod(args)
       break
     case 'hashlist-callback-hash':
       cancel = false
@@ -62,12 +65,11 @@ ipcRenderer.on('to-dwn', (event, args) => {
     case 'start-list-dwn':
       cancel = false
       path = args.path
-      console.log(args)
-      dwnlist(args)
+      downloadList(args)
       break
     case 'hashlist-callback-quickcheck':
       cancel = false
-      quickchecklist(args)
+      quickCheckList(args)
       break
     case 'cancel':
       cancel = true
@@ -75,30 +77,63 @@ ipcRenderer.on('to-dwn', (event, args) => {
   }
 })
 
-const dwnMod = (args) => {
-  downloaded = 0
-  if (args.args.mod.Torrent !== '') {
-    downloadFileRecursive(args.data.data, 0, path, args.args.mod.DownloadUrl, true, args.args.mod.Torrent)
-  } else {
-    downloadFileRecursive(args.data.data, 0, path, args.args.mod.DownloadUrl, false, args.args.mod.Torrent)
-  }
+const downloadMod = (args) => {
+  finishProgressHash(args.data.data, args.args.mod)
 }
 
-const dwnlist = (args) => {
+const downloadList = (args) => {
   downloaded = 0
-  downloadFileRecursive(args.list, 0, path, args.mod.DownloadUrl, args.torrent, args.mod.Torrent)
+  downloadFileR(args.list, 0, path, args.mod, args.torrent)
 }
 
 const updateMod = (args) => {
-  cleanFileRecursive(listDiff(args.data.data, path, args.args.mod), 0, path, quickCheckRecursiveList, args.data.data, 0, path, [], args.args.mod)
+  async.waterfall([
+    (callback) => {
+      listDiff(args.data.data, path, args.args.mod, callback)
+    },
+    (toDelete, callback) => {
+      removeFilesList(toDelete, callback)
+    },
+    (callback) => {
+      quickCheckListR(args.data.data, 0, path, [], args.args.mod, callback)
+    }
+  ],
+    (err, result) => {
+      if (err) {
+        console.log(err)
+      }
+      finishProgressHash(result, args.args.mod)
+    })
 }
 
-const quickchecklist = (args) => {
-  try {
-    fs.lstatSync(path + args.args.mod.Directories)
-    quickCheckRecursive(args.data.data, 0, path, args.args.mod)
-  } catch (e) {
-    console.log(e)
+const hashMod = (args) => {
+  async.waterfall([
+    (callback) => {
+      listDiff(args.data.data, path, args.args.mod, callback)
+    },
+    (toDelete, callback) => {
+      removeFilesList(toDelete, callback)
+    },
+    (callback) => {
+      hashListR(args.data.data, 0, path, [], args.args.mod, 0, callback)
+    }
+  ],
+    (err, result) => {
+      if (err) {
+        if (err === 'Cancelled') {
+          cancelled()
+        } else {
+          console.log(err)
+        }
+      }
+      finishProgressHash(result, args.args.mod)
+    })
+}
+
+const quickCheckList = (args) => {
+  if (fs.existsSync(path + args.args.mod.Directories)) {
+    quickCheckR(args.data.data, 0, path, args.args.mod)
+  } else {
     ipcRenderer.send('to-app', {
       type: 'update-quickcheck',
       update: 0,
@@ -107,57 +142,31 @@ const quickchecklist = (args) => {
   }
 }
 
-const hashMod = (args) => {
-  cleanFileRecursive(listDiff(args.data.data, path, args.args.mod), 0, path, hashFileRecursive, args.data.data, 0, path, [], args.args.mod)
-}
-
-const getHashlist = (mod, callback) => {
-  ipcRenderer.send('to-web', {
-    type: 'get-url',
-    callback: callback,
-    url: APIBaseURL + APIModHashlistURL + mod.Id,
-    callBackTarget: 'to-dwn',
-    mod: mod
+const listDiff = (list, basepath, mod, callback) => {
+  changeStatus(true, 'Prüfe auf überflüssige Dateien...', 'Prüfung...')
+  let modlist = []
+  list.forEach((cur, i) => {
+    modlist.push(basepath + cur.RelativPath)
+  })
+  recursive(pathf.join(basepath, mod.Directories), (err, files) => {
+    if (err) {
+      console.log(err)
+    }
+    let toDelete = files.filter(val => !modlist.includes(val))
+    callback(null, toDelete)
   })
 }
 
-const findFileInList = (list, path, basepath) => {
-  let found = false
-  list.forEach((listvalue) => {
-    if (basepath.replace(/\\/g, '/') + listvalue.RelativPath.replace(/\\/g, '/') === path.replace(/\\/g, '/')) {
-      found = true
+const removeFilesList = (list, callback) => {
+  changeStatus(true, list.length + ' Dateien werden gelöscht...', 'Lösche...')
+  list.forEach((cur, i) => {
+    try {
+      fs.unlinkSync(cur)
+    } catch (e) {
+      console.log(e)
     }
   })
-  return [found, path]
-}
-
-const listDiff = (list, basepath, mod) => {
-  let files = walkFolder(basepath + mod.Directories)
-  let toDelete = []
-  files.forEach((filesvalue) => {
-    let search = findFileInList(list, filesvalue, basepath)
-    if (!search[0]) {
-      toDelete.push(search[1])
-    }
-  })
-  return toDelete
-}
-
-const cleanFileRecursive = (list, index, basepath, callback, hashlist, hashIndex, path, dllist, mod) => {
-  try {
-    fs.unlink(list[index])
-    if (list.length > index + 1) {
-      cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod)
-    } else {
-      callback(hashlist, hashIndex, path, dllist, mod)
-    }
-  } catch (e) {
-    if (list.length > index + 1) {
-      cleanFileRecursive(list, index + 1, basepath, callback, hashlist, hashIndex, dllist, mod)
-    } else {
-      callback(hashlist, hashIndex, path, dllist, mod)
-    }
-  }
+  callback(null)
 }
 
 const initSeeding = (dirPath, TorrentURL) => {
@@ -165,6 +174,25 @@ const initSeeding = (dirPath, TorrentURL) => {
     updateProgressTorrentInit({
       torrentUploadSpeedState: client.progress
     })
+    try {
+      client.destroy((err) => {
+        if (err) {
+          console.log(err)
+        }
+        client = window.client = new WebTorrent({
+          maxConns: 150
+        })
+        clearInterval(update)
+        cancelled()
+      })
+    } catch (e) {
+      console.log(e)
+      client = window.client = new WebTorrent({
+        maxConns: 150
+      })
+      clearInterval(update)
+      cancelled()
+    }
   },
     1000
   )
@@ -193,111 +221,66 @@ const initSeeding = (dirPath, TorrentURL) => {
   })
 }
 
-const downloadFileRecursive = (list, index, basepath, dlserver, torrent, torrentURL) => {
-  let dest = basepath + list[index].RelativPath
-  let folder = dest.replace(list[index].FileName, '')
+const downloadFileR = (list, index, basepath, mod, torrent) => {
+  let cur = list[index]
+  let dest = basepath + cur.RelativPath
+  let folder = dest.replace(cur.FileName, '')
 
   try {
     let stats = fs.lstatSync(folder)
-    if (!(stats.isDirectory() && folder.includes('addons'))) {
-      dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
+    if (!(stats.isDirectory() && folder.includes('addons')) && torrent) {
+      initTorrent(folder, mod.Torrent)
     } else {
-      if (torrent) {
-        initTorrent(folder, torrentURL)
-      } else {
-        dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
-      }
+      let size = 0
+      let requestobj = null
+      list.forEach((cur) => {
+        size += cur.Size
+      })
+      progress(requestobj = request(mod.DownloadUrl + cur.RelativPath), {}).on('progress', (state) => {
+        if (cancel) {
+          requestobj.abort()
+          cancelled()
+        }
+        state.totalSize = size
+        state.totalDownloaded = downloaded
+        state.fileName = cur.FileName
+        state.fileSize = cur.Size
+        if (state.speed) {
+          updateProgressServer(state)
+        }
+      }).on('error', (err) => {
+        console.log(err)
+      }).on('end', () => {
+        if (cur.RelativPath.includes('.bisign')) {
+          updateProgressServerBisign({
+            totalSize: size,
+            totalDownloaded: downloaded,
+            fileName: cur.FileName,
+            fileSize: cur.Size
+          })
+        }
+        downloaded += cur.Size
+        if (cancel) {
+          cancel = false
+          cancelled()
+        } else {
+          if (index === list.length - 1) {
+            downloadFinished()
+          } else {
+            downloadFileR(list, index + 1, basepath, mod, torrent)
+          }
+        }
+      }).pipe(fs.createWriteStream(dest))
     }
   } catch (e) {
+    console.log(e)
     mkpath(folder, () => {
-      if (!folder.includes('addons') && torrent) {
-        dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
+      if (index === list.length - 1) {
+        downloadFinished()
       } else {
-        if (torrent) {
-          initTorrent(folder, torrentURL)
-        } else {
-          dlFileCallback(list, index, dest, basepath, dlserver, torrent, torrentURL)
-        }
+        downloadFileR(list, index, basepath, mod, torrent)
       }
     })
-  }
-}
-
-const dlFileCallback = (list, index, dest, basepath, dlserver, torrent, torrentURL) => {
-  let size = 0
-  let requestobj = null
-  list.forEach((cur) => {
-    size += cur.Size
-  })
-  progress(requestobj = request(dlserver + list[index].RelativPath), {}).on('progress', (state) => {
-    if (cancel) {
-      requestobj.abort()
-    }
-    state.totalSize = size
-    state.totalDownloaded = downloaded
-    state.fileName = list[index].FileName
-    state.fileSize = list[index].Size
-    updateProgressServer(state)
-  }).on('error', (err) => {
-    console.log(err)
-  }).on('end', () => {
-    if (list[index].RelativPath.includes('.bisign')) {
-      updateProgressServerBisign({
-        totalSize: size,
-        totalDownloaded: downloaded,
-        fileName: list[index].FileName,
-        fileSize: list[index].Size
-      })
-    }
-    downloaded += list[index].Size
-    if (cancel) {
-      cancel = false
-      cancelled()
-    } else {
-      if (list.length > index + 1) {
-        downloadFileRecursive(list, index + 1, basepath, dlserver, torrent, torrentURL)
-      } else {
-        downloadFinished()
-      }
-    }
-  }).pipe(fs.createWriteStream(dest))
-}
-
-const hashFileRecursive = (list, index, basepath, dllist, mod) => {
-  let dest = basepath + list[index].RelativPath
-
-  if (cancel) {
-    cancel = false
-    cancelled()
-  } else {
-    updateProgressHash({
-      index: index,
-      size: list.length
-    }, list[index].FileName, mod)
-
-    try {
-      fs.lstatSync(dest.replace(list[index].FileName, ''))
-      fs.lstatSync(dest)
-      hasha.fromFile(dest, {
-        algorithm: 'md5'
-      }).then((hash) => {
-        if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
-          dllist.push(list[index])
-        }
-        if (list.length > index + 1) {
-          hashFileRecursive(list, index + 1, basepath, dllist, mod)
-        } else {
-          finishProgressHash(dllist, mod)
-        }
-      })
-    } catch (e) {
-      dllist.push(list[index])
-      if (list.length > index + 1) {
-        hashFileRecursive(list, index + 1, basepath, dllist, mod)
-      } else {
-        finishProgressHash(dllist, mod)
-      }
-    }
   }
 }
 
@@ -313,6 +296,27 @@ const initTorrent = (folder, torrentURL) => {
     updateProgressTorrentInit({
       torrentUploadSpeedState: client.progress
     })
+    if (cancel) {
+      try {
+        client.destroy((err) => {
+          if (err) {
+            console.log(err)
+          }
+          client = window.client = new WebTorrent({
+            maxConns: 150
+          })
+          clearInterval(update)
+          cancelled()
+        })
+      } catch (e) {
+        console.log(e)
+        client = window.client = new WebTorrent({
+          maxConns: 150
+        })
+        clearInterval(update)
+        cancelled()
+      }
+    }
   },
     1000
   )
@@ -328,7 +332,7 @@ const initTorrent = (folder, torrentURL) => {
           torrentMaxConnsState: client.maxConns,
           torrentProgressState: torrent.progress,
           torrentRationState: torrent.ratio,
-          torrentETAState: torrent.timeRemaining,
+          todrrentETAState: torrent.timeRemaining,
           torrentDownloadedState: torrent.downloaded,
           torrentUploadedState: torrent.uploaded,
           torrentNumPeersState: torrent.numPeers,
@@ -356,6 +360,182 @@ const initTorrent = (folder, torrentURL) => {
     changeStatus(false, 'Torrent - Fehler', 'Fataler Fehler')
     console.log(err)
   })
+}
+
+const quickCheckR = (list, index, basepath, mod) => {
+  let cur = list[index]
+  let dest = basepath + cur.RelativPath
+  if (fs.existsSync(dest)) {
+    try {
+      let stats = fs.lstatSync(dest)
+      if (dest.includes('.bisign')) {
+        hasha.fromFile(dest, {algorithm: 'md5'}).then(hash => {
+          if (cur.Hash.toUpperCase() !== hash.toUpperCase()) {
+            ipcRenderer.send('to-app', {
+              type: 'update-quickcheck',
+              update: 1,
+              mod: mod
+            })
+          } else {
+            if (index === list.length - 1) {
+              ipcRenderer.send('to-app', {
+                type: 'update-quickcheck',
+                update: 2,
+                mod: mod
+              })
+            } else {
+              quickCheckR(list, index + 1, basepath, mod)
+            }
+          }
+        })
+      } else {
+        if (cur.Size !== stats.size) {
+          ipcRenderer.send('to-app', {
+            type: 'update-quickcheck',
+            update: 1,
+            mod: mod
+          })
+        } else {
+          if (index === list.length - 1) {
+            ipcRenderer.send('to-app', {
+              type: 'update-quickcheck',
+              update: 2,
+              mod: mod
+            })
+          } else {
+            quickCheckR(list, index + 1, basepath, mod)
+          }
+        }
+      }
+    } catch (e) {
+      console.log(e)
+      ipcRenderer.send('to-app', {
+        type: 'update-quickcheck',
+        update: 1,
+        mod: mod
+      })
+    }
+  } else {
+    ipcRenderer.send('to-app', {
+      type: 'update-quickcheck',
+      update: 1,
+      mod: mod
+    })
+  }
+}
+
+const hashListR = (list, index, basepath, dllist, mod, checked, callback) => {
+  let cur = list[index]
+  let dest = basepath + cur.RelativPath
+  let size = 0
+  list.forEach((cur) => {
+    size += cur.Size
+  })
+  updateProgressHash({
+    index: index,
+    size: list.length,
+    totalFileSize: size,
+    totalChecked: checked
+  }, cur.FileName, mod)
+  if (fs.existsSync(dest)) {
+    try {
+      hasha.fromFile(dest, {algorithm: 'md5'}).then(hash => {
+        if (cur.Hash.toUpperCase() !== hash.toUpperCase()) {
+          dllist.push(cur)
+        }
+        let stats = fs.lstatSync(dest)
+        checked += stats.size
+        if (index === list.length - 1) {
+          callback(null, dllist)
+        } else {
+          if (cancel) {
+            cancel = false
+            let reason = 'Cancelled'
+            callback(reason)
+          } else {
+            hashListR(list, index + 1, basepath, dllist, mod, checked, callback)
+          }
+        }
+      })
+    } catch (e) {
+      console.log(e)
+      dllist.push(cur)
+      if (index === list.length - 1) {
+        callback(null, dllist)
+      } else {
+        if (cancel) {
+          cancel = false
+          let reason = 'Cancelled'
+          callback(reason)
+        } else {
+          hashListR(list, index + 1, basepath, dllist, mod, checked, callback)
+        }
+      }
+    }
+  } else {
+    dllist.push(cur)
+    if (index === list.length - 1) {
+      callback(null, dllist)
+    } else {
+      if (cancel) {
+        cancel = false
+        let reason = 'Cancelled'
+        callback(reason)
+      } else {
+        hashListR(list, index + 1, basepath, dllist, mod, checked, callback)
+      }
+    }
+  }
+}
+
+const quickCheckListR = (list, index, basepath, dllist, mod, callback) => {
+  let cur = list[index]
+  let dest = basepath + cur.RelativPath
+  updateProgressQuick({
+    index: index,
+    size: list.length
+  }, cur.FileName, mod)
+  if (fs.existsSync(dest)) {
+    try {
+      let stats = fs.lstatSync(dest)
+      if (dest.includes('.bisign')) {
+        hasha.fromFile(dest, {algorithm: 'md5'}).then(hash => {
+          if (cur.Hash.toUpperCase() !== hash.toUpperCase()) {
+            dllist.push(cur)
+          }
+          if (index === list.length - 1) {
+            callback(null, dllist)
+          } else {
+            quickCheckListR(list, index + 1, basepath, dllist, mod, callback)
+          }
+        })
+      } else {
+        if (cur.Size !== stats.size) {
+          dllist.push(cur)
+        }
+        if (index === list.length - 1) {
+          callback(null, dllist)
+        } else {
+          quickCheckListR(list, index + 1, basepath, dllist, mod, callback)
+        }
+      }
+    } catch (e) {
+      console.log(e)
+      dllist.push(cur)
+      if (index === list.length - 1) {
+        callback(null, dllist)
+      } else {
+        quickCheckListR(list, index + 1, basepath, dllist, mod, callback)
+      }
+    }
+  } else {
+    dllist.push(cur)
+    if (index === list.length - 1) {
+      callback(null, dllist)
+    } else {
+      quickCheckListR(list, index + 1, basepath, dllist, mod, callback)
+    }
+  }
 }
 
 const updateProgressServer = (state) => {
@@ -408,6 +588,15 @@ const cancelled = () => {
   })
 }
 
+const updateProgressQuick = (state, filename, mod) => {
+  ipcRenderer.send('to-app', {
+    type: 'update-chickcheck-progress',
+    state: state,
+    fileName: filename,
+    mod: mod
+  })
+}
+
 const updateProgressHash = (state, filename, mod) => {
   ipcRenderer.send('to-app', {
     type: 'update-hash-progress',
@@ -425,107 +614,12 @@ const finishProgressHash = (list, mod) => {
   })
 }
 
-const quickCheckRecursive = (list, index, basepath, mod) => {
-  try {
-    let dest = basepath + list[index].RelativPath
-    let stats = fs.lstatSync(dest)
-    if (dest.includes('.bisign')) {
-      hasha.fromFile(dest, {
-        algorithm: 'md5'
-      }).then((hash) => {
-        if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
-          ipcRenderer.send('to-app', {
-            type: 'update-quickcheck',
-            update: 1,
-            mod: mod
-          })
-        } else {
-          if (list.length > index + 1) {
-            quickCheckRecursive(list, index + 1, basepath, mod)
-          } else {
-            ipcRenderer.send('to-app', {
-              type: 'update-quickcheck',
-              update: 2,
-              mod: mod
-            })
-          }
-        }
-      })
-    } else if (list[index].Size !== stats.size) {
-      ipcRenderer.send('to-app', {
-        type: 'update-quickcheck',
-        update: 1,
-        mod: mod
-      })
-    } else {
-      if (list.length > index + 1) {
-        quickCheckRecursive(list, index + 1, basepath, mod)
-      } else {
-        ipcRenderer.send('to-app', {
-          type: 'update-quickcheck',
-          update: 2,
-          mod: mod
-        })
-      }
-    }
-  } catch (e) {
-    ipcRenderer.send('to-app', {
-      type: 'update-quickcheck',
-      update: 1,
-      mod: mod
-    })
-  }
-}
-
-const quickCheckRecursiveList = (list, index, basepath, dllist, mod) => {
-  try {
-    let dest = basepath + list[index].RelativPath
-    let stats = fs.lstatSync(dest)
-    if (dest.includes('.bisign')) {
-      hasha.fromFile(dest, {
-        algorithm: 'md5'
-      }).then((hash) => {
-        if (list[index].Hash.toUpperCase() !== hash.toUpperCase()) {
-          dllist.push(list[index])
-        }
-        if (list.length > index + 1) {
-          quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
-        } else {
-          finishProgressHash(dllist, mod)
-        }
-      })
-    } else if (list[index].Size !== stats.size) {
-      dllist.push(list[index])
-      if (list.length > index + 1) {
-        quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
-      } else {
-        finishProgressHash(dllist, mod)
-      }
-    } else {
-      if (list.length > index + 1) {
-        quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
-      } else {
-        finishProgressHash(dllist, mod)
-      }
-    }
-  } catch (e) {
-    dllist.push(list[index])
-    if (list.length > index + 1) {
-      quickCheckRecursiveList(list, index + 1, basepath, dllist, mod)
-    } else {
-      finishProgressHash(dllist, mod)
-    }
-  }
-}
-
-const walkFolder = (dir) => {
-  let results = []
-  let list = fs.readdirSync(dir)
-  list.forEach((file) => {
-    file = dir + '/' + file
-    let stat = fs.statSync(file)
-    if (stat && stat.isDirectory()) results = results.concat(walkFolder(file))
-    else results.push(file)
+const getHashlist = (mod, callback) => {
+  ipcRenderer.send('to-web', {
+    type: 'get-url',
+    callback: callback,
+    url: config.APIBaseURL + config.APIModHashlistURL + mod.Id,
+    callBackTarget: 'to-dwn',
+    mod: mod
   })
-  return results
 }

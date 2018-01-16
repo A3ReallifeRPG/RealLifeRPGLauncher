@@ -1,4 +1,3 @@
-/* global STATICFILESERVE */
 const jsonist = require('jsonist')
 const {ipcRenderer} = require('electron')
 const fs = require('fs')
@@ -7,6 +6,7 @@ const progress = require('request-progress')
 const {app} = require('electron').remote
 const ps = require('ps-node')
 const exec = require('child_process').exec
+const config = require('../config')
 
 ipcRenderer.on('to-web', (event, args) => {
   switch (args.type) {
@@ -39,8 +39,7 @@ const getUrlCallback = (args, err, data, resp) => {
 }
 
 const downloadFILE = (file) => {
-  console.log(STATICFILESERVE + file)
-  progress(request(STATICFILESERVE + file), {}).on('progress', (state) => {
+  progress(request(config.STATICFILESERVE + file), {}).on('progress', (state) => {
     ipcRenderer.send('to-app', {
       type: 'update-dl-progress-file',
       state: state

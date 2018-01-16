@@ -15,11 +15,10 @@
 
     <style>
         .bottom-fix {
-            position: relative;
-            margin-top: -65px; /* negative value of footer height */
-            height: 65px;
-            clear: both;
-            padding-top: 20px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            background-color: #2b3e50;
         }
 
         .container {
@@ -55,11 +54,13 @@
 <div class="container">
     <div id="agreement">
     </div>
-    <hr>
+    <br><br><br>
 </div>
 <div class="bottom-fix center">
+    <hr>
     <button class="btn btn-success accept">Annehmen</button>
-    <button class="btn btn-danger decline">Deinstallieren</button>
+    <button class="btn btn-danger decline">Ablehnen</button>
+    <hr>
 </div>
 </body>
     <script src="agreement.js"></script>

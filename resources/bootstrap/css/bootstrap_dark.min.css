@@ -7444,7 +7444,8 @@ canvas#smoothie-chart {
 
 .alertify-dialog {
     padding: 0;
-    background-color: #4e5d6c
+    background-color: #4e5d6c;
+    border: 1px solid #ffffff;
 }
 
 .alertify-inner {
