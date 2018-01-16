@@ -2,7 +2,6 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.downloading = false
   $rootScope.AppLoaded = true
   $rootScope.ArmaPath = ''
-  $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   $rootScope.slide = 0
   $rootScope.theme = 'dark'
   $rootScope.updating = false
@@ -12,6 +11,14 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.logged_in = false
   $rootScope.logging_in = false
   $rootScope.map = null
+
+  if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
+    $rootScope.portable = true
+    $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' Portable - Mods'
+  } else {
+    $rootScope.portable = false
+    $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
+  }
 
   storage.get('settings', (err, data) => {
     if (err) {
