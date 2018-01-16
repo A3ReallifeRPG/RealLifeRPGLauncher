@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -55,23 +55,26 @@
   },
   "build": {
     "appId": "realliferpg.de",
-    "mac.category": "launcher.application",
+    "productName": "RealLifeRPG Launcher",
+    "copyright": "Copyright ©2018 ${author}",
     "win": {
-      "title": "RealLifeRPG Launcher",
-      "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
-      "remoteReleases": "https://static.realliferpg.de/remoteReleases/",
       "target": "squirrel"
     },
     "squirrelWindows": {
+      "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
       "loadingGif": "build/install-spinner.gif",
-      "setupIcon": "build/icon.ico"
+      "remoteReleases": "https://static.realliferpg.de/remoteReleases/"
+    },
+    "portable": {
+      "requestExecutionLevel": "user"
     },
     "extraFiles": "README.md"
   },
   "devDependencies": {
     "devtron": "1.4.0",
     "electron": "^1.7.10",
-    "electron-builder": "10.15.1",
+    "electron-builder": "19.42.0",
+    "electron-builder-squirrel-windows": "19.42.0",
     "standard": "*"
   },
   "contributors": [

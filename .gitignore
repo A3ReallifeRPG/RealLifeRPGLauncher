@@ -2,4 +2,4 @@
 /dist/*
 Thumbs.db
 .idea
-package-lock.json
+yarn.lock
