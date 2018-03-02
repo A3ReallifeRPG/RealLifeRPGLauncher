@@ -71,6 +71,10 @@ ipcRenderer.on('to-dwn', (event, args) => {
       cancel = false
       quickCheckList(args)
       break
+    case 'start-bisign-check':
+      cancel = false
+      deleteBisigns(args)
+      break
     case 'cancel':
       cancel = true
       break
@@ -103,6 +107,28 @@ const updateMod = (args) => {
         console.log(err)
       }
       finishProgressHash(result, args.args.mod)
+    })
+}
+
+const deleteBisigns = (args) => {
+  async.waterfall([
+    (callback) => {
+      deleteBisignFiles(path, args.mod, callback)
+    }
+  ],
+    (err, result) => {
+      if (err) {
+        if (err === 'Cancelled') {
+          cancelled()
+        } else {
+          console.log(err)
+        }
+      }
+      ipcRenderer.send('to-dwn', {
+        type: 'start-mod-hash',
+        mod: args.mod,
+        path: path
+      })
     })
 }
 
@@ -140,6 +166,21 @@ const quickCheckList = (args) => {
       mod: args.args.mod
     })
   }
+}
+
+const deleteBisignFiles = (basepath, mod, callback) => {
+  changeStatus(true, 'Lösche Bisign Dateien...', 'Lösche...')
+  recursive(pathf.join(basepath, mod.Directories), (err, files) => {
+    if (err) {
+      console.log(err)
+    }
+    files.forEach((cur, i) => {
+      if (pathf.extname(cur) === '.bisign') {
+        fs.unlinkSync(cur)
+      }
+    })
+    callback(null)
+  })
 }
 
 const listDiff = (list, basepath, mod, callback) => {

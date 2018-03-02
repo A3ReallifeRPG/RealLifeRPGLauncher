@@ -169,8 +169,10 @@
                                                                 <div class="btn-group btn-group-sm">
                                                                     <button class="btn btn-success btn-sm" ng-click="action(mod)" ng-disabled="downloading">{{mod.state[1]}}</button>
                                                                     <button class="btn btn-warning btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initHash(mod)" ng-disabled="downloading">Prüfen</button>
+                                                                    <button class="btn btn-danger btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initBisignCheck(mod)" ng-disabled="downloading">Bisign</button>
                                                                     <button class="btn btn-primary btn-sm" ng-show="mod.state[0] === 3 && mod.HasGameFiles && mod.Torrent !== '' && mod.Torrent !== null" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
                                                                     <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="openModDir(mod)"><span class=" glyphicon glyphicon-folder-open"></span></button>
+                                                                    <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0" ng-disabled="downloading" ng-click="refresh()"><span class=" glyphicon glyphicon-refresh"></span></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -344,25 +346,23 @@
                                             <div class="col-md-4">
                                                 <div class="panel panel-primary">
                                                     <div class="panel-heading">
-                                                        <span data-hover="tooltip" title="" tooltips tooltip-template="Dein Ingame Name" tooltip-side="bottom">{{player_data.name}}</span>#<span tooltips tooltip-template="Deine ID" tooltip-side="bottom">{{player_data.uid}}</span>
+                                                        <span data-hover="tooltip" title="" tooltips tooltip-template="Dein Ingame Name" tooltip-side="bottom">{{player_data.name}}</span>#<span tooltips tooltip-template="Deine ID" tooltip-side="bottom">{{player_data.id}}</span>
                                                         <span class="pull-right" tooltips tooltip-template="Dein Name auf Steam" tooltip-side="bottom" tooltip-class="pull-right">{{player_data.profilename}}</span>
                                                     </div>
                                                 </div>
-                                                <div style="text-align: center;">
-                                                    <div class="progress active" style="margin: auto;">
-                                                        <div class="progress-bar progress-bar-striped progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: {{player_data.exp_progress}}%"></div>
-                                                    </div>
+                                                <h4><span class="pull-left" tooltips tooltip-template="Dein aktuelles Level">{{player_data.level}}</span><span class="pull-right">{{player_data.level+ 1}}</span></h4>
+                                                <div class="progress active" style="margin: auto;">
+                                                    <div tooltips tooltip-template="Dein Fortschritt zu Level {{player_data.level + 1}}" class="progress-bar progress-bar-striped progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: {{player_data.level_progress}}%"></div>
                                                 </div>
-                                                <br>
                                                 <ul class="list-group list-group-unbordered margin-none">
                                                     <li class="list-group-item">
-                                                        <b>PlayerID</b> <a class="pull-right" tooltips tooltip-template="Deine SteamID64" tooltip-class="pull-right">{{player_data.playerid}}</a>
+                                                        <b>PlayerID</b> <a class="pull-right" tooltips tooltip-template="Deine SteamID64" tooltip-class="pull-right">{{player_data.pid}}</a>
                                                     </li>
                                                     <li class="list-group-item">
                                                         <b>BE GUID</b> <a class="pull-right" tooltips tooltip-template="Deine Battleye GUID" tooltip-class="pull-right">{{player_data.guid}}</a>
                                                     </li>
                                                     <li class="list-group-item">
-                                                        <b>Zuletzt gesehen</b> <a class="pull-right" tooltips tooltip-template="Zu diesem Zeitpunkt warst du zuletzt Online" tooltip-class="pull-right">{{player_data.last_change}}</a>
+                                                        <b>Zuletzt gesehen</b> <a class="pull-right" tooltips tooltip-template="Zu diesem Zeitpunkt warst du zuletzt Online" tooltip-class="pull-right">{{player_data.last_seen.date}}</a>
                                                     </li>
                                                     <li class="list-group-item">
                                                         <b>Bargeld</b> <a class="pull-right" tooltips tooltip-template="Dein Bargeld" tooltip-class="pull-right">${{player_data.cash_readable}}</a>
@@ -405,17 +405,17 @@
                                                         </thead>
                                                         <tbody>
                                                         <tr role="row" class="odd" ng-repeat="vehicle in player_data.vehicles">
-                                                            <td>{{vehicle.classname}}</td>
+                                                            <td>{{vehicle.name}}</td>
                                                             <td>
                                                                 <i ng-if="vehicle.type === 'Car'" class="fa fa-car" aria-hidden="true"></i>
                                                                 <i ng-if="vehicle.type === 'Air'" class="fa fa-plane" aria-hidden="true"></i>
                                                                 <i ng-if="vehicle.type === 'Ship'" class="fa fa-ship" aria-hidden="true"></i>
                                                             </td>
                                                             <td>
-                                                                <span ng-if="vehicle.side === 'cop'" class="label label-info label-cop">Polizei</span>
-                                                                <span ng-if="vehicle.side === 'civ'" class="label label-info label-civ">Zivil</span>
-                                                                <span ng-if="vehicle.side === 'adac'" class="label label-info label-adac">RAC</span>
-                                                                <span ng-if="vehicle.side === 'med'" class="label label-info label-medic">Medic</span>
+                                                                <span ng-if="vehicle.side === 'WEST'" class="label label-info label-cop">Polizei</span>
+                                                                <span ng-if="vehicle.side === 'CIV'" class="label label-info label-civ">Zivil</span>
+                                                                <span ng-if="vehicle.side === 'EAST'" class="label label-info label-adac">RAC</span>
+                                                                <span ng-if="vehicle.side === 'GUER'" class="label label-info label-medic">Medic</span>
                                                             </td>
                                                             <td>
                                                                 <span ng-if="vehicle.alive" class="label label-success"><i class="fa fa-check" aria-hidden="true"></i></span>
@@ -703,22 +703,38 @@
                                     <div class="panel panel-default ">
                                         <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question1">
                                             <h4 class="panel-title">
-                                                <a href="#" class="ing">Du wirst beim Joinen auf den Server immer wieder gekickt</a>
+                                                <a href="#" class="ing">Du wirst beim Joinen auf den Server gekickt ("Verbindung zur Sitzung abgebrochen"/"Session Lost")</a>
                                             </h4>
                                         </div>
                                         <div id="question1" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
-                                                Nutze den Button "Prüfen" zum Überprüfen der Mods
+                                                Nutze den Button "Bisign" zum löschen der .bisign Dateien und prüfen der Mods.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default ">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question2">
+                                            <h4 class="panel-title">
+                                                <a href="#" class="ing">Du wirst beim Joinen auf den Server gekickt wegen "Sie können diese Mission nicht spielen..."</a>
+                                            </h4>
+                                        </div>
+                                        <div id="question2" class="panel-collapse collapse" style="height: 0;">
+                                            <div class="panel-body">
+                                                <ul>
+                                                    <li>Gehe 100% sicher das die ReallifeRPG-Mods geladen werden, dies ist sichtbar am ReallifeRPG-Logo im Hauptmenü.</li>
+                                                    <li>Fehler hierbei können unter anderem entstehen durch mehrere Arma Installationen, der ReallifeRPG Launcher startet die Arma Installation die im Pfad ausgewählt ist, nicht die die Steam möglicherweise verwendet!</li>
+                                                    <li>Melde dich im Support falls du das Problem nicht selber behben kannst, dort wird dir immer geholfen :)</li>
+                                                </ul>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="panel panel-default">
-                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question2">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question3">
                                             <h4 class="panel-title">
                                                 <a href="#" class="ing">Das Verbinden zum Torrent dauert sehr lang, was ist falsch ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question2" class="panel-collapse collapse" style="height: 0;">
+                                        <div id="question3" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
                                                 Beim Verbinden zum Torrent müssen erst alle vorhandenen Dateien
                                                 geprüft werden.<br>
@@ -729,24 +745,24 @@
                                         </div>
                                     </div>
                                     <div class="panel panel-default">
-                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question3">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question4">
                                             <h4 class="panel-title">
                                                 <a href="#" class="ing">Wie kann ich euch durch seeden unterstüzen ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question3" class="panel-collapse collapse" style="height: 0;">
+                                        <div id="question4" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
                                                 Sobald du den Mod heruntergelanden hast kannst du mit dem Button "Seeden" das Seeding starten. Danke! <3<br>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="panel panel-default">
-                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question4">
+                                        <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question5">
                                             <h4 class="panel-title">
                                                 <a href="#" class="ing">Ein Bug im Launcher! Was nun ?</a>
                                             </h4>
                                         </div>
-                                        <div id="question4" class="panel-collapse collapse" style="height: 0;">
+                                        <div id="question5" class="panel-collapse collapse" style="height: 0;">
                                             <div class="panel-body">
                                                 Alle Bugs Ingame bitte nur im <a href="https://forum.realliferpg.de/wpbt/">Bugtracker</a>
                                                 <br>
@@ -755,7 +771,7 @@
                                                 <br>
                                                 Ansonsten melde bitte deinen Bug im Launcher via
                                                 <ul>
-                                                    <li><a href="https://forum.realliferpg.de/wpbt/index.php?product/2-reallife-rpg/">Bugtracker</a></li>
+                                                    <li><a href="https://forum.realliferpg.de/wpbt/product/2-infopanel/">Bugtracker</a></li>
                                                     <li><a href="https://github.com/A3ReallifeRPG/RealLifeRPGLauncher/issues">Github</a></li>
                                                     <li><a href="mailto:NotKaibu@gmail.com">Per Mail an NotKaibu@gmail.com</a></li>
                                                 </ul>
