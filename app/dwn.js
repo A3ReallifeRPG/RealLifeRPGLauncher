@@ -228,7 +228,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
 
   try {
     let stats = fs.lstatSync(folder)
-    if (!(stats.isDirectory() && folder.includes('addons')) && torrent) {
+    if (stats.isDirectory() && folder.includes('addons') && torrent) {
       initTorrent(folder, mod.Torrent)
     } else {
       let size = 0
