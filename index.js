@@ -137,7 +137,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     if (typeof args.args !== 'undefined') {
       if (args.args.callback === 'player-callback') {
         $rootScope.player_data = args.data.data[0]
-        $rootScope.player_data.last_change = moment(new Date($rootScope.player_data.last_change)).format('H:mm, DD.MM.YYYY')
+        $rootScope.player_data.last_seen.date = moment(new Date($rootScope.player_data.last_seen.date)).format('H:mm, DD.MM.YYYY')
         $rootScope.player_data.cash_readable = $rootScope.player_data.cash.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.')
         $rootScope.player_data.bankacc_readable = $rootScope.player_data.bankacc.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.')
         $rootScope.player_data.exp_readable = $rootScope.player_data.exp.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.')

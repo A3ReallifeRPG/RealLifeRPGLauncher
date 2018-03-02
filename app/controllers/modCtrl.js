@@ -331,6 +331,15 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
     })
   }
 
+  $scope.initBisignCheck = (mod) => {
+    alertify.log('Bisign Dateien werden neu geladen...', 'primary')
+    ipcRenderer.send('to-dwn', {
+      type: 'start-bisign-check',
+      mod: mod,
+      path: $rootScope.ArmaPath
+    })
+  }
+
   $scope.initUpdate = (mod) => {
     alertify.log('Update wird gestartet', 'primary')
     ipcRenderer.send('to-dwn', {
