@@ -336,6 +336,7 @@
                                 <br>
                                 <div style="text-align: center" ng-if="!logged_in">
                                     <div class="jumbotron">
+                                        <h4>Dieser Schritt ist rein Optional! <br> <br>Der Mod kann direkt heruntergeladen werden und diese Funktion ist erst verfügbar wenn du einmal auf dem Server gewesen bist.</h4>
                                         <h4><a href="" ng-click="login()">Logge</a> dich oben Rechts im Launcher mit deinem API Schlüssel aus dem <a href="https://info.realliferpg.de/">Infopanel</a> ein.</h4>
                                     </div>
                                     <img src="resources/img/api_key_showcase.png">
@@ -405,7 +406,9 @@
                                                         </thead>
                                                         <tbody>
                                                         <tr role="row" class="odd" ng-repeat="vehicle in player_data.vehicles">
-                                                            <td>{{vehicle.name}}</td>
+                                                            <td>
+                                                                {{vehicle.name}}
+                                                            </td>
                                                             <td>
                                                                 <i ng-if="vehicle.type === 'Car'" class="fa fa-car" aria-hidden="true"></i>
                                                                 <i ng-if="vehicle.type === 'Air'" class="fa fa-plane" aria-hidden="true"></i>
@@ -659,6 +662,14 @@
                                                 <span class="pull-right">
                                                         <input class="icheck" id="darkSwitch" type="radio" name="theme">
                                                 </span>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <form>
+                                            <div class="form-group form-inline">
+                                                <h5>Debug</h5>
+                                                <button class="btn btn-success" ng-disabled="uploadingRPT" type="button" ng-click="uploadRPT()">Letzten RPT hochladen</button>
                                             </div>
                                         </form>
                                     </div>

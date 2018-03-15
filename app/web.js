@@ -7,6 +7,7 @@ const {app} = require('electron').remote
 const ps = require('ps-node')
 const exec = require('child_process').exec
 const config = require('../config')
+const pathf = require('path')
 
 ipcRenderer.on('to-web', (event, args) => {
   switch (args.type) {
@@ -18,6 +19,9 @@ ipcRenderer.on('to-web', (event, args) => {
       break
     case 'ping-server-via-rdp' :
       pingServer(args.server)
+      break
+    case 'upload_rpt' :
+      uploadRPT(getLatestRptFile(getArmaAppData()), args.pid)
       break
   }
 })
@@ -72,5 +76,65 @@ const pingServer = (server) => {
         })
       }
     })
+  })
+}
+
+const getLatestRptFile = (dir) => {
+  let files = fs.readdirSync(dir).filter(function (v) {
+    return pathf.extname(v) === '.rpt'
+  }).map(function (v) {
+    return {
+      name: dir + v,
+      time: fs.statSync(dir + v).mtime.getTime()
+    }
+  }).sort(function (a, b) {
+    return b.time - a.time
+  }).map(function (v) {
+    return v.name
+  })
+
+  if (files.length > 0) {
+    return files[0]
+  } else {
+    console.log('Keine RPT Logs vorhanden')
+    ipcRenderer.send('to-app', {
+      'type': 'rpt_upload_callback',
+      'success': false,
+      'url': ''
+    })
+  }
+}
+
+const getArmaAppData = () => {
+  return pathf.join(app.getPath('appData'), '..', 'Local', 'Arma 3', '\\')
+}
+
+const uploadRPT = (rptfile, playerid) => {
+  let formData = {
+    file: fs.createReadStream(rptfile)
+  }
+  if (playerid) {
+    formData.pid = playerid
+  }
+  request.post({
+    url: 'https://api.realliferpg.de/v1/rpt_upload',
+    formData: formData
+  }, function optionalCallback (err, httpResponse, body) {
+    if (err) {
+      ipcRenderer.send('to-app', {
+        'type': 'rpt_upload_callback',
+        'success': false,
+        'url': ''
+      })
+      return console.error('upload failed:', err)
+    }
+    body = JSON.parse(body)
+    if (body.status === 200) {
+      ipcRenderer.send('to-app', {
+        'type': 'rpt_upload_callback',
+        'success': true,
+        'url': body.data.link
+      })
+    }
   })
 }

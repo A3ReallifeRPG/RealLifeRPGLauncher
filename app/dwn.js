@@ -14,6 +14,7 @@ const pathf = require('path')
 let cancel = false
 let downloaded = 0
 let update = null
+let debug = false
 
 let client = window.client = new WebTorrent({
   maxConns: 150
@@ -87,6 +88,9 @@ const downloadMod = (args) => {
 
 const downloadList = (args) => {
   downloaded = 0
+  if (debug) {
+    console.log(args.list)
+  }
   downloadFileR(args.list, 0, path, args.mod, args.torrent)
 }
 
