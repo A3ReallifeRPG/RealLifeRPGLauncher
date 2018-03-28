@@ -665,11 +665,15 @@
                                             </div>
                                         </form>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-8">
                                         <form>
                                             <div class="form-group form-inline">
                                                 <h5>Debug</h5>
-                                                <button class="btn btn-success" ng-disabled="uploadingRPT" type="button" ng-click="uploadRPT()">Letzten RPT hochladen</button>
+                                                <div class="btn-group btn-group-margin" role="group">
+                                                    <button class="btn btn-success" ng-disabled="uploadingRPT" type="button" ng-click="uploadRPT()">Letzten RPT hochladen <i class="fa fa-upload" aria-hidden="true"></i></button>
+                                                    <button class="btn btn-success" type="button" ng-click="openMPCache()">MPMission Cache öffnen <i class="fa fa-folder-open" aria-hidden="true"></i></button>
+                                                    <button class="btn btn-success" type="button" ng-click="startA3Verify()">Arma 3 auf Fehler prüfen <i class="fa fa fa-cogs" aria-hidden="true"></i></button>
+                                                </div>
                                             </div>
                                         </form>
                                     </div>
@@ -758,7 +762,7 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading accordion-toggle collapsed question-toggle" data-toggle="collapse" data-parent="#faqAccordion" data-target="#question4">
                                             <h4 class="panel-title">
-                                                <a href="#" class="ing">Wie kann ich euch durch seeden unterstüzen ?</a>
+                                                <a href="#" class="ing">Wie kann ich euch durch seeden unterstützen ?</a>
                                             </h4>
                                         </div>
                                         <div id="question4" class="panel-collapse collapse" style="height: 0;">

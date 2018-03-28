@@ -357,7 +357,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('map', {
       title: 'Karte',
-      text: 'Hier findest du eine Karte von Abramia auf der du dir den Füllstand aller Tankstellen anzeigen lassen kannst.',
+      text: 'Hier findest du eine Karte von Havenborn auf der du dir den Füllstand aller Tankstellen anzeigen lassen kannst.',
       attachTo: '.mapTabBtn bottom',
       buttons: {
         text: 'Weiter',

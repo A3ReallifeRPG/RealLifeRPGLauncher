@@ -153,4 +153,12 @@ angular.module('App').controller('settingsCtrl', ['$scope', '$rootScope', ($scop
       })
     }
   }
+
+  $scope.openMPCache = () => {
+    shell.showItemInFolder(path.join(app.getPath('appData'), '..', 'Local', 'Arma 3', 'MPMissionsCache', 'x'))
+  }
+
+  $scope.startA3Verify = () => {
+    shell.openExternal('steam://validate/107410')
+  }
 }])

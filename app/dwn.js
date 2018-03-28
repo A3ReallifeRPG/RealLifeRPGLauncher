@@ -15,6 +15,7 @@ let cancel = false
 let downloaded = 0
 let update = null
 let debug = false
+let downloadTimeouts = 0
 
 let client = window.client = new WebTorrent({
   maxConns: 150
@@ -295,6 +296,26 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
         }
       }).on('error', (err) => {
         console.log(err)
+        switch (err.code) {
+          case 'ETIMEDOUT':
+            downloadTimeouts += 1
+            downloadErrorNotify(`Timeout zum Downloadserver (#${downloadTimeouts})`)
+            if (index === list.length - 1) {
+              downloadFinished()
+            } else {
+              downloadFileR(list, index, basepath, mod, torrent)
+            }
+            break
+          case 'ECONNREFUSED':
+            downloadErrored('Verbindung abgelehnt')
+            break
+          case 'ENOTFOUND':
+            downloadErrored('DNS Fehler')
+            break
+          default:
+            downloadErrored(err.code)
+            break
+        }
       }).on('end', () => {
         if (cur.RelativPath.includes('.bisign')) {
           updateProgressServerBisign({
@@ -332,6 +353,20 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
 const downloadFinished = () => {
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-done'
+  })
+}
+
+const downloadErrored = (msg) => {
+  ipcRenderer.send('to-app', {
+    type: 'update-dl-progress-error',
+    err_msg: msg
+  })
+}
+
+const downloadErrorNotify = (msg) => {
+  ipcRenderer.send('to-app', {
+    type: 'notify-dl',
+    err_msg: msg
   })
 }
 
@@ -377,7 +412,7 @@ const initTorrent = (folder, torrentURL) => {
           torrentMaxConnsState: client.maxConns,
           torrentProgressState: torrent.progress,
           torrentRationState: torrent.ratio,
-          todrrentETAState: torrent.timeRemaining,
+          torrentETAState: torrent.timeRemaining,
           torrentDownloadedState: torrent.downloaded,
           torrentUploadedState: torrent.uploaded,
           torrentNumPeersState: torrent.numPeers,
@@ -635,7 +670,7 @@ const cancelled = () => {
 
 const updateProgressQuick = (state, filename, mod) => {
   ipcRenderer.send('to-app', {
-    type: 'update-chickcheck-progress',
+    type: 'update-quickcheck-progress',
     state: state,
     fileName: filename,
     mod: mod

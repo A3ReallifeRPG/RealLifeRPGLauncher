@@ -7609,3 +7609,7 @@ tooltip[tooltip-class="pull-right"] {
 .modScroll {
     max-height: 368px;
 }
+
+.btn-group-margin .btn + .btn, .btn-group-margin .btn + .btn-group-margin, .btn-group-margin .btn-group-margin + .btn, .btn-group-margin .btn-group-margin + .btn-group-margin {
+    margin-left: 4px !important;
+}
