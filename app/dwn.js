@@ -282,6 +282,11 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
       list.forEach((cur) => {
         size += cur.Size
       })
+      try {
+        fs.unlinkSync(dest)
+      } catch (e) {
+
+      }
       progress(requestobj = request(mod.DownloadUrl + cur.RelativPath), {}).on('progress', (state) => {
         if (cancel) {
           requestobj.abort()

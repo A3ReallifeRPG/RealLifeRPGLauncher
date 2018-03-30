@@ -249,7 +249,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           canCancel: false,
           downSpeed: 0,
           upSpeed: 0,
-          totalProgress: 0,
+          totalProgress: '',
           totalSize: 0,
           totalDownloaded: 0,
           totalETA: '',
