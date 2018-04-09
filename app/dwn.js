@@ -317,6 +317,15 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
           case 'ENOTFOUND':
             downloadErrored('DNS Fehler')
             break
+          case 'ECONNRESET':
+            downloadTimeouts += 1
+            downloadErrorNotify(`Verbindungsabbruch zum Downloadserver (#${downloadTimeouts})`)
+            if (index === list.length - 1) {
+              downloadFinished()
+            } else {
+              downloadFileR(list, index, basepath, mod, torrent)
+            }
+            break
           default:
             downloadErrored(err.code)
             break
