@@ -201,7 +201,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           if (size > 100000000) {
             if (args.mod.Torrent !== '' && args.mod.Torrent !== null) {
               alertify.set({labels: {ok: 'Torrent', cancel: 'Server'}})
-              alertify.confirm(args.list.length + ' Dateien müssen heruntergelanden werden (' + prettyBytes(size) + ')', (e) => {
+              alertify.confirm(args.list.length + ' Dateien müssen heruntergeladen werden (' + prettyBytes(size) + ')', (e) => {
                 if (e) {
                   $scope.reset()
                   $scope.initListDownload(args.list, true, args.mod)
@@ -216,7 +216,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           } else {
             $scope.initListDownload(args.list, false, args.mod)
           }
-          helpers.spawnNotification(args.list.length + ' Dateien müssen heruntergelanden werden (' + prettyBytes(size) + ')')
+          helpers.spawnNotification(args.list.length + ' Dateien müssen heruntergeladen werden (' + prettyBytes(size) + ')')
           $scope.$apply()
         } else {
           helpers.spawnNotification('Überprüfung abgeschlossen - Mod ist aktuell.')
@@ -278,7 +278,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           fileName: '',
           fileProgress: ''
         })
-        helpers.spawnNotification('Download Fehlgeschlagen.')
+        helpers.spawnNotification('Download fehlgeschlagen.')
         break
       case 'cancelled':
         $scope.reset()
@@ -387,7 +387,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
 
   $scope.initListDownload = (list, torrent, mod) => {
     $scope.update({
-      state: 'Download wird gestarted...',
+      state: 'Download wird gestartet...',
       hint: '',
       downloading: true,
       canCancel: true,
@@ -626,11 +626,11 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           $rootScope.getMods()
         } else {
           $rootScope.slide = 5
-          alertify.log('Bitte wähle deine Arma Pfad aus', 'primary')
+          alertify.log('Bitte wähle deinen Arma Pfad aus', 'primary')
         }
       })
     } else {
-      alertify.log('Kein Arma Pfad gefunden', 'danger')
+      alertify.log('Keinen Arma Pfad gefunden', 'danger')
     }
   }
 
