@@ -21,9 +21,6 @@ Unser Launcher ist OpenSource, ihr könnt euch die gesammte Source herunterladen
 Gerne könnt ihr auch zur Weiterentwicklung beitragen, mehr Infos dazu findet ihr weiter unten.
 
 Wir haben unseren Launcher öffentlich gemacht, um der Arma Community in diesem Bereich einen kleinen Anstoß zu geben, ebenfalls über Open Source Lösungen nachzudenken.
-=======
-Wir haben unseren Launcher öffentlich gemacht um der Arma Community in diesem Bereich einen kleinen Anstoß zu geben ebenfalls über Open Source Lösungen nachzudenken.
->>>>>>> Stashed changes
 Wenn ihr den Launcher nutzen wollt oder von ihm lernt würden wir uns über ein bisschen Credit sehr freuen und bitte ändert aus rein praktikablen Gründen für die Nutzer Icon und Bootstrap Theme.
 
 RealLifeRPG ist eine Arma3 Gaming Community.
