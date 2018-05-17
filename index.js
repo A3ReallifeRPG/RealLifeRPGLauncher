@@ -11,6 +11,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.logged_in = false
   $rootScope.logging_in = false
   $rootScope.map = null
+  $rootScope.uploadingRPT = false
 
   if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
     $rootScope.portable = true
@@ -154,6 +155,27 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
           $rootScope.ArmaPath = data.armapath
           $rootScope.getMods()
         })
+        $rootScope.$apply()
+      }
+    }
+    if (args.type === 'rpt_upload_callback') {
+      if (args.success) {
+        alertify.set({labels: {ok: 'Link kopieren <span class="glyphicon glyphicon-copy"></span>', cancel: 'Abbrechen'}})
+        alertify.confirm('Hochladen erfolgreich, sende den Link dem Dev/Admin/Support', (e) => {
+          if (e) {
+            helpers.copyToClipboard(args.url)
+            alertify.log('Kopiert', 'success')
+            $rootScope.uploadingRPT = false
+            $rootScope.$apply()
+          } else {
+            alertify.log('Abgebrochen', 'danger')
+            $rootScope.uploadingRPT = false
+            $rootScope.$apply()
+          }
+        })
+      } else {
+        alertify.log('Fehler', 'danger')
+        $rootScope.uploadingRPT = false
         $rootScope.$apply()
       }
     }
@@ -335,7 +357,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('map', {
       title: 'Karte',
-      text: 'Hier findest du eine Karte von Abramia auf der du dir den Füllstand aller Tankstellen anzeigen lassen kannst.',
+      text: 'Hier findest du eine Karte von Havenborn auf der du dir den Füllstand aller Tankstellen anzeigen lassen kannst.',
       attachTo: '.mapTabBtn bottom',
       buttons: {
         text: 'Weiter',

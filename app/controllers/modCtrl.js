@@ -67,6 +67,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
         $scope.$apply()
         break
       case 'update-dl-progress-torrent':
+        console.log(args)
         $scope.update({
           state: 'Torrent - Verbunden',
           hint: 'Download via Torrent läuft',
@@ -86,7 +87,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
         $scope.pushToChart(new Date().getTime(), args.state.torrentDownloadSpeedState, args.state.torrentUploadSpeedState)
         $scope.$apply()
         break
-      case 'update-chickcheck-progress':
+      case 'update-quickcheck-progress':
         $scope.update({
           state: 'Versionsunterschiede werden bestimmt...',
           hint: 'Prüfe Dateien',
@@ -241,15 +242,50 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
         })
         break
       case 'update-dl-progress-done':
-        $scope.state = 'Abgeschlossen'
-        $scope.progress = 100
+        $scope.update({
+          state: 'Abgeschlossen',
+          hint: 'Download abgeschlossen',
+          downloading: false,
+          canCancel: false,
+          downSpeed: 0,
+          upSpeed: 0,
+          totalProgress: '',
+          totalSize: 0,
+          totalDownloaded: 0,
+          totalETA: '',
+          totalPeers: 0,
+          maxConns: 0,
+          fileName: '',
+          fileProgress: ''
+        })
         helpers.spawnNotification('Download abgeschlossen.')
-        $scope.reset()
-        $scope.checkUpdates()
+        $rootScope.refresh()
+        break
+      case 'update-dl-progress-error':
+        $scope.update({
+          state: 'Fehler',
+          hint: args.err_msg,
+          downloading: false,
+          canCancel: false,
+          downSpeed: 0,
+          upSpeed: 0,
+          totalProgress: '',
+          totalSize: 0,
+          totalDownloaded: 0,
+          totalETA: '',
+          totalPeers: 0,
+          maxConns: 0,
+          fileName: '',
+          fileProgress: ''
+        })
+        helpers.spawnNotification('Download Fehlgeschlagen.')
         break
       case 'cancelled':
         $scope.reset()
         $scope.checkUpdates()
+        break
+      case 'notify-dl':
+        alertify.log(args.err_msg, 'danger')
         break
       case 'notification-callback':
         if (args.data.Active) {
@@ -418,7 +454,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           yAxes: [{
             ticks: {
               callback: (value) => {
-                return value + ' MB/s'
+                return ' ' + value + ' MB/s'
               },
               min: 0
             }

@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.6.3",
+  "version": "2.6.7",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -18,7 +18,7 @@
     "start": "electron .",
     "pack": "build --target dir",
     "dist": "build && build -w portable",
-    "test": "standard",
+    "test": "standard --fix",
     "lint": "standard",
     "lint-fix": "standard --fix"
   },

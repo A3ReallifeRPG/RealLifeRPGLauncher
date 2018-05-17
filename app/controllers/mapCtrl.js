@@ -44,10 +44,13 @@ angular.module('App').controller('mapCtrl', ['$scope', '$rootScope', ($scope, $r
       })
     })
 
-    L.control.layers({
-      'Server 1 Tankstellen': L.layerGroup($scope.fuelstations[0].Markers),
-      'Server 2 Tankstellen': L.layerGroup($scope.fuelstations[1].Markers)
-    }).addTo($rootScope.map)
+    let layers = {}
+
+    $scope.fuelstations.forEach((cur, i) => {
+      layers['Tankstellen Server ' + cur.Id] = L.layerGroup(cur.Markers)
+    })
+
+    L.control.layers(layers).addTo($rootScope.map)
   }
 
   $scope.init = () => {
