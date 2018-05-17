@@ -18,6 +18,7 @@
     "start": "electron .",
     "pack": "build --target dir",
     "dist": "build && build -w portable",
+    "appx": "build -w appx",
     "test": "standard --fix",
     "lint": "standard",
     "lint-fix": "standard --fix"
@@ -64,6 +65,15 @@
       "iconUrl": "https://static.realliferpg.de/img/launcher/icon.ico",
       "loadingGif": "build/install-spinner.gif",
       "remoteReleases": "https://static.realliferpg.de/remoteReleases/"
+    },
+    "appx": {
+      "applicationId": "realliferpg.de",
+      "backgroundColor": "#2b3e50",
+      "displayName": "RealLifeRPG",
+      "identityName": "realliferpg.de",
+      "languages": [
+        "de"
+      ]
     },
     "portable": {
       "requestExecutionLevel": "user"

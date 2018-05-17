@@ -92,6 +92,9 @@ const downloadList = (args) => {
   if (debug) {
     console.log(args.list)
   }
+  args.list.sort((a, b) => {
+    return a.Size > b.Size
+  })
   downloadFileR(args.list, 0, path, args.mod, args.torrent)
 }
 

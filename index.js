@@ -160,7 +160,12 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     }
     if (args.type === 'rpt_upload_callback') {
       if (args.success) {
-        alertify.set({labels: {ok: 'Link kopieren <span class="glyphicon glyphicon-copy"></span>', cancel: 'Abbrechen'}})
+        alertify.set({
+          labels: {
+            ok: 'Link kopieren <span class="glyphicon glyphicon-copy"></span>',
+            cancel: 'Abbrechen'
+          }
+        })
         alertify.confirm('Hochladen erfolgreich, sende den Link dem Dev/Admin/Support', (e) => {
           if (e) {
             helpers.copyToClipboard(args.url)
@@ -229,7 +234,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('mods', {
       title: 'Mods',
-      text: 'Hier kannst du unsere Mods downloaden und prüfen sowie das Spiel starten.',
+      text: 'Hier kannst du unsere Mods downloaden und prüfen, sowie das Spiel starten.',
       attachTo: '.modsTabBtn bottom',
       buttons: {
         text: 'Weiter',
@@ -261,7 +266,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('player', {
       title: 'Spieler',
-      text: 'Nachdem du dich eingeloggt hast findest du hier deine Spielerdaten.',
+      text: 'Nachdem du dich eingeloggt hast, findest du hier deine Spielerdaten.',
       attachTo: '.playerTabBtn bottom',
       buttons: {
         text: 'Weiter',
@@ -293,7 +298,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('tfar', {
       title: 'Task Force Radio',
-      text: 'Hier kannst du das Task Force Radio Plugin für deinen Teamspeak 3 Client installieren, sowie einen Skin der im ReallifeRPG Stil gehalten ist.',
+      text: 'Hier kannst du das Task Force Radio Plugin für deinen Teamspeak 3 Client installieren, sowie einen Skin, der im ReallifeRPG Stil gehalten ist.',
       attachTo: '.tfarTabBtn bottom',
       buttons: {
         text: 'Weiter',
@@ -325,7 +330,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('faq', {
       title: 'FAQ',
-      text: 'Hier werden viele oft gestellte Fragen direkt beantwortet. Schau kurz mal hier nach bevor du dich im Support meldest, vielleicht wird deine Frage ja direkt beantwortet.',
+      text: 'Hier werden viele oft gestellte Fragen direkt beantwortet. Schau kurz mal hier nach, bevor du dich im Support meldest - vielleicht wird deine Frage ja direkt beantwortet.',
       attachTo: '.faqTabBtn bottom',
       buttons: {
         text: 'Weiter',
@@ -341,7 +346,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('Twitch', {
       title: 'Über',
-      text: 'Hier findest du immer Streamer die gerade auf unserem Server spielen.',
+      text: 'Hier findest du immer Streamer, die gerade auf unserem Server spielen.',
       attachTo: '.twitchTabBtn bottom',
       buttons: {
         text: 'Weiter',
@@ -389,7 +394,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
     $rootScope.tour.addStep('end', {
       title: 'Viel Spaß!',
-      text: 'Genug gelesen, lad dir unseren Mod runter, installier Task Force Radio, betritt den Server und entdecke deine ganz eigene Weise auf ReallifeRPG zu spielen. Viel Spaß von unserem ganzen Team!',
+      text: 'Genug gelesen, lad dir unseren Mod runter, installier Task Force Radio, betritt den Server und entdecke deine ganz eigene Weise, auf ReallifeRPG zu spielen. Viel Spaß von unserem ganzen Team!',
       buttons: {
         text: 'Beenden',
         action: $rootScope.endTour
@@ -433,3 +438,6 @@ App.directive('onFinishRender', ($timeout) => {
     }
   }
 })
+
+document.addEventListener('dragover', event => event.preventDefault())
+document.addEventListener('drop', event => event.preventDefault())
