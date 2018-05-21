@@ -110,12 +110,12 @@ const updateMod = (args) => {
       quickCheckListR(args.data.data, 0, path, [], args.args.mod, callback)
     }
   ],
-    (err, result) => {
-      if (err) {
-        console.log(err)
-      }
-      finishProgressHash(result, args.args.mod)
-    })
+  (err, result) => {
+    if (err) {
+      console.log(err)
+    }
+    finishProgressHash(result, args.args.mod)
+  })
 }
 
 const deleteBisigns = (args) => {
@@ -124,20 +124,20 @@ const deleteBisigns = (args) => {
       deleteBisignFiles(path, args.mod, callback)
     }
   ],
-    (err, result) => {
-      if (err) {
-        if (err === 'Cancelled') {
-          cancelled()
-        } else {
-          console.log(err)
-        }
+  (err, result) => {
+    if (err) {
+      if (err === 'Cancelled') {
+        cancelled()
+      } else {
+        console.log(err)
       }
-      ipcRenderer.send('to-dwn', {
-        type: 'start-mod-hash',
-        mod: args.mod,
-        path: path
-      })
+    }
+    ipcRenderer.send('to-dwn', {
+      type: 'start-mod-hash',
+      mod: args.mod,
+      path: path
     })
+  })
 }
 
 const hashMod = (args) => {
@@ -152,16 +152,16 @@ const hashMod = (args) => {
       hashListR(args.data.data, 0, path, [], args.args.mod, 0, callback)
     }
   ],
-    (err, result) => {
-      if (err) {
-        if (err === 'Cancelled') {
-          cancelled()
-        } else {
-          console.log(err)
-        }
+  (err, result) => {
+    if (err) {
+      if (err === 'Cancelled') {
+        cancelled()
+      } else {
+        console.log(err)
       }
-      finishProgressHash(result, args.args.mod)
-    })
+    }
+    finishProgressHash(result, args.args.mod)
+  })
 }
 
 const quickCheckList = (args) => {
@@ -243,7 +243,7 @@ const initSeeding = (dirPath, TorrentURL) => {
       cancelled()
     }
   },
-    1000
+  1000
   )
   client.add(TorrentURL, {
     path: dirPath
@@ -265,7 +265,7 @@ const initSeeding = (dirPath, TorrentURL) => {
         })
       }
     },
-      1000
+    1000
     )
   })
 }
@@ -415,7 +415,7 @@ const initTorrent = (folder, torrentURL) => {
       }
     }
   },
-    1000
+  1000
   )
   client.add(torrentURL, {
     path: path
@@ -442,7 +442,7 @@ const initTorrent = (folder, torrentURL) => {
         })
       }
     },
-      1000
+    1000
     )
     torrent.on('done', () => {
       torrent.destroy(() => {

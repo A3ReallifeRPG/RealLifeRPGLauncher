@@ -32,6 +32,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     }
   })
 
+  /*
   storage.get('agreement', (err, data) => {
     if (err) {
       ipcRenderer.send('open-agreement')
@@ -42,6 +43,7 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
       ipcRenderer.send('open-agreement')
     }
   })
+  */
 
   storage.get('player', (err, data) => {
     if (err) throw err
