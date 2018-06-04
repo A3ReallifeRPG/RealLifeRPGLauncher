@@ -15,9 +15,15 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
 
   if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
     $rootScope.portable = true
+    $rootScope.store = false
     $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' Portable - Mods'
+  } else if (typeof process.windowsStore !== 'undefined') {
+    $rootScope.portable = false
+    $rootScope.store = true
+    $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' Windows Store - Mods'
   } else {
     $rootScope.portable = false
+    $rootScope.store = false
     $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - Mods'
   }
 

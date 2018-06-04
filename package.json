@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.6.9",
+  "version": "2.7.0",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -16,8 +16,8 @@
   },
   "scripts": {
     "start": "electron .",
+    "dist": "build && build -w portable && build -w appx",
     "portable": "build -w portable",
-    "dist": "build && build -w portable",
     "appx": "build -w appx",
     "test": "standard --fix",
     "lint": "standard",
@@ -57,7 +57,7 @@
   "build": {
     "appId": "realliferpg.de",
     "productName": "RealLifeRPG",
-    "copyright": "Copyright ©2018 ${author}",
+    "copyright": "Copyright ©2018 RealLifeRPG",
     "win": {
       "target": "squirrel"
     },
