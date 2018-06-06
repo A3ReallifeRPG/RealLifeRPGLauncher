@@ -2,6 +2,7 @@ const fs = require('fs')
 const request = require('request')
 const progress = require('request-progress')
 const mkpath = require('mkpath')
+const {app} = require('electron').remote
 const WebTorrent = require('webtorrent')
 const hasha = require('hasha')
 const config = require('../config')
@@ -10,6 +11,17 @@ const {ipcRenderer} = require('electron')
 const async = require('async')
 const recursive = require('recursive-readdir')
 const pathf = require('path')
+const os = require('os')
+
+let agent = `RealLifeRPG Launcher/${app.getVersion()} (${os.type()} ${os.release()}; ${os.platform()}; ${os.arch()}) - `
+
+if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
+  agent = agent.concat('Portable')
+} else if (typeof process.windowsStore !== 'undefined') {
+  agent = agent.concat('Windows UWP')
+} else {
+  agent = agent.concat('Desktop')
+}
 
 let cancel = false
 let downloaded = 0
@@ -290,7 +302,13 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
       } catch (e) {
 
       }
-      progress(requestobj = request(mod.DownloadUrl + cur.RelativPath), {}).on('progress', (state) => {
+      let options = {
+        url: mod.DownloadUrl + cur.RelativPath,
+        headers: {
+          'user-agent': agent
+        }
+      }
+      progress(requestobj = request(options), {}).on('progress', (state) => {
         if (cancel) {
           requestobj.abort()
           cancelled()

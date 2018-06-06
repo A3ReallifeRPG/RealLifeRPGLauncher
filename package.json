@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -67,10 +67,12 @@
       "remoteReleases": "https://static.realliferpg.de/remoteReleases/"
     },
     "appx": {
-      "applicationId": "realliferpg.de",
+      "applicationId": "Kaibu.ReallifeRPG",
+      "publisher": "CN=3E2F6B16-28C3-4276-919B-C80D5AE8D520",
       "backgroundColor": "#2b3e50",
       "displayName": "RealLifeRPG",
-      "identityName": "realliferpg.de",
+      "identityName": "13873Kaibu.ReallifeRPG",
+      "publisherDisplayName": "Kaibu",
       "languages": [
         "de"
       ]

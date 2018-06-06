@@ -8,6 +8,17 @@ const ps = require('ps-node')
 const exec = require('child_process').exec
 const config = require('../config')
 const pathf = require('path')
+const os = require('os')
+
+let agent = `RealLifeRPG Launcher/${app.getVersion()} (${os.type()} ${os.release()}; ${os.platform()}; ${os.arch()}) - `
+
+if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
+  agent = agent.concat('Portable')
+} else if (typeof process.windowsStore !== 'undefined') {
+  agent = agent.concat('Windows UWP')
+} else {
+  agent = agent.concat('Desktop')
+}
 
 ipcRenderer.on('to-web', (event, args) => {
   switch (args.type) {
@@ -27,7 +38,11 @@ ipcRenderer.on('to-web', (event, args) => {
 })
 
 const getUrl = (args) => {
-  jsonist.get(args.url, (err, data, resp) => {
+  jsonist.get(args.url, {
+    headers: {
+      'user-agent': agent
+    }
+  }, (err, data, resp) => {
     getUrlCallback(args, err, data, resp)
   })
 }
@@ -43,7 +58,13 @@ const getUrlCallback = (args, err, data, resp) => {
 }
 
 const downloadFILE = (file) => {
-  progress(request(config.STATICFILESERVE + file), {}).on('progress', (state) => {
+  let options = {
+    url: config.STATICFILESERVE + file,
+    headers: {
+      'user-agent': agent
+    }
+  }
+  progress(request(options), {}).on('progress', (state) => {
     ipcRenderer.send('to-app', {
       type: 'update-dl-progress-file',
       state: state
