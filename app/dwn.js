@@ -327,7 +327,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
             downloadTimeouts += 1
             downloadErrorNotify(`Timeout zum Downloadserver (#${downloadTimeouts})`)
             if (index === list.length - 1) {
-              downloadFinished()
+              downloadFinished(mod)
             } else {
               downloadFileR(list, index, basepath, mod, torrent)
             }
@@ -342,7 +342,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
             downloadTimeouts += 1
             downloadErrorNotify(`Verbindungsabbruch zum Downloadserver (#${downloadTimeouts})`)
             if (index === list.length - 1) {
-              downloadFinished()
+              downloadFinished(mod)
             } else {
               downloadFileR(list, index, basepath, mod, torrent)
             }
@@ -366,7 +366,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
           cancelled()
         } else {
           if (index === list.length - 1) {
-            downloadFinished()
+            downloadFinished(mod)
           } else {
             downloadFileR(list, index + 1, basepath, mod, torrent)
           }
@@ -377,7 +377,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
     console.log(e)
     mkpath(folder, () => {
       if (index === list.length - 1) {
-        downloadFinished()
+        downloadFinished(mod)
       } else {
         downloadFileR(list, index, basepath, mod, torrent)
       }
@@ -385,7 +385,8 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
   }
 }
 
-const downloadFinished = () => {
+const downloadFinished = (mod) => {
+  checkModCppSync(path, mod)
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-done'
   })
@@ -603,6 +604,15 @@ const hashListR = (list, index, basepath, dllist, mod, checked, callback) => {
   }
 }
 
+const checkModCppSync = (basepath, mod) => {
+  let dest = basepath + mod.Directories
+  dest = pathf.join(dest, 'mod.cpp')
+  if (!fs.existsSync(dest)) {
+    let data = `dir="${mod.Directories}";${os.EOL}name="${mod.Name}";${os.EOL}picture="RealLifeRPG.paa";${os.EOL}actionName="Website";${os.EOL}action="http://realliferpg.de/";${os.EOL}description="${mod.Name}";`
+    fs.writeFileSync(dest, data)
+  }
+}
+
 const quickCheckListR = (list, index, basepath, dllist, mod, callback) => {
   let cur = list[index]
   let dest = basepath + cur.RelativPath
@@ -722,6 +732,7 @@ const updateProgressHash = (state, filename, mod) => {
 }
 
 const finishProgressHash = (list, mod) => {
+  checkModCppSync(path, mod)
   ipcRenderer.send('to-app', {
     type: 'update-hash-progress-done',
     list: list,
