@@ -606,10 +606,12 @@ const hashListR = (list, index, basepath, dllist, mod, checked, callback) => {
 
 const checkModCppSync = (basepath, mod) => {
   let dest = basepath + mod.Directories
-  dest = pathf.join(dest, 'mod.cpp')
-  if (!fs.existsSync(dest)) {
-    let data = `dir="${mod.Directories}";${os.EOL}name="${mod.Name}";${os.EOL}picture="RealLifeRPG.paa";${os.EOL}actionName="Website";${os.EOL}action="http://realliferpg.de/";${os.EOL}description="${mod.Name}";`
-    fs.writeFileSync(dest, data)
+  if (fs.existsSync(dest)) {
+    dest = pathf.join(dest, 'mod.cpp')
+    if (!fs.existsSync(dest)) {
+      let data = `dir="${mod.Directories}";${os.EOL}name="${mod.Name}";${os.EOL}picture="RealLifeRPG.paa";${os.EOL}actionName="Website";${os.EOL}action="http://realliferpg.de/";${os.EOL}description="${mod.Name}";`
+      fs.writeFileSync(dest, data)
+    }
   }
 }
 
