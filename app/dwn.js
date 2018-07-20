@@ -300,7 +300,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
       try {
         fs.unlinkSync(dest)
       } catch (e) {
-
+        console.log(e)
       }
       let options = {
         url: mod.DownloadUrl + cur.RelativPath,

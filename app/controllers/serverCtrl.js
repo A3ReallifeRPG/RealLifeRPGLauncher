@@ -47,6 +47,12 @@ angular.module('App').controller('serverCtrl', ['$scope', '$sce', ($scope, $sce)
         }
         break
     }
+    if (server.sortIcon === 'fa fa-sort-alpha-asc') {
+      server.PlayersShow.sort()
+      server.PlayersShow.reverse()
+    } else {
+      server.PlayersShow.sort()
+    }
   }
 
   $scope.resetPlayerList = (server) => {
@@ -280,9 +286,12 @@ angular.module('App').controller('serverCtrl', ['$scope', '$sce', ($scope, $sce)
             server.DescriptionHTML = $sce.trustAsHtml(server.Description)
             server.last_update = helpers.getRefreshTime(server.updated_at.date)
             server.PlayersShow = server.Players
+            server.PlayersShow.sort()
             server.PlayercountShow = server.Playercount
             server.ListSide = 'Spieler'
             server.ping = false
+            server.sortIcon = 'fa fa-sort-alpha-desc'
+            server.sortText = 'Absteigend sortieren'
             $scope.redrawChart(server)
             $('#playerScroll' + server.Id).perfectScrollbar()
             ping.promise.probe(server.IpAddress)
@@ -297,6 +306,18 @@ angular.module('App').controller('serverCtrl', ['$scope', '$sce', ($scope, $sce)
         break
     }
   })
+
+  $scope.sort = (server) => {
+    if (server.sortIcon === 'fa fa-sort-alpha-desc') {
+      server.sortIcon = 'fa fa-sort-alpha-asc'
+      server.PlayersShow.reverse()
+      server.sortText = 'Absteigend sortieren'
+    } else {
+      server.sortIcon = 'fa fa-sort-alpha-desc'
+      server.PlayersShow.sort()
+      server.sortText = 'Aufsteigend sortieren'
+    }
+  }
 
   $scope.joinServer = (server) => {
     if (server.appId === 107410) {
