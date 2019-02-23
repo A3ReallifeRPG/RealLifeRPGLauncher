@@ -132,7 +132,7 @@
                         <a><i class="fa fa-upload" aria-hidden="true"></i> {{upSpeed}}/s</a>
                     </li>
                     <li class="reloadTabBtn">
-                        <a ng-click="refresh()" title="Inhalte neu laden"><span class="glyphicon glyphicon-refresh"></span></a>
+                        <a ng-click="refresh()" title="Inhalte neu laden"><span ng-class="reloadClass" class="glyphicon glyphicon-refresh"></span></a>
                     </li>
                 </ul>
             </div>
@@ -172,7 +172,7 @@
                                                                     <button class="btn btn-danger btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="initBisignCheck(mod)" ng-disabled="downloading">Bisign</button>
                                                                     <button class="btn btn-primary btn-sm" ng-show="mod.state[0] === 3 && mod.HasGameFiles && mod.Torrent !== '' && mod.Torrent !== null" ng-disabled="downloading" ng-click="initTorrent(mod)"><i class="fa fa-upload" aria-hidden="true"></i> Seeden</button>
                                                                     <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0 && mod.HasGameFiles" ng-click="openModDir(mod)"><span class=" glyphicon glyphicon-folder-open"></span></button>
-                                                                    <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0" ng-disabled="downloading" ng-click="refresh()"><span class=" glyphicon glyphicon-refresh"></span></button>
+                                                                    <button class="btn btn-success btn-sm" ng-show="mod.state[0] !== 0" ng-disabled="downloading || reloadDisabled" ng-click="refresh()"><span ng-class="reloadClass" class="glyphicon glyphicon-refresh"></span></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -311,7 +311,7 @@
                                             </div>
                                             <form class="form-inline pull-right">
                                                 <div class="form-group-sm">
-                                                    <button type="button" class="btn btn-success btn-sm" ng-click="refresh()"><i class="fa fa-refresh" aria-hidden="true"></i> Aktualisieren</button>
+                                                    <button type="button" class="btn btn-success btn-sm" ng-disabled="reloadDisabled" ng-click="refresh()"><span ng-class="reloadClass" class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Aktualisieren</button>
                                                     <button ng-if="server.appId === 107410" type="button" class="btn btn-success btn-sm" ng-click="pingServer(server)"><i class="fa fa-wrench" aria-hidden="true"></i> Reparieren</button>
                                                     <label ng-if="profiles && server.appId === 107410">
                                                         <select class="form-control" ng-model="profiles.selected" ng-change="setProfile()" ng-options="profile for profile in profiles.available"></select>
