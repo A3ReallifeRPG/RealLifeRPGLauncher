@@ -7,7 +7,7 @@ module.exports = {
   'APIFuelStationURL': 'fuelstations',
   'APINotificationURL': 'notification',
   'APIChangelogURL': 'changelog',
-  'APIPlayerURL': 'player/',
+  'APIPlayerURL': 'player/full/',
   'APIValidatePlayerURL': 'player/validate/',
   'APITwitchURL': 'twitch',
   'STATICFILESERVE': 'http://static.realliferpg.de/arma/',

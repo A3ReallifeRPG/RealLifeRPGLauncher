@@ -2,6 +2,7 @@ const fs = require('fs')
 const request = require('request')
 const progress = require('request-progress')
 const mkpath = require('mkpath')
+const {app} = require('electron').remote
 const WebTorrent = require('webtorrent')
 const hasha = require('hasha')
 const config = require('../config')
@@ -10,6 +11,17 @@ const {ipcRenderer} = require('electron')
 const async = require('async')
 const recursive = require('recursive-readdir')
 const pathf = require('path')
+const os = require('os')
+
+let agent = `RealLifeRPG Launcher/${app.getVersion()} (${os.type()} ${os.release()}; ${os.platform()}; ${os.arch()}) - `
+
+if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
+  agent = agent.concat('Portable')
+} else if (typeof process.windowsStore !== 'undefined') {
+  agent = agent.concat('Windows UWP')
+} else {
+  agent = agent.concat('Desktop')
+}
 
 let cancel = false
 let downloaded = 0
@@ -110,12 +122,12 @@ const updateMod = (args) => {
       quickCheckListR(args.data.data, 0, path, [], args.args.mod, callback)
     }
   ],
-    (err, result) => {
-      if (err) {
-        console.log(err)
-      }
-      finishProgressHash(result, args.args.mod)
-    })
+  (err, result) => {
+    if (err) {
+      console.log(err)
+    }
+    finishProgressHash(result, args.args.mod)
+  })
 }
 
 const deleteBisigns = (args) => {
@@ -124,20 +136,20 @@ const deleteBisigns = (args) => {
       deleteBisignFiles(path, args.mod, callback)
     }
   ],
-    (err, result) => {
-      if (err) {
-        if (err === 'Cancelled') {
-          cancelled()
-        } else {
-          console.log(err)
-        }
+  (err, result) => {
+    if (err) {
+      if (err === 'Cancelled') {
+        cancelled()
+      } else {
+        console.log(err)
       }
-      ipcRenderer.send('to-dwn', {
-        type: 'start-mod-hash',
-        mod: args.mod,
-        path: path
-      })
+    }
+    ipcRenderer.send('to-dwn', {
+      type: 'start-mod-hash',
+      mod: args.mod,
+      path: path
     })
+  })
 }
 
 const hashMod = (args) => {
@@ -152,16 +164,16 @@ const hashMod = (args) => {
       hashListR(args.data.data, 0, path, [], args.args.mod, 0, callback)
     }
   ],
-    (err, result) => {
-      if (err) {
-        if (err === 'Cancelled') {
-          cancelled()
-        } else {
-          console.log(err)
-        }
+  (err, result) => {
+    if (err) {
+      if (err === 'Cancelled') {
+        cancelled()
+      } else {
+        console.log(err)
       }
-      finishProgressHash(result, args.args.mod)
-    })
+    }
+    finishProgressHash(result, args.args.mod)
+  })
 }
 
 const quickCheckList = (args) => {
@@ -243,7 +255,7 @@ const initSeeding = (dirPath, TorrentURL) => {
       cancelled()
     }
   },
-    1000
+  1000
   )
   client.add(TorrentURL, {
     path: dirPath
@@ -265,7 +277,7 @@ const initSeeding = (dirPath, TorrentURL) => {
         })
       }
     },
-      1000
+    1000
     )
   })
 }
@@ -288,9 +300,15 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
       try {
         fs.unlinkSync(dest)
       } catch (e) {
-
+        console.log(e)
       }
-      progress(requestobj = request(mod.DownloadUrl + cur.RelativPath), {}).on('progress', (state) => {
+      let options = {
+        url: mod.DownloadUrl + cur.RelativPath,
+        headers: {
+          'user-agent': agent
+        }
+      }
+      progress(requestobj = request(options), {}).on('progress', (state) => {
         if (cancel) {
           requestobj.abort()
           cancelled()
@@ -309,7 +327,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
             downloadTimeouts += 1
             downloadErrorNotify(`Timeout zum Downloadserver (#${downloadTimeouts})`)
             if (index === list.length - 1) {
-              downloadFinished()
+              downloadFinished(mod)
             } else {
               downloadFileR(list, index, basepath, mod, torrent)
             }
@@ -324,7 +342,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
             downloadTimeouts += 1
             downloadErrorNotify(`Verbindungsabbruch zum Downloadserver (#${downloadTimeouts})`)
             if (index === list.length - 1) {
-              downloadFinished()
+              downloadFinished(mod)
             } else {
               downloadFileR(list, index, basepath, mod, torrent)
             }
@@ -348,7 +366,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
           cancelled()
         } else {
           if (index === list.length - 1) {
-            downloadFinished()
+            downloadFinished(mod)
           } else {
             downloadFileR(list, index + 1, basepath, mod, torrent)
           }
@@ -359,7 +377,7 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
     console.log(e)
     mkpath(folder, () => {
       if (index === list.length - 1) {
-        downloadFinished()
+        downloadFinished(mod)
       } else {
         downloadFileR(list, index, basepath, mod, torrent)
       }
@@ -367,7 +385,8 @@ const downloadFileR = (list, index, basepath, mod, torrent) => {
   }
 }
 
-const downloadFinished = () => {
+const downloadFinished = (mod) => {
+  checkModCppSync(path, mod)
   ipcRenderer.send('to-app', {
     type: 'update-dl-progress-done'
   })
@@ -415,7 +434,7 @@ const initTorrent = (folder, torrentURL) => {
       }
     }
   },
-    1000
+  1000
   )
   client.add(torrentURL, {
     path: path
@@ -442,7 +461,7 @@ const initTorrent = (folder, torrentURL) => {
         })
       }
     },
-      1000
+    1000
     )
     torrent.on('done', () => {
       torrent.destroy(() => {
@@ -585,6 +604,17 @@ const hashListR = (list, index, basepath, dllist, mod, checked, callback) => {
   }
 }
 
+const checkModCppSync = (basepath, mod) => {
+  let dest = basepath + mod.Directories
+  if (fs.existsSync(dest)) {
+    dest = pathf.join(dest, 'mod.cpp')
+    if (!fs.existsSync(dest)) {
+      let data = `dir="${mod.Directories}";${os.EOL}name="${mod.Name}";${os.EOL}picture="RealLifeRPG.paa";${os.EOL}actionName="Website";${os.EOL}action="http://realliferpg.de/";${os.EOL}description="${mod.Name}";`
+      fs.writeFileSync(dest, data)
+    }
+  }
+}
+
 const quickCheckListR = (list, index, basepath, dllist, mod, callback) => {
   let cur = list[index]
   let dest = basepath + cur.RelativPath
@@ -704,6 +734,7 @@ const updateProgressHash = (state, filename, mod) => {
 }
 
 const finishProgressHash = (list, mod) => {
+  checkModCppSync(path, mod)
   ipcRenderer.send('to-app', {
     type: 'update-hash-progress-done',
     list: list,

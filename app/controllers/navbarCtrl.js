@@ -32,6 +32,9 @@ angular.module('App').controller('navbarCtrl', ['$scope', '$rootScope', ($scope,
       if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
         $rootScope.portable = true
         $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' Portable - ' + $scope.tabs[$rootScope.slide].title
+      } else if (typeof process.windowsStore !== 'undefined') {
+        $rootScope.portable = false
+        $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' Windows Store - ' + $scope.tabs[$rootScope.slide].title
       } else {
         $rootScope.portable = false
         $rootScope.AppTitle = 'RealLifeRPG Launcher - ' + app.getVersion() + ' - ' + $scope.tabs[$rootScope.slide].title

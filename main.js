@@ -208,6 +208,8 @@ const createTray = () => {
               shell.openExternal('https://realliferpg.de/download/')
             }
           })
+        } else if (typeof process.windowsStore !== 'undefined') {
+          shell.openItem('ms-windows-store://downloadsandupdates')
         } else {
           autoUpdater.checkForUpdates()
         }

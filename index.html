@@ -259,7 +259,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div ng-show="server.Playercount != 0">
-                                                        <h5>{{server.ListSide}} <span class="pull-right">{{server.PlayercountShow}}/{{server.Slots}}</span></h5>
+                                                        <h5>{{server.ListSide}} <i ng-click="sort(server)" tooltips tooltip-template="{{server.sortText}}" class="hover-underline cursor-pointer {{server.sortIcon}}"></i><span class="pull-right">{{server.PlayercountShow}}/{{server.Slots}}</span></h5>
                                                         <ul id="playerScroll{{server.Id}}" class="list-group list-group-unbordered margin-none" style="height: 350px;position: relative;">
                                                             <li class="list-group-item" ng-repeat="player in server.PlayersShow">
                                                                 <b>{{player}}</b>
@@ -407,7 +407,7 @@
                                                         <tbody>
                                                         <tr role="row" class="odd" ng-repeat="vehicle in player_data.vehicles">
                                                             <td>
-                                                                {{vehicle.name}}
+                                                                {{vehicle.vehicle_data.name}}
                                                             </td>
                                                             <td>
                                                                 <i ng-if="vehicle.type === 'Car'" class="fa fa-car" aria-hidden="true"></i>
@@ -818,11 +818,6 @@
                                                 </div>
                                                 <div class="panel panel-body center">
                                                     Egal ob groß, ob klein kannst du dich jederzeit im Support melden um von uns gelistet zu werden.
-                                                    <br>
-                                                    Du magst unsere Farben und brauchst ein Design: <a class="white" href="https://forum.realliferpg.de/index.php?thread/2779-der-osterhase-war-für-alle-realliferpg-streamer-fleißig/" target="_blank"><span class="label label-success label-large">ReallifeRPG Streamkit by callypo</span></a>
-=======
-                                                    Egal ob groß ob klein kannst du dich jederzeit im Support melden um von uns gelistet zu werden.
->>>>>>> Stashed changes
                                                 </div>
                                             </div>
                                         </div>
