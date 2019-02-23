@@ -73,8 +73,8 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     ipcRenderer.send('quitAndInstall')
   }
 
-  $rootScope.refresh = () => {
-    if (!$rootScope.reloadDisabled) {
+  $rootScope.refresh = (ui) => {
+    if (!$rootScope.reloadDisabled || !ui) {
       storage.get('settings', (err) => {
         if (err) throw err
         $rootScope.getMods()

@@ -259,7 +259,7 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
           fileProgress: ''
         })
         helpers.spawnNotification('Download abgeschlossen.')
-        $rootScope.refresh()
+        $rootScope.refresh(false)
         break
       case 'update-dl-progress-error':
         $scope.update({

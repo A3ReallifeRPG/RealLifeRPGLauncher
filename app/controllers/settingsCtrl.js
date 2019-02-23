@@ -132,7 +132,7 @@ angular.module('App').controller('settingsCtrl', ['$scope', '$rootScope', ($scop
     if (dpath !== 'undefined' && dpath.includes('arma3') && dpath.includes('.exe')) {
       $rootScope.ArmaPath = dpath.substring(0, dpath.lastIndexOf('\\')) + '\\'
       $scope.saveSettings()
-      $rootScope.refresh()
+      $rootScope.refresh(false)
     } else {
       $rootScope.ArmaPath = ''
       $scope.saveSettings()
