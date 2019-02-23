@@ -289,16 +289,18 @@ app.on('window-all-closed', () => {
   ipcMain.removeAllListeners()
 })
 
-const shouldQuit = app.makeSingleInstance(() => {
-  if (win) {
-    if (win.isMinimized()) win.restore()
-    if (!win.isVisible()) win.show()
-    win.focus()
-  }
-})
+const shouldQuit = app.requestSingleInstanceLock()
 
-if (shouldQuit) {
+if (!shouldQuit) {
   app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      if (!win.isVisible()) win.show()
+      win.focus()
+    }
+  })
 }
 
 app.on('ready', () => {

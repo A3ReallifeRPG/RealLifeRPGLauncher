@@ -15,8 +15,8 @@ angular.module('App').controller('mapCtrl', ['$scope', '$rootScope', ($scope, $r
       instance.Fuelstations.forEach((fuelstation) => {
         let fuel = Math.round((fuelstation.Fuel / 30000) * 100)
         let m = {
-          x: (fuelstation.Pos.replace('[', '').replace(']', '').split(',')[0] / 15360) * 8192,
-          y: ((15360 - fuelstation.Pos.replace('[', '').replace(']', '').split(',')[1]) / 15360) * 8192
+          x: fuelstation.Pos.replace('[', '').replace(']', '').split(',')[0],
+          y: (16384 - fuelstation.Pos.replace('[', '').replace(']', '').split(',')[1])
         }
 
         if (fuel > 70) {
@@ -51,26 +51,28 @@ angular.module('App').controller('mapCtrl', ['$scope', '$rootScope', ($scope, $r
     })
 
     L.control.layers(layers).addTo($rootScope.map)
+
+    $('.leaflet-control-layers-toggle:eq(1)').css('background-image', 'url(resources/icon/gas.png)')
   }
 
   $scope.init = () => {
     helpers.getFuelstations()
 
-    let base = L.tileLayer('https://tiles.realliferpg.de/map/{z}/{x}/{y}.png', {
+    let base = L.tileLayer('https://tiles.realliferpg.de/nordholm/map/{z}/{x}/{y}.png', {
       minZoom: 1,
-      maxZoom: 5,
+      maxZoom: 6,
       attribution: '<a target="_blank" href="https://realliferpg.de">Havenborn Map by ReallifeRPG</a>',
       tms: true
     })
-    let sat = L.tileLayer('https://tiles.realliferpg.de/sat/{z}/{x}/{y}.png', {
+    let sat = L.tileLayer('https://tiles.realliferpg.de/nordholm/sat-dirt/{z}/{x}/{y}.png', {
       minZoom: 1,
-      maxZoom: 5,
+      maxZoom: 6,
       attribution: '<a target="_blank" href="https://realliferpg.de">Havenborn Map by ReallifeRPG</a>',
       tms: true
     })
-    let roads = L.tileLayer('https://tiles.realliferpg.de/roads/{z}/{x}/{y}.png', {
+    let roads = L.tileLayer('https://tiles.realliferpg.de/nordholm/roads/{z}/{x}/{y}.png', {
       minZoom: 1,
-      maxZoom: 5,
+      maxZoom: 6,
       attribution: '<a target="_blank" href="https://realliferpg.de">Havenborn Map by ReallifeRPG</a>',
       tms: true
     })
@@ -118,8 +120,8 @@ angular.module('App').controller('mapCtrl', ['$scope', '$rootScope', ($scope, $r
 
     L.control.layers(baseLayers, overlayLayers).addTo($rootScope.map)
 
-    let southWest = $rootScope.map.unproject([0, 8192], $rootScope.map.getMaxZoom())
-    let northEast = $rootScope.map.unproject([8192, 0], $rootScope.map.getMaxZoom())
+    let southWest = $rootScope.map.unproject([0, 16384], $rootScope.map.getMaxZoom())
+    let northEast = $rootScope.map.unproject([16384, 0], $rootScope.map.getMaxZoom())
     $rootScope.map.setMaxBounds(new L.LatLngBounds(southWest, northEast))
   }
 }])

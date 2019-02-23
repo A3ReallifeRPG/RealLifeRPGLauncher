@@ -12,6 +12,8 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
   $rootScope.logging_in = false
   $rootScope.map = null
   $rootScope.uploadingRPT = false
+  $rootScope.reloadClass = 'glyphicon glyphicon-refresh'
+  $rootScope.reloadDisabled = false
 
   if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
     $rootScope.portable = true
@@ -71,16 +73,25 @@ const App = angular.module('App', ['720kb.tooltips']).run(($rootScope) => {
     ipcRenderer.send('quitAndInstall')
   }
 
-  $rootScope.refresh = () => {
-    storage.get('settings', (err) => {
-      if (err) throw err
-      $rootScope.getMods()
-    })
-    helpers.getServers()
-    helpers.getChangelog()
-    helpers.getTwitch()
-    if ($rootScope.logged_in) {
-      helpers.getPlayerData($rootScope.apiKey)
+  $rootScope.refresh = (ui) => {
+    if (!$rootScope.reloadDisabled || !ui) {
+      storage.get('settings', (err) => {
+        if (err) throw err
+        $rootScope.getMods()
+      })
+      helpers.getServers()
+      helpers.getChangelog()
+      helpers.getTwitch()
+      if ($rootScope.logged_in) {
+        helpers.getPlayerData($rootScope.apiKey)
+      }
+      $rootScope.reloadClass = 'fa fa-spin fa-spinner'
+      $rootScope.reloadDisabled = true
+      setTimeout(() => {
+        $rootScope.reloadDisabled = false
+        $rootScope.reloadClass = 'glyphicon glyphicon-refresh'
+        $rootScope.$apply()
+      }, 3000)
     }
   }
 

@@ -84,9 +84,9 @@
   },
   "devDependencies": {
     "devtron": "1.4.0",
+    "electron": "^4.0.5",
     "electron-builder": "19.42.0",
     "electron-builder-squirrel-windows": "19.42.0",
-    "electron": "1.7.15",
     "standard": "*"
   },
   "contributors": [
@@ -119,18 +119,18 @@
     "leaflet": "^1.2.0",
     "marked": "^0.3.6",
     "mkpath": "1.0.0",
-    "moment": "^2.18.1",
+    "moment": "^2.24.0",
     "perfect-scrollbar": "^0.7.0",
     "ping": "^0.2.2",
-    "pretty-bytes": "^4.0.2",
+    "pretty-bytes": "^5.1.0",
     "ps-node": "^0.1.6",
     "recursive-readdir": "^2.2.1",
-    "request": "^2.83.0",
+    "request": "^2.88.0",
     "request-progress": "^3.0.0",
     "tether": "^1.4.3",
     "tether-shepherd": "^1.8.1",
     "unzip": "^0.1.11",
-    "webtorrent": "^0.98.20",
+    "webtorrent": "^0.103.0",
     "winreg": "^1.2.4"
   }
 }
