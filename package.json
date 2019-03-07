@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "electron .",
-    "dist": "build && build -w portable && build -w appx",
+    "dist": "build && build -w portable",
     "portable": "build -w portable",
     "appx": "build -w appx",
     "test": "standard --fix",
