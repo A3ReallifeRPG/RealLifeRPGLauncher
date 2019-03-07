@@ -1,6 +1,6 @@
 {
   "name": "RealLifeRPG",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "description": "RealLifeRPG Launcher",
   "homepage": "https://www.realliferpg.de",
   "author": "RealLifeRPG",
@@ -85,8 +85,8 @@
   "devDependencies": {
     "devtron": "1.4.0",
     "electron": "^4.0.5",
-    "electron-builder": "19.42.0",
-    "electron-builder-squirrel-windows": "19.42.0",
+    "electron-builder": "20.39.0",
+    "electron-builder-squirrel-windows": "20.39.0",
     "standard": "*"
   },
   "contributors": [
