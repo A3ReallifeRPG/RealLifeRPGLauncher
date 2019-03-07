@@ -24,10 +24,13 @@ if (typeof process.env.PORTABLE_EXECUTABLE_DIR !== 'undefined') {
 }
 
 let cancel = false
+let cancelDownload = false
 let downloaded = 0
 let update = null
 let debug = false
 let downloadTimeouts = 0
+let downloadAsyncList = []
+let threadLimit = 10
 
 let client = window.client = new WebTorrent({
   maxConns: 150
@@ -59,6 +62,7 @@ ipcRenderer.on('to-dwn', (event, args) => {
       getHashlist(args.mod, 'hashlist-callback-quickcheck')
       break
     case 'start-mod-update':
+      cancelDownload = false
       cancel = false
       path = args.path
       changeStatus(true, 'Frage Modinformationen ab...', 'Warte auf Server...')
@@ -91,6 +95,7 @@ ipcRenderer.on('to-dwn', (event, args) => {
       break
     case 'cancel':
       cancel = true
+      cancelDownload = true
       break
   }
 })
@@ -107,7 +112,7 @@ const downloadList = (args) => {
   args.list.sort((a, b) => {
     return a.Size > b.Size
   })
-  downloadFileR(args.list, 0, path, args.mod, args.torrent)
+  launchDownload(args.list, args.mod, path)
 }
 
 const updateMod = (args) => {
@@ -280,6 +285,167 @@ const initSeeding = (dirPath, TorrentURL) => {
     1000
     )
   })
+}
+
+const launchDownload = (list, mod, basepath) => {
+  list.forEach((cur, i) => {
+    cur.speed = 0
+    cur.size = 0
+    cur.transferred = 0
+    cur.finished = 0
+  })
+  downloadAsyncList = list
+  let tasks = []
+  list.forEach((cur, i) => {
+    tasks.push(function (callback) {
+      downloadFile(callback, cur, mod, basepath, i)
+    })
+  })
+
+  async.parallelLimit(tasks, threadLimit, (err, result) => {
+    console.log(err)
+    if (!err) {
+      downloadFinished(mod)
+    } else {
+      if (err.message === 'Abgebrochen') {
+        cancelled()
+      } else {
+        downloadErrored(err.message)
+      }
+    }
+    clearInterval(update)
+  })
+  clearInterval(update)
+  update = setInterval(() => {
+    if (!cancel) {
+      getCurrentDownloadStats()
+    } else {
+      clearInterval(update)
+      cancelled()
+    }
+  },
+  1000
+  )
+}
+
+const updateCurDownloadSpeed = (i, state) => {
+  if (state.speed !== 0) {
+    downloadAsyncList[i].speed = state.speed
+  }
+  downloadAsyncList[i].speed = state.speed
+  downloadAsyncList[i].transferred = state.size.transferred
+}
+
+const getCurrentDownloadStats = () => {
+  let speed = 0
+  let transferred = 0
+  let total = 0
+  let threads = 0
+  let finished = 0
+  downloadAsyncList.forEach((cur, i) => {
+    speed += cur.speed
+    transferred += cur.transferred
+    total += downloadAsyncList[i].Size
+    if (cur.speed > 0) {
+      threads++
+    }
+    if (cur.finished) {
+      finished++
+    }
+  })
+  if (speed) {
+    updateProgressServer({
+      totalSize: total,
+      totalDownloaded: transferred,
+      speed: speed,
+      threads: threads,
+      count: downloadAsyncList.length,
+      finished: finished
+    })
+  }
+}
+
+const resetCurDownloadSpeed = (i) => {
+  downloadAsyncList[i].speed = 0
+  downloadAsyncList[i].finished = 1
+}
+
+const downloadFile = (callback, item, mod, basepath, i) => {
+  if (cancelDownload) {
+    callback(new Error('Abgebrochen'))
+  } else {
+    let dest = basepath + item.RelativPath
+    let folder = dest.replace(item.FileName, '')
+
+    if (fs.existsSync(folder)) {
+      let requestobj = null
+      try {
+        fs.unlinkSync(dest)
+      } catch (e) {
+        console.log(e)
+      }
+      let options = {
+        url: mod.DownloadUrl + item.RelativPath,
+        headers: {
+          'user-agent': agent
+        }
+      }
+      progress(requestobj = request(options), {}).on('progress', (state) => {
+        if (cancelDownload) {
+          requestobj.abort()
+          callback(new Error('Abgebrochen'))
+        }
+        updateCurDownloadSpeed(i, state)
+      }).on('error', (err) => {
+        resetCurDownloadSpeed(i)
+        if (cancelDownload) {
+          requestobj.abort()
+          callback(new Error('Abgebrochen'))
+        }
+        console.log(err)
+        switch (err.code) {
+          case 'ETIMEDOUT':
+            downloadTimeouts += 1
+            downloadErrorNotify(`Timeout zum Downloadserver (#${downloadTimeouts})`)
+            if (downloadTimeouts < 15) {
+              setTimeout(() => {
+                downloadFile(callback, item, mod, basepath, i)
+              }, 1000)
+            } else {
+              callback(new Error('Timeoutlimit erreicht'))
+            }
+            break
+          case 'ECONNREFUSED':
+            callback(new Error('Verbindung abgelehnt'))
+            break
+          case 'ENOTFOUND':
+            callback(new Error('DNS Fehler'))
+            break
+          case 'ECONNRESET':
+            downloadTimeouts += 1
+            downloadErrorNotify(`Verbindungsabbruch zum Downloadserver (#${downloadTimeouts})`)
+            if (downloadTimeouts < 15) {
+              downloadFile(callback, item, mod, basepath, i)
+            } else {
+              callback(new Error('Timeoutlimit erreicht'))
+            }
+            break
+          default:
+            callback(new Error('err.code'))
+            break
+        }
+      }).on('end', () => {
+        resetCurDownloadSpeed(i)
+        if (!cancelDownload) {
+          callback(null)
+        }
+      }).pipe(fs.createWriteStream(dest))
+    } else {
+      mkpath(folder, () => {
+        downloadFile(callback, item, mod, basepath, i)
+      })
+    }
+  }
 }
 
 const downloadFileR = (list, index, basepath, mod, torrent) => {
