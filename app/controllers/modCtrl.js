@@ -24,24 +24,25 @@ angular.module('App').controller('modCtrl', ['$scope', '$rootScope', ($scope, $r
         $('#modScroll').perfectScrollbar()
         break
       case 'update-dl-progress-server':
+        console.log(args.state)
         $scope.update({
-          state: 'Server - Verbunden',
-          hint: 'Download via Server läuft',
+          state: `Server - Verbunden`,
+          hint: `Download läuft über (${args.state.threads} Threads)`,
           downloading: true,
           canCancel: true,
           downSpeed: prettyBytes(args.state.speed),
           upSpeed: 0,
-          totalProgress: helpers.toFileProgress(args.state.totalSize, args.state.totalDownloaded + args.state.size.transferred),
+          totalProgress: helpers.toFileProgress(args.state.totalSize, args.state.totalDownloaded),
           totalSize: prettyBytes(args.state.totalSize),
-          totalDownloaded: prettyBytes(args.state.totalDownloaded + args.state.size.transferred),
-          totalETA: humanizeDuration(Math.round(((args.state.totalSize - (args.state.totalDownloaded + args.state.size.transferred)) / args.state.speed) * 1000), {
+          totalDownloaded: prettyBytes(args.state.totalDownloaded),
+          totalETA: humanizeDuration(Math.round(((args.state.totalSize - (args.state.totalDownloaded)) / args.state.speed) * 1000), {
             language: 'de',
             round: true
           }),
           totalPeers: 0,
           maxConns: 0,
-          fileName: helpers.cutName(args.state.fileName),
-          fileProgress: helpers.toProgress(args.state.percent)
+          fileName: args.state.finished + '/' + args.state.count,
+          fileProgress: helpers.toFileProgress(args.state.count, args.state.finished)
         })
         $scope.pushToChart(new Date().getTime(), args.state.speed)
         $scope.$apply()
