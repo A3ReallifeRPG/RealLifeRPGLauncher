@@ -41,7 +41,7 @@ Download the newest [release](https://github.com/A3ReallifeRPG/RealLifeRPGLaunch
 1. Download [NodeJs](https://nodejs.org/en/)
 2. Clone this repo `git clone https://github.com/A3ReallifeRPG/RealLifeRPGLauncher.git`
 3. Install required depedencies `npm i`
-4. Start using `npm start` oder build a portable windows launcher `build -w portable`
+4. Start using `npm start` or build a portable windows launcher `build -w portable`
 
 ## credits
 
